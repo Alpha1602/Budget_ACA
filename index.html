@@ -173,14 +173,16 @@
 </header>
 
 <nav class="tab-nav">
-  <button class="tab-btn active" onclick="switchTab('dashboard',this)">📊 Dashboard H2</button>
-  <button class="tab-btn"        onclick="switchTab('anual',this)">📅 Visión Anual 2026</button>
+  <button class="tab-btn active" onclick="switchTab('anual',this)">📅 Proyección 2026</button>
+  <button class="tab-btn"        onclick="switchTab('quarter',this)">📊 Dashboard by Quarter</button>
+  <button class="tab-btn"        onclick="switchTab('dashboard',this)">📈 Dashboard H2</button>
+  <button class="tab-btn"        onclick="switchTab('marca',this)">🏷️ Por Marca</button>
 </nav>
 
 <main>
 
-<!-- ══════════ TAB 1: DASHBOARD H2 ══════════ -->
-<div id="tab-dashboard" class="tab-panel active">
+<!-- ══════════ TAB 1: PROYECCIÓN 2026 ══════════ -->
+<div id="tab-anual" class="tab-panel active">
 
   <section>
     <h2>Highlights Ejecutivos</h2>
@@ -401,8 +403,7 @@
 </div><!-- /tab-dashboard -->
 
 
-<!-- ══════════ TAB 2: VISIÓN ANUAL 2026 ══════════ -->
-<div id="tab-anual" class="tab-panel">
+<!-- (contenido Proyección 2026 continúa aquí) -->
 
   <section>
     <h2>Evolución de Valor 2026 por Cliente — Ene a Dic (MXN)</h2>
@@ -419,19 +420,25 @@
   </section>
 
   <section>
-    <h2>Tabla Anual de Valor 2026 por Cliente (MXN)</h2>
+    <div class="section-head">
+      <h2>Tabla Anual 2026 por Cliente</h2>
+      <div class="toggle-wrap" style="margin:0;" id="anualToggle">
+        <button class="toggle-btn active" onclick="switchAnualTable('val')">Valor MXN</button>
+        <button class="toggle-btn"        onclick="switchAnualTable('pcs')">Piezas</button>
+      </div>
+    </div>
+
+    <!-- VALOR (Budget 2026) -->
+    <div id="anualTableVal">
     <div class="card" style="padding:0;overflow:hidden;">
       <table>
         <thead>
           <tr>
             <th style="text-align:left;padding-left:16px;">Cliente</th>
             <th>Ene</th><th>Feb</th><th>Mar</th><th>Abr</th><th>May</th>
-            <th style="background:#1e3a5f;">Jun ▶</th>
-            <th style="background:#1e3a5f;">Jul</th>
-            <th style="background:#1e3a5f;">Ago</th>
-            <th style="background:#1e3a5f;">Sep</th>
-            <th style="background:#1e3a5f;">Oct</th>
-            <th style="background:#1e3a5f;">Nov</th>
+            <th style="background:#1e3a5f;">Jun</th><th style="background:#1e3a5f;">Jul</th>
+            <th style="background:#1e3a5f;">Ago</th><th style="background:#1e3a5f;">Sep</th>
+            <th style="background:#1e3a5f;">Oct</th><th style="background:#1e3a5f;">Nov</th>
             <th style="background:#1e3a5f;">Dic</th>
             <th style="background:#0d2545;">TOTAL</th>
           </tr>
@@ -440,69 +447,133 @@
           <tr>
             <td style="padding-left:16px;"><span class="dot" style="background:var(--att)"></span>AT&T</td>
             <td>$7.5 M</td><td>$5.0 M</td><td>$4.2 M</td><td>$4.3 M</td><td>$4.1 M</td>
-            <td style="background:#f5f8ff;">$5.0 M</td><td style="background:#f5f8ff;">$5.1 M</td>
-            <td style="background:#f5f8ff;">$4.8 M</td><td style="background:#f5f8ff;">$6.4 M</td>
-            <td style="background:#f5f8ff;">$5.5 M</td><td style="background:#f5f8ff;">$6.6 M</td>
-            <td style="background:#f5f8ff;">$7.0 M</td>
-            <td><strong>$65.5 M</strong></td>
+            <td style="background:#f5f8ff;">$4.3 M</td><td style="background:#f5f8ff;">$4.3 M</td>
+            <td style="background:#f5f8ff;">$5.1 M</td><td style="background:#f5f8ff;">$4.8 M</td>
+            <td style="background:#f5f8ff;">$6.4 M</td><td style="background:#f5f8ff;">$5.5 M</td>
+            <td style="background:#f5f8ff;">$6.6 M</td>
+            <td><strong>$62.0 M</strong></td>
           </tr>
           <tr>
             <td style="padding-left:16px;"><span class="dot" style="background:var(--macstore)"></span>MacStore</td>
             <td>$3.5 M</td><td>$2.3 M</td><td>$1.5 M</td><td>$1.5 M</td><td>$1.4 M</td>
-            <td style="background:#f5f8ff;">$1.7 M</td><td style="background:#f5f8ff;">$2.4 M</td>
-            <td style="background:#f5f8ff;">$2.5 M</td><td style="background:#f5f8ff;">$3.3 M</td>
-            <td style="background:#f5f8ff;">$3.8 M</td><td style="background:#f5f8ff;">$4.1 M</td>
-            <td style="background:#f5f8ff;">$3.6 M</td>
-            <td><strong>$31.7 M</strong></td>
+            <td style="background:#f5f8ff;">$1.5 M</td><td style="background:#f5f8ff;">$1.4 M</td>
+            <td style="background:#f5f8ff;">$2.4 M</td><td style="background:#f5f8ff;">$2.5 M</td>
+            <td style="background:#f5f8ff;">$3.3 M</td><td style="background:#f5f8ff;">$3.8 M</td>
+            <td style="background:#f5f8ff;">$4.1 M</td>
+            <td><strong>$29.2 M</strong></td>
           </tr>
           <tr>
             <td style="padding-left:16px;"><span class="dot" style="background:var(--ishop)"></span>iShop</td>
             <td>$0.8 M</td><td>$2.0 M</td><td>$2.7 M</td><td>$1.1 M</td><td>$1.9 M</td>
-            <td style="background:#f5f8ff;">$1.9 M</td><td style="background:#f5f8ff;">$1.6 M</td>
+            <td style="background:#f5f8ff;">$1.2 M</td><td style="background:#f5f8ff;">$1.6 M</td>
             <td style="background:#f5f8ff;">$1.9 M</td><td style="background:#f5f8ff;">$3.8 M</td>
             <td style="background:#f5f8ff;">$2.2 M</td><td style="background:#f5f8ff;">$3.0 M</td>
             <td style="background:#f5f8ff;">$2.0 M</td>
-            <td><strong>$25.0 M</strong></td>
+            <td><strong>$24.3 M</strong></td>
           </tr>
           <tr>
             <td style="padding-left:16px;"><span class="dot" style="background:var(--liverpool)"></span>Liverpool</td>
             <td style="color:var(--muted)">—</td><td style="color:var(--muted)">—</td>
             <td style="color:var(--muted)">—</td><td style="color:var(--muted)">—</td><td style="color:var(--muted)">—</td>
             <td style="background:#f5f8ff;color:var(--muted)">—</td>
-            <td style="background:#f5f8ff;">$0.1 M</td>
-            <td style="background:#f5f8ff;">$0.3 M</td>
-            <td style="background:#f5f8ff;">$0.4 M</td>
-            <td style="background:#f5f8ff;">$0.4 M</td>
-            <td style="background:#f5f8ff;">$0.5 M</td>
-            <td style="background:#f5f8ff;">$0.5 M</td>
+            <td style="background:#f5f8ff;">$0.1 M</td><td style="background:#f5f8ff;">$0.3 M</td>
+            <td style="background:#f5f8ff;">$0.4 M</td><td style="background:#f5f8ff;">$0.4 M</td>
+            <td style="background:#f5f8ff;">$0.5 M</td><td style="background:#f5f8ff;">$0.5 M</td>
             <td><strong>$2.2 M</strong></td>
           </tr>
           <tr>
             <td style="padding-left:16px;"><span class="dot" style="background:var(--coppel)"></span>Coppel</td>
             <td style="color:var(--muted)">—</td><td style="color:var(--muted)">—</td>
             <td style="color:var(--muted)">—</td><td>$0.4 M</td><td style="color:var(--muted)">—</td>
-            <td style="background:#f5f8ff;color:var(--muted)">—</td>
-            <td style="background:#f5f8ff;color:var(--muted)">—</td>
-            <td style="background:#f5f8ff;color:var(--muted)">—</td>
-            <td style="background:#f5f8ff;color:var(--muted)">—</td>
-            <td style="background:#f5f8ff;color:var(--muted)">—</td>
-            <td style="background:#f5f8ff;color:var(--muted)">—</td>
-            <td style="background:#f5f8ff;color:var(--muted)">—</td>
+            <td style="background:#f5f8ff;color:var(--muted)" colspan="7">—</td>
             <td><strong>$0.4 M</strong></td>
           </tr>
         </tbody>
         <tfoot>
           <tr>
             <td style="padding-left:16px;">TOTAL</td>
-            <td>$11.8 M</td><td>$9.3 M</td><td>$8.4 M</td><td>$7.3 M</td><td>$7.4 M</td>
-            <td>$8.7 M</td><td>$9.1 M</td><td>$9.5 M</td>
-            <td>$14.0 M</td><td>$11.9 M</td><td>$14.2 M</td><td>$13.2 M</td>
-            <td><strong>$124.8 M</strong></td>
+            <td>$11.8 M</td><td>$9.2 M</td><td>$8.3 M</td><td>$7.4 M</td><td>$7.3 M</td>
+            <td>$7.1 M</td><td>$7.4 M</td><td>$9.6 M</td>
+            <td>$11.5 M</td><td>$12.4 M</td><td>$12.8 M</td><td>$13.3 M</td>
+            <td><strong>$118.1 M</strong></td>
           </tr>
         </tfoot>
       </table>
     </div>
-    <p style="font-size:11px;color:var(--muted);margin-top:8px;">* Columnas sombreadas (Jun–Dic) = FCST Consenso H2. Ene–May provienen de Budget 2026.</p>
+    <p style="font-size:11px;color:var(--muted);margin-top:8px;">* Fuente: Budget 2026 (12 meses). Columnas sombreadas = H2. No incluye Mercado Libre (~$0.6 M).</p>
+    </div>
+
+    <!-- PIEZAS (H1 no disponible, H2 de Consenso) -->
+    <div id="anualTablePcs" style="display:none;">
+    <div class="card" style="padding:0;overflow:hidden;">
+      <table>
+        <thead>
+          <tr>
+            <th style="text-align:left;padding-left:16px;">Cliente</th>
+            <th>Ene</th><th>Feb</th><th>Mar</th><th>Abr</th><th>May</th>
+            <th style="background:#1e3a5f;">Jun</th><th style="background:#1e3a5f;">Jul</th>
+            <th style="background:#1e3a5f;">Ago</th><th style="background:#1e3a5f;">Sep</th>
+            <th style="background:#1e3a5f;">Oct</th><th style="background:#1e3a5f;">Nov</th>
+            <th style="background:#1e3a5f;">Dic</th>
+            <th style="background:#0d2545;">TOTAL H2</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td style="padding-left:16px;"><span class="dot" style="background:var(--att)"></span>AT&T</td>
+            <td style="color:var(--muted)">—</td><td style="color:var(--muted)">—</td><td style="color:var(--muted)">—</td><td style="color:var(--muted)">—</td><td style="color:var(--muted)">—</td>
+            <td style="background:#f5f8ff;">21,730</td><td style="background:#f5f8ff;">22,218</td>
+            <td style="background:#f5f8ff;">20,508</td><td style="background:#f5f8ff;">25,127</td>
+            <td style="background:#f5f8ff;">22,719</td><td style="background:#f5f8ff;">26,427</td>
+            <td style="background:#f5f8ff;">29,010</td>
+            <td><strong>167,739</strong></td>
+          </tr>
+          <tr>
+            <td style="padding-left:16px;"><span class="dot" style="background:var(--macstore)"></span>MacStore</td>
+            <td style="color:var(--muted)">—</td><td style="color:var(--muted)">—</td><td style="color:var(--muted)">—</td><td style="color:var(--muted)">—</td><td style="color:var(--muted)">—</td>
+            <td style="background:#f5f8ff;">3,295</td><td style="background:#f5f8ff;">5,032</td>
+            <td style="background:#f5f8ff;">5,290</td><td style="background:#f5f8ff;">7,151</td>
+            <td style="background:#f5f8ff;">7,919</td><td style="background:#f5f8ff;">8,637</td>
+            <td style="background:#f5f8ff;">7,513</td>
+            <td><strong>44,837</strong></td>
+          </tr>
+          <tr>
+            <td style="padding-left:16px;"><span class="dot" style="background:var(--ishop)"></span>iShop</td>
+            <td style="color:var(--muted)">—</td><td style="color:var(--muted)">—</td><td style="color:var(--muted)">—</td><td style="color:var(--muted)">—</td><td style="color:var(--muted)">—</td>
+            <td style="background:#f5f8ff;">4,395</td><td style="background:#f5f8ff;">3,570</td>
+            <td style="background:#f5f8ff;">4,204</td><td style="background:#f5f8ff;">8,677</td>
+            <td style="background:#f5f8ff;">4,869</td><td style="background:#f5f8ff;">6,716</td>
+            <td style="background:#f5f8ff;">4,440</td>
+            <td><strong>36,871</strong></td>
+          </tr>
+          <tr>
+            <td style="padding-left:16px;"><span class="dot" style="background:var(--liverpool)"></span>Liverpool</td>
+            <td style="color:var(--muted)">—</td><td style="color:var(--muted)">—</td><td style="color:var(--muted)">—</td><td style="color:var(--muted)">—</td><td style="color:var(--muted)">—</td>
+            <td style="background:#f5f8ff;color:var(--muted)">—</td><td style="background:#f5f8ff;">220</td>
+            <td style="background:#f5f8ff;">630</td><td style="background:#f5f8ff;">874</td>
+            <td style="background:#f5f8ff;">973</td><td style="background:#f5f8ff;">1,089</td>
+            <td style="background:#f5f8ff;">1,223</td>
+            <td><strong>5,009</strong></td>
+          </tr>
+          <tr>
+            <td style="padding-left:16px;"><span class="dot" style="background:var(--coppel)"></span>Coppel</td>
+            <td colspan="12" style="color:var(--muted);font-style:italic;text-align:center;">Sin datos de piezas disponibles</td>
+            <td><strong>—</strong></td>
+          </tr>
+        </tbody>
+        <tfoot>
+          <tr>
+            <td style="padding-left:16px;">TOTAL H2</td>
+            <td style="color:var(--muted)">—</td><td style="color:var(--muted)">—</td><td style="color:var(--muted)">—</td><td style="color:var(--muted)">—</td><td style="color:var(--muted)">—</td>
+            <td>29,420</td><td>31,040</td><td>30,632</td>
+            <td>41,829</td><td>36,480</td><td>42,869</td><td>42,186</td>
+            <td><strong>254,456</strong></td>
+          </tr>
+        </tfoot>
+      </table>
+    </div>
+    <p style="font-size:11px;color:var(--muted);margin-top:8px;">* Piezas disponibles solo para H2 (FCST Consenso Jun–Dic). H1 no tiene dato de piezas en Budget 2026.</p>
+    </div>
   </section>
 
   <section>
@@ -529,6 +600,257 @@
 
 </div><!-- /tab-anual -->
 
+
+<!-- ══════════ TAB 2: DASHBOARD BY QUARTER ══════════ -->
+<div id="tab-quarter" class="tab-panel">
+
+  <!-- KPIs trimestrales -->
+  <section>
+    <h2>Highlights por Trimestre — Valor Total (MXN)</h2>
+    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:16px;">
+      <div class="kpi" style="--kpi-color:#90CAF9">
+        <div class="kpi-label">Q1 — Ene · Feb · Mar</div>
+        <div class="kpi-val" style="font-size:22px;">$29.4 M</div>
+        <div class="kpi-sub">Budget 2026</div>
+      </div>
+      <div class="kpi" style="--kpi-color:#64B5F6">
+        <div class="kpi-label">Q2 — Abr · May · Jun</div>
+        <div class="kpi-val" style="font-size:22px;">$21.8 M</div>
+        <div class="kpi-sub">Budget 2026</div>
+      </div>
+      <div class="kpi" style="--kpi-color:var(--accent)">
+        <div class="kpi-label">Q3 — Jul · Ago · Sep</div>
+        <div class="kpi-val" style="font-size:22px;">$28.6 M</div>
+        <div class="kpi-sub">Budget 2026 &nbsp;·&nbsp; +31% vs Q2</div>
+      </div>
+      <div class="kpi" style="--kpi-color:var(--gold)">
+        <div class="kpi-label">Q4 — Oct · Nov · Dic</div>
+        <div class="kpi-val" style="font-size:22px;">$38.4 M</div>
+        <div class="kpi-sub">Budget 2026 &nbsp;·&nbsp; Mejor trimestre</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Gráfica de valor por trimestre y tabla -->
+  <section>
+    <h2>Valor por Cliente y Trimestre (MXN)</h2>
+    <div class="two-col">
+      <div class="card">
+        <h3>Valor por Trimestre — Todos los Clientes</h3>
+        <div class="chart-wrap-xl"><canvas id="chartQValor"></canvas></div>
+      </div>
+      <div class="card" style="padding:0;overflow:hidden;">
+        <table>
+          <thead>
+            <tr>
+              <th style="text-align:left;padding-left:14px;">Cliente</th>
+              <th>Q1</th><th>Q2</th><th>Q3</th><th>Q4</th><th>TOTAL</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td style="padding-left:14px;"><span class="dot" style="background:var(--att)"></span>AT&T</td>
+              <td>$16.6 M</td><td>$12.7 M</td><td>$14.2 M</td><td>$18.5 M</td>
+              <td><strong>$62.0 M</strong></td>
+            </tr>
+            <tr>
+              <td style="padding-left:14px;"><span class="dot" style="background:var(--macstore)"></span>MacStore</td>
+              <td>$7.3 M</td><td>$4.4 M</td><td>$6.3 M</td><td>$11.3 M</td>
+              <td><strong>$29.3 M</strong></td>
+            </tr>
+            <tr>
+              <td style="padding-left:14px;"><span class="dot" style="background:var(--ishop)"></span>iShop</td>
+              <td>$5.5 M</td><td>$4.3 M</td><td>$7.3 M</td><td>$7.2 M</td>
+              <td><strong>$24.3 M</strong></td>
+            </tr>
+            <tr>
+              <td style="padding-left:14px;"><span class="dot" style="background:var(--liverpool)"></span>Liverpool</td>
+              <td style="color:var(--muted)">—</td><td style="color:var(--muted)">—</td>
+              <td>$0.7 M</td><td>$1.4 M</td>
+              <td><strong>$2.2 M</strong></td>
+            </tr>
+            <tr>
+              <td style="padding-left:14px;"><span class="dot" style="background:var(--coppel)"></span>Coppel</td>
+              <td style="color:var(--muted)">—</td><td>$0.4 M</td>
+              <td style="color:var(--muted)">—</td><td style="color:var(--muted)">—</td>
+              <td><strong>$0.4 M</strong></td>
+            </tr>
+          </tbody>
+          <tfoot>
+            <tr>
+              <td style="padding-left:14px;">TOTAL</td>
+              <td>$29.4 M</td><td>$21.8 M</td><td>$28.5 M</td><td>$38.4 M</td>
+              <td><strong>$118.1 M</strong></td>
+            </tr>
+          </tfoot>
+        </table>
+        <p style="font-size:11px;color:var(--muted);padding:10px 14px;">* Q1–Q2 de Budget 2026. Q3–Q4 de FCST Consenso.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Piezas por trimestre (H2) -->
+  <section>
+    <h2>Piezas por Cliente y Trimestre — H2 2026 (FCST Consenso)</h2>
+    <div class="two-col">
+      <div class="card">
+        <h3>Piezas por Cliente — Q2 (Jun) · Q3 · Q4</h3>
+        <div class="chart-wrap-xl"><canvas id="chartQPiezas"></canvas></div>
+      </div>
+      <div class="card" style="padding:0;overflow:hidden;">
+        <table>
+          <thead>
+            <tr>
+              <th style="text-align:left;padding-left:14px;">Cliente</th>
+              <th>Q2 (Jun)</th><th>Q3</th><th>Q4</th><th>TOTAL H2</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td style="padding-left:14px;"><span class="dot" style="background:var(--att)"></span>AT&T</td>
+              <td>21,730</td><td>67,853</td><td>78,156</td><td><strong>167,739</strong></td>
+            </tr>
+            <tr>
+              <td style="padding-left:14px;"><span class="dot" style="background:var(--macstore)"></span>MacStore</td>
+              <td>3,295</td><td>17,473</td><td>24,069</td><td><strong>44,837</strong></td>
+            </tr>
+            <tr>
+              <td style="padding-left:14px;"><span class="dot" style="background:var(--ishop)"></span>iShop</td>
+              <td>4,395</td><td>16,451</td><td>16,025</td><td><strong>36,871</strong></td>
+            </tr>
+            <tr>
+              <td style="padding-left:14px;"><span class="dot" style="background:var(--liverpool)"></span>Liverpool</td>
+              <td style="color:var(--muted)">—</td><td>1,724</td><td>3,285</td><td><strong>5,009</strong></td>
+            </tr>
+          </tbody>
+          <tfoot>
+            <tr>
+              <td style="padding-left:14px;">TOTAL</td>
+              <td>29,420</td><td>103,501</td><td>121,535</td><td><strong>254,456</strong></td>
+            </tr>
+          </tfoot>
+        </table>
+        <p style="font-size:11px;color:var(--muted);padding:10px 14px;">* Datos de piezas disponibles solo para H2 (FCST Consenso).</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Categoría por trimestre por cliente -->
+  <section>
+    <h2>Categoría por Trimestre y Cliente — Piezas H2 (Q2 Jun · Q3 · Q4)</h2>
+    <div class="two-equal">
+      <div class="card">
+        <h3><span class="dot" style="background:var(--att)"></span>AT&T — Categoría por Trimestre</h3>
+        <div class="chart-wrap-tall"><canvas id="chartQCatATT"></canvas></div>
+      </div>
+      <div class="card">
+        <h3><span class="dot" style="background:var(--macstore)"></span>MacStore — Categoría por Trimestre</h3>
+        <div class="chart-wrap-tall"><canvas id="chartQCatMac"></canvas></div>
+      </div>
+      <div class="card">
+        <h3><span class="dot" style="background:var(--ishop)"></span>iShop — Categoría por Trimestre</h3>
+        <div class="chart-wrap-tall"><canvas id="chartQCatIShop"></canvas></div>
+      </div>
+      <div class="card">
+        <h3><span class="dot" style="background:var(--liverpool)"></span>Liverpool — Categoría por Trimestre</h3>
+        <div class="chart-wrap-tall"><canvas id="chartQCatLiv"></canvas></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Share por trimestre -->
+  <section>
+    <h2>Share de Valor por Cliente — por Trimestre (%)</h2>
+    <div class="two-col">
+      <div class="card">
+        <h3>Participación % por Trimestre</h3>
+        <div class="chart-wrap-xl"><canvas id="chartQShare"></canvas></div>
+      </div>
+      <div class="card">
+        <h3>Valor por Trimestre — Comparativa de Crecimiento</h3>
+        <div class="chart-wrap-xl"><canvas id="chartQGrowth"></canvas></div>
+      </div>
+    </div>
+  </section>
+
+</div><!-- /tab-quarter -->
+
+
+<!-- ══════════ TAB 3: DASHBOARD H2 ══════════ -->
+<div id="tab-dashboard" class="tab-panel">
+
+<!-- ══════════ TAB 4: POR MARCA ══════════ -->
+<div id="tab-marca" class="tab-panel">
+
+  <!-- Filtros -->
+  <section>
+    <div class="section-head">
+      <h2>Vista por Marca · Cliente · Categoría · Mes</h2>
+      <div style="display:flex;align-items:center;gap:14px;flex-wrap:wrap;">
+        <div style="display:flex;align-items:center;gap:8px;">
+          <span style="font-size:12px;font-weight:600;color:var(--muted);">Cliente:</span>
+          <div class="filter-bar" id="marcaClienteFilter">
+            <button class="filter-chip active-all" data-cliente="all" onclick="filterMarca(this,'cliente')">Todos</button>
+            <button class="filter-chip" data-cliente="ATT"       onclick="filterMarca(this,'cliente')">AT&T</button>
+            <button class="filter-chip" data-cliente="MacStore"  onclick="filterMarca(this,'cliente')">MacStore</button>
+            <button class="filter-chip" data-cliente="iShop"     onclick="filterMarca(this,'cliente')">iShop</button>
+            <button class="filter-chip" data-cliente="Liverpool" onclick="filterMarca(this,'cliente')">Liverpool</button>
+          </div>
+        </div>
+        <div style="display:flex;align-items:center;gap:8px;">
+          <span style="font-size:12px;font-weight:600;color:var(--muted);">Vista:</span>
+          <div class="toggle-wrap" style="margin:0;" id="marcaToggle">
+            <button class="toggle-btn active" onclick="toggleMarcaMode('pcs')">Piezas</button>
+            <button class="toggle-btn"        onclick="toggleMarcaMode('val')">Valor MXN</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- KPI marcas activas -->
+    <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:14px;margin-bottom:24px;" id="marcaKpis">
+      <!-- generadas por JS -->
+    </div>
+  </section>
+
+  <!-- Charts -->
+  <section>
+    <h2>Comparativa de Marcas</h2>
+    <div class="two-col">
+      <div class="card">
+        <h3 id="marcaBarTitle">Piezas por Marca — H2 2026</h3>
+        <div class="chart-wrap-xl"><canvas id="chartMarcaBar"></canvas></div>
+      </div>
+      <div class="card">
+        <h3 id="marcaLineTitle">Piezas por Mes — por Marca</h3>
+        <div class="chart-wrap-xl"><canvas id="chartMarcaLine"></canvas></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Tabla detallada -->
+  <section>
+    <h2>Detalle por Marca · Cliente · Categoría · Mes</h2>
+    <div class="card" style="padding:0;overflow:hidden;overflow-x:auto;">
+      <table id="marcaTable" style="min-width:900px;">
+        <thead>
+          <tr>
+            <th style="text-align:left;padding-left:14px;min-width:110px;">Marca</th>
+            <th style="text-align:left;min-width:90px;">Cliente</th>
+            <th style="text-align:left;min-width:120px;">Categoría</th>
+            <th>Jun</th><th>Jul</th><th>Aug</th><th>Sep</th><th>Oct</th><th>Nov</th><th>Dec</th>
+            <th style="background:#1e3a5f;">TOTAL</th>
+          </tr>
+        </thead>
+        <tbody id="marcaTableBody">
+          <!-- generado por JS -->
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+</div><!-- /tab-marca -->
+
 </main>
 
 <footer>
@@ -540,12 +862,29 @@
 const MONTHS_H2   = ['Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
 const MONTHS_FULL = ['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
 
+// valorData = Consenso H2 (usado en filtro Dashboard H2)
 const valorData = {
   'AT&T':     [7506310,4966820,4172841,4289140,4051382,5015070,5070500,4777975,6415204,5507802,6564020,7003101],
   'MacStore': [3498968,2258704,1498288,1516132,1368618,1730693,2396343,2538858,3337211,3782938,4143965,3643636],
   'iShop':    [800677, 1989708,2678803,1120086,1928305,1949166,1593803,1889070,3834130,2191208,2998300,2033002],
   'Liverpool':[0,0,0,0,0,0,79541,278983,379891,421115,469262,524847],
   'Coppel':   [0,0,0,445377,0,0,0,0,0,0,0,0],
+};
+// valorBudget = Budget 2026 12 meses (para Proyección 2026 y Quarter)
+const valorBudget = {
+  'AT&T':     [7506309,4966819,4172841,4289139,4051382,4319528,4347350,5070500,4777975,6415204,5507802,6564020],
+  'MacStore': [3498967,2258704,1498288,1516132,1368618,1528990,1366707,2396343,2538857,3337211,3782938,4143965],
+  'iShop':    [800677, 1989707,2678803,1120086,1928304,1219616,1593802,1889069,3834130,2191208,2998299,2033001],
+  'Liverpool':[0,0,0,0,0,0,79541,278982,379890,421115,469261,524847],
+  'Coppel':   [0,0,0,445377,0,0,0,0,0,0,0,0],
+};
+// Piezas anuales (H1 no disponible = null, H2 de Consenso)
+const piezasAnual = {
+  'AT&T':     [null,null,null,null,null,21730,22218,20508,25127,22719,26427,29010],
+  'MacStore': [null,null,null,null,null,3295, 5032, 5290, 7151, 7919, 8637, 7513],
+  'iShop':    [null,null,null,null,null,4395, 3570, 4204, 8677, 4869, 6716, 4440],
+  'Liverpool':[null,null,null,null,null,0,    220,  630,  874,  973,  1089, 1223],
+  'Coppel':   [null,null,null,null,null,null,null,null,null,null,null,null],
 };
 
 const catData = {
@@ -593,6 +932,15 @@ const clientColors = {
   'Liverpool':'#C62828',
   'Coppel':   '#388E3C',
 };
+
+/* ── TOGGLE TABLA ANUAL ── */
+function switchAnualTable(mode) {
+  document.getElementById('anualTableVal').style.display = mode==='val' ? '' : 'none';
+  document.getElementById('anualTablePcs').style.display = mode==='pcs' ? '' : 'none';
+  document.querySelectorAll('#anualToggle .toggle-btn').forEach((b,i)=>{
+    b.classList.toggle('active',(i===0&&mode==='val')||(i===1&&mode==='pcs'));
+  });
+}
 
 /* ── TABS ── */
 function switchTab(id, btn) {
@@ -730,12 +1078,12 @@ function filterValor(btn) {
   buildValorChart(key);
 }
 
-/* ── CHART 4: línea anual por cliente ── */
+/* ── CHART 4: línea anual por cliente (Budget) ── */
 new Chart(document.getElementById('chartAnualLinea'), {
   type:'line',
   data:{
     labels:MONTHS_FULL,
-    datasets: Object.entries(valorData).filter(([k])=>k!=='Coppel').map(([name,vals])=>({
+    datasets: Object.entries(valorBudget).filter(([k])=>k!=='Coppel').map(([name,vals])=>({
       label:name, data:vals,
       borderColor:clientColors[name], backgroundColor:'transparent',
       borderWidth:2.5, pointRadius:4, pointBackgroundColor:clientColors[name], tension:.35
@@ -754,7 +1102,7 @@ new Chart(document.getElementById('chartAnualLinea'), {
   }
 });
 
-/* ── CHART 5: share 100% por mes ── */
+/* ── CHART 5: share 100% por mes (Budget) ── */
 (function(){
   const clients=['AT&T','MacStore','iShop','Liverpool'];
   const colors =['#00A8E0','#555','#FF6D00','#C62828'];
@@ -765,8 +1113,8 @@ new Chart(document.getElementById('chartAnualLinea'), {
       datasets:clients.map((name,i)=>({
         label:name,
         data:MONTHS_FULL.map((_,mi)=>{
-          const tot=clients.reduce((s,c)=>s+(valorData[c][mi]||0),0);
-          return tot?Math.round((valorData[name][mi]||0)/tot*100):0;
+          const tot=clients.reduce((s,c)=>s+(valorBudget[c][mi]||0),0);
+          return tot?Math.round((valorBudget[name][mi]||0)/tot*100):0;
         }),
         backgroundColor:colors[i], borderWidth:0,
       }))
@@ -818,6 +1166,490 @@ makeCatChart('chartCatATT',   'ATT');
 makeCatChart('chartCatMac',   'MacStore');
 makeCatChart('chartCatIShop', 'iShop');
 makeCatChart('chartCatLiv',   'Liverpool');
+
+/* ══════════ QUARTER DATA ══════════ */
+const QUARTERS = ['Q2 (Jun)','Q3','Q4'];
+
+// Valor por cliente por trimestre (MXN)
+const qValor = {
+  'AT&T':     [13355592, 16263679, 19074923],
+  'MacStore': [4615443,  8272412,  11570539],
+  'iShop':    [4997557,  7317003,   7222510],
+  'Liverpool':[0,        738415,    1415224],
+  'Coppel':   [0,        0,         0      ],
+};
+// qValorAll = Budget 2026 agrupado por Q (Q1=Ene-Mar, Q2=Abr-Jun, Q3=Jul-Sep, Q4=Oct-Dic)
+const qValorAll = {
+  'AT&T':     [16645969, 12659049, 14195825, 18487026],
+  'MacStore': [7255959,  4413740,  6301907,  11264114],
+  'iShop':    [5469187,  4268006,  7317001,   7222508],
+  'Liverpool':[0,        0,        738413,    1415223],
+};
+
+// Piezas por cliente por trimestre (H2: Q2=Jun, Q3=Jul+Aug+Sep, Q4=Oct+Nov+Dec)
+const qPiezas = {
+  'AT&T':     [21730, 67853, 78156],
+  'MacStore': [3295,  17473, 24069],
+  'iShop':    [4395,  16451, 16025],
+  'Liverpool':[0,     1724,  3285 ],
+};
+
+// Categoría por trimestre (piezas H2)
+const qCatData = {
+  'ATT': {
+    'Others':       [18590, 55090, 59405],
+    'Cases iPhone': [1618,  7694,  12693],
+    'Micas':        [1522,  5069,  6058 ],
+  },
+  'MacStore': {
+    'Cases iPhone': [1086, 5995, 9176],
+    'Others':       [826,  4765, 5272],
+    'Micas':        [348,  2150, 4751],
+    'Cases Airpods':[172,  1854, 1958],
+    'Cases iPad':   [511,  1576, 1721],
+    'Cases Macbook':[347,  1089, 1149],
+  },
+  'iShop': {
+    'Cases iPhone': [1266, 8588, 7677],
+    'Cases iPad':   [974,  3404, 2988],
+    'Cases Macbook':[1028, 2035, 2296],
+    'Others':       [800,  1738, 2633],
+    'Cases Airpods':[280,  540,  234 ],
+  },
+  'Liverpool': {
+    'Cases Airpods':[0, 874, 1494],
+    'Cases iPhone': [0, 440, 900 ],
+    'Others':       [0, 410, 891 ],
+  },
+};
+
+/* ── Q CHART 1: Valor por cliente por trimestre (stacked bar, Q1-Q4) ── */
+new Chart(document.getElementById('chartQValor'), {
+  type:'bar',
+  data:{
+    labels:['Q1','Q2','Q3','Q4'],
+    datasets: Object.entries(qValorAll).map(([name,vals])=>({
+      label: name,
+      data: vals,
+      backgroundColor: clientColors[name],
+      borderRadius: 4,
+    }))
+  },
+  options:{
+    responsive:true, maintainAspectRatio:false,
+    plugins:{
+      legend:{position:'bottom',labels:{font:{size:11},boxWidth:12,padding:14}},
+      tooltip:{callbacks:{label:c=>` ${c.dataset.label}: $${(c.parsed.y/1e6).toFixed(2)} M`}}
+    },
+    scales:{
+      x:{stacked:true, grid:{display:false}},
+      y:{stacked:true, ticks:{callback:v=>'$'+(v/1e6).toFixed(0)+'M'}, grid:{color:'#E8EDF4'}}
+    }
+  }
+});
+
+/* ── Q CHART 2: Piezas por cliente por trimestre ── */
+new Chart(document.getElementById('chartQPiezas'), {
+  type:'bar',
+  data:{
+    labels: QUARTERS,
+    datasets:[
+      {label:'AT&T',     data:qPiezas['AT&T'],     backgroundColor:'#00A8E0', borderRadius:4},
+      {label:'MacStore', data:qPiezas['MacStore'],  backgroundColor:'#555555', borderRadius:4},
+      {label:'iShop',    data:qPiezas['iShop'],     backgroundColor:'#FF6D00', borderRadius:4},
+      {label:'Liverpool',data:qPiezas['Liverpool'], backgroundColor:'#C62828', borderRadius:4},
+    ]
+  },
+  options:{
+    responsive:true, maintainAspectRatio:false,
+    plugins:{
+      legend:{position:'bottom',labels:{font:{size:11},boxWidth:12,padding:14}},
+      tooltip:{callbacks:{label:c=>` ${c.dataset.label}: ${c.parsed.y.toLocaleString('es-MX')} pcs`}}
+    },
+    scales:{
+      x:{stacked:true, grid:{display:false}},
+      y:{stacked:true, ticks:{callback:v=>v>=1000?(v/1000).toFixed(0)+'K':v}, grid:{color:'#E8EDF4'}}
+    }
+  }
+});
+
+/* ── Q CHARTS 3-6: Categoría por trimestre por cliente ── */
+function makeQCatChart(canvasId, clientKey) {
+  const cats = qCatData[clientKey];
+  new Chart(document.getElementById(canvasId), {
+    type:'bar',
+    data:{
+      labels: QUARTERS,
+      datasets: Object.entries(cats).map(([cat,vals])=>({
+        label: cat, data: vals,
+        backgroundColor: catColors[cat]||'#90A4AE', borderWidth:0,
+      }))
+    },
+    options:{
+      responsive:true, maintainAspectRatio:false,
+      plugins:{
+        legend:{position:'bottom',labels:{font:{size:10},boxWidth:10,padding:10}},
+        tooltip:{callbacks:{label:c=>{
+          const tot = Object.values(cats).reduce((s,arr)=>s+(arr[c.dataIndex]||0),0);
+          const pct = tot?((c.parsed.y/tot)*100).toFixed(1):0;
+          return ` ${c.dataset.label}: ${c.parsed.y.toLocaleString('es-MX')} pcs (${pct}%)`;
+        }}}
+      },
+      scales:{
+        x:{stacked:true, grid:{display:false}},
+        y:{stacked:true, ticks:{callback:v=>v>=1000?(v/1000).toFixed(0)+'K':v}, grid:{color:'#E8EDF4'}}
+      }
+    }
+  });
+}
+makeQCatChart('chartQCatATT',   'ATT');
+makeQCatChart('chartQCatMac',   'MacStore');
+makeQCatChart('chartQCatIShop', 'iShop');
+makeQCatChart('chartQCatLiv',   'Liverpool');
+
+/* ══════════ MARCA DATA ══════════ */
+// Estructura: marca → cliente → categoría → mes → {pcs, val}
+const MONTHS_H2_KEYS = ['Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+
+const marcaRaw = {
+  'Quikcell': {
+    'ATT': {
+      'Micas':  { pcs:{Jun:1522,Jul:1524,Aug:1520,Sep:2025,Oct:2020,Nov:2018,Dec:2020}, val:{Jun:472196,Jul:472822,Aug:471574,Sep:627825,Oct:626204,Nov:625585,Dec:626011} },
+      'Others': { pcs:{Jun:18564,Jul:19193,Aug:17387,Sep:18437,Oct:17601,Nov:19547,Dec:22172}, val:{Jun:3698145,Jul:3826219,Aug:3485339,Sep:3699411,Oct:3512904,Nov:3939454,Dec:4401439} },
+    },
+    'MacStore': {
+      'Micas':  { pcs:{Jun:348,Jul:383,Aug:340,Sep:1427,Oct:1975,Nov:1927,Dec:849}, val:{Jun:107856,Jul:118730,Aug:105420,Sep:442370,Oct:612325,Nov:597370,Dec:263241} },
+      'Others': { pcs:{Jun:187,Jul:192,Aug:188,Sep:200,Oct:195,Nov:205,Dec:219}, val:{Jun:43388,Jul:44556,Aug:43634,Sep:46420,Oct:45255,Nov:47580,Dec:50838} },
+    },
+  },
+  'Speck': {
+    'ATT': {
+      'Cases iPhone': { pcs:{Jun:1516,Jul:1390,Aug:1480,Sep:4480,Oct:2940,Nov:4700,Dec:4600}, val:{Jun:783478,Jul:718430,Aug:764960,Sep:2316960,Oct:1520220,Nov:2429700,Dec:2378200} },
+      'Micas':        { pcs:{Jun:52,Jul:52,Aug:52,Sep:0,Oct:52,Nov:52,Dec:52}, val:{Jun:26884,Jul:26884,Aug:26884,Sep:0,Oct:26884,Nov:26884,Dec:26884} },
+    },
+    'MacStore': {
+      'Cases iPhone': { pcs:{Jun:344,Jul:491,Aug:491,Sep:873,Oct:746,Nov:1109,Dec:789}, val:{Jun:177794,Jul:253877,Aug:253877,Sep:451471,Oct:385738,Nov:573554,Dec:408039} },
+      'Cases iPad':   { pcs:{Jun:511,Jul:503,Aug:608,Sep:465,Oct:490,Nov:589,Dec:642}, val:{Jun:264192,Jul:260049,Aug:314336,Sep:240435,Oct:253378,Nov:304560,Dec:331944} },
+      'Cases Macbook':{ pcs:{Jun:347,Jul:357,Aug:430,Sep:302,Oct:328,Nov:392,Dec:429}, val:{Jun:179387,Jul:184557,Aug:222270,Sep:156134,Oct:169596,Nov:202776,Dec:221831} },
+    },
+    'iShop': {
+      'Cases iPhone': { pcs:{Jun:412,Jul:453,Aug:0,Sep:3640,Oct:462,Nov:562,Dec:436}, val:{Jun:213104,Jul:234351,Aug:0,Sep:1882920,Oct:239004,Nov:290716,Dec:225468} },
+      'Cases iPad':   { pcs:{Jun:974,Jul:843,Aug:1775,Sep:786,Oct:711,Nov:1506,Dec:771}, val:{Jun:503594,Jul:435951,Aug:917900,Sep:406434,Oct:367557,Nov:778902,Dec:398637} },
+      'Cases Macbook':{ pcs:{Jun:1028,Jul:558,Aug:980,Sep:497,Oct:517,Nov:1102,Dec:677}, val:{Jun:531478,Jul:288594,Aug:506840,Sep:257011,Oct:267293,Nov:569834,Dec:350126} },
+    },
+    'Liverpool': {
+      'Cases iPhone': { pcs:{Jun:0,Jul:0,Aug:0,Sep:0,Oct:0,Nov:0,Dec:0}, val:{Jun:0,Jul:0,Aug:0,Sep:0,Oct:0,Nov:0,Dec:0} },
+    },
+  },
+  'Nomad': {
+    'iShop': {
+      'Cases iPhone': { pcs:{Jun:286,Jul:191,Aug:93,Sep:1459,Oct:462,Nov:1009,Dec:476}, val:{Jun:147914,Jul:98777,Aug:48111,Sep:754734,Oct:238974,Nov:521954,Dec:246212} },
+      'Cases Airpods':{ pcs:{Jun:280,Jul:220,Aug:160,Sep:160,Oct:114,Nov:60,Dec:60}, val:{Jun:144808,Jul:113764,Aug:82720,Sep:82720,Oct:58956,Nov:31020,Dec:31020} },
+      'Others':       { pcs:{Jun:432,Jul:436,Aug:432,Sep:432,Oct:432,Nov:432,Dec:432}, val:{Jun:223452,Jul:225522,Aug:223452,Sep:223452,Oct:223452,Nov:223452,Dec:223452} },
+    },
+    'Liverpool': {
+      'Others':       { pcs:{Jun:0,Jul:0,Aug:190,Sep:220,Oct:255,Nov:295,Dec:341}, val:{Jun:0,Jul:0,Aug:98230,Sep:113740,Oct:131895,Nov:152585,Dec:176357} },
+      'Cases iPhone': { pcs:{Jun:0,Jul:0,Aug:140,Sep:300,Oct:300,Nov:300,Dec:300}, val:{Jun:0,Jul:0,Aug:72380,Sep:155100,Oct:155100,Nov:155100,Dec:155100} },
+      'Cases Airpods':{ pcs:{Jun:0,Jul:220,Aug:300,Sep:354,Oct:418,Nov:494,Dec:582}, val:{Jun:0,Jul:113764,Aug:155100,Sep:183018,Oct:216114,Nov:255524,Dec:300996} },
+    },
+    'MacStore': {
+      'Cases iPhone': { pcs:{Jun:284,Jul:442,Aug:442,Sep:765,Oct:730,Nov:900,Dec:886}, val:{Jun:146872,Jul:228554,Aug:228554,Sep:395595,Oct:377490,Nov:465300,Dec:458108} },
+      'Cases Airpods':{ pcs:{Jun:172,Jul:602,Aug:646,Sep:606,Oct:621,Nov:656,Dec:681}, val:{Jun:88936,Jul:311354,Aug:334028,Sep:313302,Oct:321162,Nov:339296,Dec:352038} },
+      'Others':       { pcs:{Jun:490,Jul:652,Aug:656,Sep:702,Oct:680,Nov:701,Dec:707}, val:{Jun:253390,Jul:337084,Aug:339154,Sep:363134,Oct:351680,Nov:362417,Dec:365522} },
+    },
+  },
+  'Tech21': {
+    'ATT': {
+      'Cases iPhone': { pcs:{Jun:102,Jul:88,Aug:96,Sep:160,Oct:132,Nov:134,Dec:127}, val:{Jun:52734,Jul:45496,Aug:49632,Sep:82720,Oct:68244,Nov:69284,Dec:65659} },
+    },
+    'iShop': {
+      'Cases iPhone': { pcs:{Jun:568,Jul:595,Aug:557,Sep:3060,Oct:1720,Nov:1273,Dec:1277}, val:{Jun:293792,Jul:307765,Aug:288049,Sep:1582260,Oct:889280,Nov:658391,Dec:660459} },
+      'Cases Macbook':{ pcs:{Jun:295,Jul:0,Aug:0,Sep:0,Oct:0,Nov:340,Dec:235}, val:{Jun:152530,Jul:0,Aug:0,Sep:0,Oct:0,Nov:175780,Dec:121505} },
+      'Cases iPad':   { pcs:{Jun:300,Jul:0,Aug:315,Sep:199,Oct:200,Nov:300,Dec:200}, val:{Jun:155100,Jul:0,Aug:162855,Sep:102917,Oct:103400,Nov:155100,Dec:103400} },
+    },
+    'MacStore': {
+      'Micas':        { pcs:{Jun:0,Jul:486,Aug:0,Sep:1087,Oct:1312,Nov:1356,Dec:992}, val:{Jun:0,Jul:251334,Aug:0,Sep:562277,Oct:678688,Nov:701568,Dec:513088} },
+      'Cases iPhone': { pcs:{Jun:458,Jul:453,Aug:450,Sep:0,Oct:266,Nov:323,Dec:36}, val:{Jun:236834,Jul:234351,Aug:232740,Sep:0,Oct:137546,Nov:167071,Dec:18620} },
+    },
+  },
+  'Uniq': {
+    'MacStore': {
+      'Cases iPhone': { pcs:{Jun:0,Jul:248,Aug:300,Sep:593,Oct:570,Nov:611,Dec:657}, val:{Jun:0,Jul:128248,Aug:155100,Sep:306681,Oct:294810,Nov:316091,Dec:339841} },
+      'Cases Airpods':{ pcs:{Jun:0,Jul:0,Aug:0,Sep:0,Oct:0,Nov:0,Dec:0}, val:{Jun:0,Jul:0,Aug:0,Sep:0,Oct:0,Nov:0,Dec:0} },
+      'Others':       { pcs:{Jun:0,Jul:707,Aug:719,Sep:749,Oct:805,Nov:855,Dec:905}, val:{Jun:0,Jul:365725,Aug:371939,Sep:387433,Oct:416389,Nov:442245,Dec:468095} },
+    },
+  },
+  'TECH21': {
+    'MacStore': {
+      'Cases iPhone': { pcs:{Jun:0,Jul:0,Aug:0,Sep:235,Oct:0,Nov:0,Dec:0}, val:{Jun:0,Jul:0,Aug:0,Sep:121535,Oct:0,Nov:0,Dec:0} },
+    },
+    'ATT': {
+      'Cases iPhone': { pcs:{Jun:0,Jul:0,Aug:0,Sep:0,Oct:0,Nov:0,Dec:5240}, val:{Jun:0,Jul:0,Aug:0,Sep:0,Oct:0,Nov:0,Dec:2710520} },
+    },
+  },
+};
+
+const marcaColors = {
+  'Quikcell':'#1565C0', 'Speck':'#00BFA5', 'Nomad':'#FF6D00',
+  'Tech21':'#C62828', 'Uniq':'#7B1FA2', 'TECH21':'#E53935',
+};
+
+/* ── Estado de filtros ── */
+let marcaState = { cliente: 'all', mode: 'pcs' };
+let marcaBarChart = null, marcaLineChart = null;
+
+/* ── Helpers ── */
+function getMarcaSummary() {
+  const result = {};
+  for (const [marca, clientes] of Object.entries(marcaRaw)) {
+    for (const [cliente, cats] of Object.entries(clientes)) {
+      if (marcaState.cliente !== 'all' && cliente !== marcaState.cliente) continue;
+      if (!result[marca]) result[marca] = { pcs:{}, val:{}, byMes_pcs:{}, byMes_val:{} };
+      for (const [cat, mData] of Object.entries(cats)) {
+        for (const m of MONTHS_H2_KEYS) {
+          result[marca].pcs[cat] = (result[marca].pcs[cat]||0) + (mData.pcs[m]||0);
+          result[marca].val[cat] = (result[marca].val[cat]||0) + (mData.val[m]||0);
+          result[marca].byMes_pcs[m] = (result[marca].byMes_pcs[m]||0) + (mData.pcs[m]||0);
+          result[marca].byMes_val[m] = (result[marca].byMes_val[m]||0) + (mData.val[m]||0);
+        }
+      }
+    }
+  }
+  return result;
+}
+
+function getTableRows() {
+  const rows = [];
+  for (const [marca, clientes] of Object.entries(marcaRaw)) {
+    for (const [cliente, cats] of Object.entries(clientes)) {
+      if (marcaState.cliente !== 'all' && cliente !== marcaState.cliente) continue;
+      for (const [cat, mData] of Object.entries(cats)) {
+        const totPcs = MONTHS_H2_KEYS.reduce((s,m)=>s+(mData.pcs[m]||0),0);
+        const totVal = MONTHS_H2_KEYS.reduce((s,m)=>s+(mData.val[m]||0),0);
+        if (totPcs === 0 && totVal === 0) continue;
+        rows.push({ marca, cliente, cat, mData, totPcs, totVal });
+      }
+    }
+  }
+  rows.sort((a,b) => (marcaState.mode==='pcs' ? b.totPcs-a.totPcs : b.totVal-a.totVal));
+  return rows;
+}
+
+function fmtNum(v, mode) {
+  if (mode === 'pcs') return v > 0 ? v.toLocaleString('es-MX') : '—';
+  return v > 0 ? '$' + (v/1000).toFixed(0) + 'K' : '—';
+}
+
+/* ── Render KPIs ── */
+function renderMarcaKpis(summary) {
+  const container = document.getElementById('marcaKpis');
+  const sorted = Object.entries(summary)
+    .map(([m,d]) => ({ marca:m, tot: marcaState.mode==='pcs' ? Object.values(d.pcs).reduce((a,b)=>a+b,0) : Object.values(d.val).reduce((a,b)=>a+b,0) }))
+    .filter(x=>x.tot>0)
+    .sort((a,b)=>b.tot-a.tot);
+  container.innerHTML = sorted.map(({marca,tot}) => `
+    <div class="kpi" style="--kpi-color:${marcaColors[marca]||'#90A4AE'}">
+      <div class="kpi-label">${marca}</div>
+      <div class="kpi-val" style="font-size:20px;">${marcaState.mode==='pcs' ? tot.toLocaleString('es-MX') : '$'+(tot/1e6).toFixed(1)+' M'}</div>
+      <div class="kpi-sub">${marcaState.mode==='pcs'?'piezas H2':'valor H2 MXN'}</div>
+    </div>`).join('');
+}
+
+/* ── Render charts ── */
+function renderMarcaCharts(summary) {
+  const marcas = Object.keys(summary).filter(m => {
+    const tot = marcaState.mode==='pcs'
+      ? Object.values(summary[m].pcs).reduce((a,b)=>a+b,0)
+      : Object.values(summary[m].val).reduce((a,b)=>a+b,0);
+    return tot > 0;
+  }).sort((a,b) => {
+    const ta = marcaState.mode==='pcs' ? Object.values(summary[a].pcs).reduce((x,y)=>x+y,0) : Object.values(summary[a].val).reduce((x,y)=>x+y,0);
+    const tb = marcaState.mode==='pcs' ? Object.values(summary[b].pcs).reduce((x,y)=>x+y,0) : Object.values(summary[b].val).reduce((x,y)=>x+y,0);
+    return tb - ta;
+  });
+
+  const isVal = marcaState.mode === 'val';
+  document.getElementById('marcaBarTitle').textContent  = `${isVal?'Valor MXN':'Piezas'} por Marca — H2 2026`;
+  document.getElementById('marcaLineTitle').textContent = `${isVal?'Valor MXN':'Piezas'} por Mes — por Marca`;
+
+  // Bar chart
+  if (marcaBarChart) marcaBarChart.destroy();
+  marcaBarChart = new Chart(document.getElementById('chartMarcaBar'), {
+    type: 'bar',
+    data: {
+      labels: marcas,
+      datasets: [{
+        label: isVal ? 'Valor MXN' : 'Piezas',
+        data: marcas.map(m => isVal
+          ? Object.values(summary[m].val).reduce((a,b)=>a+b,0)
+          : Object.values(summary[m].pcs).reduce((a,b)=>a+b,0)),
+        backgroundColor: marcas.map(m => marcaColors[m]||'#90A4AE'),
+        borderRadius: 4,
+      }]
+    },
+    options: {
+      responsive:true, maintainAspectRatio:false, indexAxis:'y',
+      plugins:{
+        legend:{display:false},
+        tooltip:{callbacks:{label:c=>isVal?` $${(c.parsed.x/1e6).toFixed(2)} M`:` ${c.parsed.x.toLocaleString('es-MX')} pcs`}}
+      },
+      scales:{
+        x:{ticks:{callback:v=>isVal?'$'+(v/1e6).toFixed(1)+'M':v>=1000?(v/1000).toFixed(0)+'K':v},grid:{color:'#E8EDF4'}},
+        y:{grid:{display:false}}
+      }
+    }
+  });
+
+  // Line chart
+  if (marcaLineChart) marcaLineChart.destroy();
+  marcaLineChart = new Chart(document.getElementById('chartMarcaLine'), {
+    type:'line',
+    data:{
+      labels: MONTHS_H2_KEYS,
+      datasets: marcas.map(m=>({
+        label:m,
+        data: MONTHS_H2_KEYS.map(mes=>isVal?(summary[m].byMes_val[mes]||0):(summary[m].byMes_pcs[mes]||0)),
+        borderColor: marcaColors[m]||'#90A4AE',
+        backgroundColor:'transparent',
+        borderWidth:2.5, pointRadius:4, pointBackgroundColor:marcaColors[m]||'#90A4AE', tension:.35,
+      }))
+    },
+    options:{
+      responsive:true, maintainAspectRatio:false,
+      plugins:{
+        legend:{position:'bottom',labels:{font:{size:11},boxWidth:12,padding:10}},
+        tooltip:{callbacks:{label:c=>isVal?` ${c.dataset.label}: $${(c.parsed.y/1e6).toFixed(2)} M`:` ${c.dataset.label}: ${c.parsed.y.toLocaleString('es-MX')} pcs`}}
+      },
+      scales:{
+        x:{grid:{display:false}},
+        y:{ticks:{callback:v=>isVal?'$'+(v/1e6).toFixed(1)+'M':v>=1000?(v/1000).toFixed(0)+'K':v},grid:{color:'#E8EDF4'}}
+      }
+    }
+  });
+}
+
+/* ── Render tabla ── */
+function renderMarcaTable() {
+  const rows = getTableRows();
+  const isVal = marcaState.mode === 'val';
+  const tbody = document.getElementById('marcaTableBody');
+  let html = '';
+  let lastMarca = '', lastCliente = '';
+
+  rows.forEach(({marca,cliente,cat,mData,totPcs,totVal}) => {
+    const newMarca   = marca   !== lastMarca;
+    const newCliente = cliente !== lastCliente || newMarca;
+    lastMarca   = marca;
+    lastCliente = cliente;
+
+    const dotColor = clientColors[cliente] || '#90A4AE';
+    const dot = `<span class="dot" style="background:${dotColor}"></span>`;
+    const marcaCell   = newMarca   ? `<td rowspan="1" style="padding-left:14px;font-weight:700;color:${marcaColors[marca]||'#333'}">${marca}</td>` : '<td style="padding-left:14px;color:var(--muted)">↳</td>';
+    const clienteCell = newCliente ? `<td>${dot}${cliente}</td>` : `<td style="color:var(--muted)">↳</td>`;
+
+    const cells = MONTHS_H2_KEYS.map(m => {
+      const v = isVal ? (mData.val[m]||0) : (mData.pcs[m]||0);
+      return `<td>${fmtNum(v, marcaState.mode)}</td>`;
+    }).join('');
+    const tot = isVal ? totVal : totPcs;
+
+    html += `<tr>${marcaCell}${clienteCell}<td style="font-size:11.5px;color:var(--muted)">${cat}</td>${cells}<td style="background:#f5f8ff;font-weight:700">${fmtNum(tot,marcaState.mode)}</td></tr>`;
+  });
+  tbody.innerHTML = html;
+}
+
+/* ── Render todo ── */
+function renderMarca() {
+  const summary = getMarcaSummary();
+  renderMarcaKpis(summary);
+  renderMarcaCharts(summary);
+  renderMarcaTable();
+}
+
+/* ── Filtros ── */
+const filterActiveClassMap = {
+  all:'active-all', ATT:'active-att', MacStore:'active-macstore', iShop:'active-ishop', Liverpool:'active-liverpool'
+};
+function filterMarca(btn, type) {
+  const key = btn.dataset.cliente;
+  document.querySelectorAll('#marcaClienteFilter .filter-chip').forEach(b=>{
+    Object.values(filterActiveClassMap).forEach(c=>b.classList.remove(c));
+  });
+  btn.classList.add(filterActiveClassMap[key]||'active-all');
+  marcaState.cliente = key;
+  renderMarca();
+}
+
+function toggleMarcaMode(mode) {
+  marcaState.mode = mode;
+  document.querySelectorAll('#marcaToggle .toggle-btn').forEach((b,i)=>{
+    b.classList.toggle('active',(i===0&&mode==='pcs')||(i===1&&mode==='val'));
+  });
+  renderMarca();
+}
+
+// Render inicial (diferido para no bloquear otros charts)
+setTimeout(renderMarca, 200);
+
+/* ── Q CHART 7: Share % por trimestre (100% stacked) ── */
+(function(){
+  const clients = ['AT&T','MacStore','iShop','Liverpool'];
+  const colors  = ['#00A8E0','#555','#FF6D00','#C62828'];
+  new Chart(document.getElementById('chartQShare'),{
+    type:'bar',
+    data:{
+      labels:['Q1','Q2','Q3','Q4'],
+      datasets: clients.map((name,i)=>({
+        label:name,
+        data:['Q1','Q2','Q3','Q4'].map((_,qi)=>{
+          const tot = clients.reduce((s,c)=>s+(qValorAll[c][qi]||0),0);
+          return tot?Math.round((qValorAll[name][qi]||0)/tot*100):0;
+        }),
+        backgroundColor: colors[i], borderWidth:0,
+      }))
+    },
+    options:{
+      responsive:true, maintainAspectRatio:false,
+      plugins:{
+        legend:{position:'bottom',labels:{font:{size:11},boxWidth:12,padding:12}},
+        tooltip:{callbacks:{label:c=>` ${c.dataset.label}: ${c.parsed.y}%`}}
+      },
+      scales:{
+        x:{stacked:true, grid:{display:false}},
+        y:{stacked:true, max:100, ticks:{callback:v=>v+'%'}, grid:{color:'#E8EDF4'}}
+      }
+    }
+  });
+})();
+
+/* ── Q CHART 8: Crecimiento por trimestre (línea) ── */
+(function(){
+  const clients = ['AT&T','MacStore','iShop','Liverpool'];
+  const colors  = ['#00A8E0','#555','#FF6D00','#C62828'];
+  new Chart(document.getElementById('chartQGrowth'),{
+    type:'line',
+    data:{
+      labels:['Q1','Q2','Q3','Q4'],
+      datasets: clients.map((name,i)=>({
+        label:name,
+        data: qValorAll[name],
+        borderColor: colors[i], backgroundColor:'transparent',
+        borderWidth:2.5, pointRadius:5, pointBackgroundColor:colors[i], tension:.3,
+      }))
+    },
+    options:{
+      responsive:true, maintainAspectRatio:false,
+      plugins:{
+        legend:{position:'bottom',labels:{font:{size:11},boxWidth:12,padding:12}},
+        tooltip:{callbacks:{label:c=>` ${c.dataset.label}: $${(c.parsed.y/1e6).toFixed(2)} M`}}
+      },
+      scales:{
+        x:{grid:{display:false}},
+        y:{ticks:{callback:v=>'$'+(v/1e6).toFixed(1)+'M'}, grid:{color:'#E8EDF4'}}
+      }
+    }
+  });
+})();
 </script>
 </body>
 </html>
