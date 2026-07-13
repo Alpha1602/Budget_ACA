@@ -167,40 +167,6 @@
   <div class="tab" onclick="switchTab('marca',this)">🏷️ Por Marca</div>
 </div>
 
-<!-- ══════════ GLOBAL FILTERS ══════════ -->
-<div class="filters">
-  <div class="filter-group">
-    <div class="filter-label">Cliente</div>
-    <select id="filterCliente" onchange="applyFilters()">
-      <option value="all">Todos</option>
-      <option value="AT&T">AT&amp;T</option>
-      <option value="MacStore">MacStore</option>
-      <option value="iShop">iShop</option>
-      <option value="Liverpool">Liverpool</option>
-      <option value="Coppel">Coppel</option>
-    </select>
-  </div>
-  <div class="filter-group">
-    <div class="filter-label">Mes Desde</div>
-    <input type="number" id="filterMesDesde" min="1" max="12" value="1" onchange="applyFilters()" style="width:72px">
-  </div>
-  <div class="filter-group">
-    <div class="filter-label">Mes Hasta</div>
-    <input type="number" id="filterMesHasta" min="1" max="12" value="12" onchange="applyFilters()" style="width:72px">
-  </div>
-  <div class="filter-group">
-    <div class="filter-label">Métrica</div>
-    <div class="metric-toggle">
-      <button id="btnValor" class="active" onclick="setMetric('valor')">$ Valor</button>
-      <button id="btnPiezas" onclick="setMetric('piezas')">Piezas</button>
-    </div>
-  </div>
-  <button class="btn btn-secondary" onclick="resetFilters()" style="align-self:flex-end">Reset</button>
-</div>
-
-<!-- ══════════ KPI GRID (dynamic) ══════════ -->
-<div class="kpi-grid" id="kpiGrid"></div>
-
 <!-- ══════════ CONTENT ══════════ -->
 <div class="content">
 
@@ -443,36 +409,6 @@
     </div>
   </div>
 
-  <div class="grid-2">
-    <div class="card">
-      <div class="card-title"><span class="dot" style="background:var(--att)"></span>AT&amp;T — Categoría por Trimestre</div>
-      <canvas id="chartQCatATT"></canvas>
-    </div>
-    <div class="card">
-      <div class="card-title"><span class="dot" style="background:var(--macstore)"></span>MacStore — Categoría por Trimestre</div>
-      <canvas id="chartQCatMac"></canvas>
-    </div>
-    <div class="card">
-      <div class="card-title"><span class="dot" style="background:var(--ishop)"></span>iShop — Categoría por Trimestre</div>
-      <canvas id="chartQCatIShop"></canvas>
-    </div>
-    <div class="card">
-      <div class="card-title"><span class="dot" style="background:var(--liverpool)"></span>Liverpool — Categoría por Trimestre</div>
-      <canvas id="chartQCatLiv"></canvas>
-    </div>
-  </div>
-
-  <div class="grid-2">
-    <div class="card">
-      <div class="card-title">Share de Valor por Cliente — por Trimestre (%)</div>
-      <canvas id="chartQShare" class="canvas-tall"></canvas>
-    </div>
-    <div class="card">
-      <div class="card-title">Evolución de Valor por Trimestre — por Cliente</div>
-      <canvas id="chartQGrowth" class="canvas-tall"></canvas>
-    </div>
-  </div>
-
 </div><!-- /section-quarter -->
 
 
@@ -670,6 +606,45 @@
 
   <div class="card">
     <div class="card-title">Detalle por Marca · Cliente · Categoría · Mes</div>
+
+    <!-- ── Filtros de tabla ── -->
+    <div style="display:flex;flex-wrap:wrap;gap:14px;align-items:flex-start;margin-bottom:14px;padding-bottom:14px;border-bottom:1px solid var(--border)">
+      <div>
+        <div class="filter-label" style="font-size:10px;text-transform:uppercase;letter-spacing:.5px;color:var(--muted);font-weight:700;margin-bottom:5px">Cliente</div>
+        <div class="chip-row" id="tblClienteFilter">
+          <button class="chip on" data-val="all" onclick="setTblFilter('cliente',this)">Todos</button>
+          <button class="chip" data-val="ATT" onclick="setTblFilter('cliente',this)">AT&amp;T</button>
+          <button class="chip" data-val="MacStore" onclick="setTblFilter('cliente',this)">MacStore</button>
+          <button class="chip" data-val="iShop" onclick="setTblFilter('cliente',this)">iShop</button>
+          <button class="chip" data-val="Liverpool" onclick="setTblFilter('cliente',this)">Liverpool</button>
+        </div>
+      </div>
+      <div>
+        <div class="filter-label" style="font-size:10px;text-transform:uppercase;letter-spacing:.5px;color:var(--muted);font-weight:700;margin-bottom:5px">Marca</div>
+        <div class="chip-row" id="tblMarcaFilter">
+          <button class="chip on" data-val="all" onclick="setTblFilter('marca',this)">Todas</button>
+          <button class="chip" data-val="Quikcell" onclick="setTblFilter('marca',this)">Quikcell</button>
+          <button class="chip" data-val="Speck" onclick="setTblFilter('marca',this)">Speck</button>
+          <button class="chip" data-val="Nomad" onclick="setTblFilter('marca',this)">Nomad</button>
+          <button class="chip" data-val="Tech21" onclick="setTblFilter('marca',this)">Tech21</button>
+          <button class="chip" data-val="Uniq" onclick="setTblFilter('marca',this)">Uniq</button>
+          <button class="chip" data-val="TECH21" onclick="setTblFilter('marca',this)">TECH21</button>
+        </div>
+      </div>
+      <div>
+        <div class="filter-label" style="font-size:10px;text-transform:uppercase;letter-spacing:.5px;color:var(--muted);font-weight:700;margin-bottom:5px">Categoría</div>
+        <div class="chip-row" id="tblCatFilter">
+          <button class="chip on" data-val="all" onclick="setTblFilter('cat',this)">Todas</button>
+          <button class="chip" data-val="Cases iPhone" onclick="setTblFilter('cat',this)">Cases iPhone</button>
+          <button class="chip" data-val="Cases iPad" onclick="setTblFilter('cat',this)">Cases iPad</button>
+          <button class="chip" data-val="Cases Macbook" onclick="setTblFilter('cat',this)">Cases Macbook</button>
+          <button class="chip" data-val="Cases Airpods" onclick="setTblFilter('cat',this)">Cases Airpods</button>
+          <button class="chip" data-val="Micas" onclick="setTblFilter('cat',this)">Micas</button>
+          <button class="chip" data-val="Others" onclick="setTblFilter('cat',this)">Others</button>
+        </div>
+      </div>
+    </div>
+
     <div class="table-wrap">
       <table id="marcaTable" style="min-width:900px">
         <thead><tr>
@@ -801,98 +776,7 @@ const marcaRaw = {
 };
 const marcaColors = {'Quikcell':'#2563eb','Speck':'#00BFA5','Nomad':'#FF6D00','Tech21':'#C62828','Uniq':'#7B1FA2','TECH21':'#E53935'};
 
-/* ══════════ GLOBAL FILTER STATE ══════════ */
-let currentMetric = 'valor';
-
-function setMetric(m) {
-  currentMetric = m;
-  document.getElementById('btnValor').classList.toggle('active', m==='valor');
-  document.getElementById('btnPiezas').classList.toggle('active', m==='piezas');
-  applyFilters();
-}
-
-function resetFilters() {
-  document.getElementById('filterCliente').value = 'all';
-  document.getElementById('filterMesDesde').value = 1;
-  document.getElementById('filterMesHasta').value = 12;
-  currentMetric = 'valor';
-  document.getElementById('btnValor').classList.add('active');
-  document.getElementById('btnPiezas').classList.remove('active');
-  applyFilters();
-}
-
-function applyFilters() {
-  const cliente = document.getElementById('filterCliente').value;
-  let mesD = parseInt(document.getElementById('filterMesDesde').value) || 1;
-  let mesH = parseInt(document.getElementById('filterMesHasta').value) || 12;
-  if (mesD < 1) mesD = 1; if (mesD > 12) mesD = 12;
-  if (mesH < mesD) mesH = mesD; if (mesH > 12) mesH = 12;
-  buildKpis(cliente, mesD, mesH, currentMetric);
-}
-
-function buildKpis(cliente, mesD, mesH, metric) {
-  const grid = document.getElementById('kpiGrid');
-  const clients = cliente === 'all' ? Object.keys(valorBudget) : [cliente];
-  const idxD = mesD - 1, idxH = mesH - 1;
-
-  // Total valor
-  let totalVal = 0;
-  clients.forEach(c => { for (let i=idxD;i<=idxH;i++) totalVal += (valorBudget[c]?.[i]||0); });
-
-  // Total piezas H2 (only months 6-12, idx 5-11)
-  let totalPcs = 0;
-  clients.forEach(c => { for (let i=Math.max(5,idxD);i<=Math.min(11,idxH);i++) totalPcs += (piezasAnual[c]?.[i]||0); });
-
-  // Best month (valor)
-  let bestMonthVal = 0, bestMonthName = '—';
-  for (let i=idxD;i<=idxH;i++) {
-    let v = 0; clients.forEach(c => v += (valorBudget[c]?.[i]||0));
-    if (v > bestMonthVal) { bestMonthVal = v; bestMonthName = MES_NAMES[i]; }
-  }
-
-  // Lead client share (only when all)
-  let leadTxt = '';
-  if (cliente === 'all') {
-    const attTotal = valorBudget['AT&T'].reduce((s,v)=>s+v,0);
-    const allTotal = Object.values(valorBudget).reduce((s,arr)=>s+arr.reduce((a,b)=>a+b,0),0);
-    leadTxt = `AT&T ${((attTotal/allTotal)*100).toFixed(1)}% del total`;
-  } else {
-    const cTotal = (valorBudget[cliente]||[]).reduce((s,v)=>s+v,0);
-    const allTotal = Object.values(valorBudget).reduce((s,arr)=>s+arr.reduce((a,b)=>a+b,0),0);
-    leadTxt = `${((cTotal/allTotal)*100).toFixed(1)}% del total anual`;
-  }
-
-  // H2 valor
-  let h2Val = 0;
-  clients.forEach(c => { for (let i=Math.max(5,idxD);i<=Math.min(11,idxH);i++) h2Val += (valorBudget[c]?.[i]||0); });
-
-  grid.innerHTML = `
-    <div class="kpi-card">
-      <div class="kpi-label">Total Valor${mesD===1&&mesH===12?'':' (filtrado)'}</div>
-      <div class="kpi-value">$${(totalVal/1e6).toFixed(1)} M</div>
-      <div class="kpi-sub">Budget 2026 · MXN</div>
-    </div>
-    <div class="kpi-card">
-      <div class="kpi-label">Total Piezas H2</div>
-      <div class="kpi-value">${totalPcs>0?totalPcs.toLocaleString('es-MX'):'—'}</div>
-      <div class="kpi-sub">FCST Consenso Jun–Dic</div>
-    </div>
-    <div class="kpi-card">
-      <div class="kpi-label">Mejor Mes (Valor)</div>
-      <div class="kpi-value">${bestMonthName}</div>
-      <div class="kpi-sub">$${(bestMonthVal/1e6).toFixed(1)} M</div>
-    </div>
-    <div class="kpi-card">
-      <div class="kpi-label">${cliente==='all'?'Cliente Líder':'Participación'}</div>
-      <div class="kpi-value">${cliente==='all'?'AT&T':cliente}</div>
-      <div class="kpi-sub">${leadTxt}</div>
-    </div>
-    <div class="kpi-card">
-      <div class="kpi-label">Valor H2 (filtrado)</div>
-      <div class="kpi-value">$${(h2Val/1e6).toFixed(1)} M</div>
-      <div class="kpi-sub">Jul–Dic 2026</div>
-    </div>`;
-}
+/* (global filter bar removed) */
 
 /* ══════════ TABS ══════════ */
 function switchTab(id, el) {
@@ -1069,48 +953,12 @@ new Chart(document.getElementById('chartQPiezas'),{
     scales:{x:{stacked:true,grid:{display:false}},y:{stacked:true,ticks:{callback:v=>v>=1000?(v/1000).toFixed(0)+'K':v},grid:{color:'#e2e8f0'}}}
   }
 });
-function makeQCatChart(id,key){
-  const cats=qCatData[key];
-  new Chart(document.getElementById(id),{
-    type:'bar',
-    data:{labels:QUARTERS,datasets:Object.entries(cats).map(([cat,vals])=>({label:cat,data:vals,backgroundColor:catColors[cat]||'#90A4AE',borderWidth:0}))},
-    options:{responsive:true,maintainAspectRatio:false,
-      plugins:{legend:{position:'bottom',labels:{font:{size:10},boxWidth:10,padding:8}},tooltip:{callbacks:{label:c=>{const tot=Object.values(cats).reduce((s,arr)=>s+(arr[c.dataIndex]||0),0);const pct=tot?((c.parsed.y/tot)*100).toFixed(1):0;return ` ${c.dataset.label}: ${c.parsed.y.toLocaleString('es-MX')} pcs (${pct}%)`;} }}},
-      scales:{x:{stacked:true,grid:{display:false}},y:{stacked:true,ticks:{callback:v=>v>=1000?(v/1000).toFixed(0)+'K':v},grid:{color:'#e2e8f0'}}}
-    }
-  });
-}
-makeQCatChart('chartQCatATT','ATT');
-makeQCatChart('chartQCatMac','MacStore');
-makeQCatChart('chartQCatIShop','iShop');
-makeQCatChart('chartQCatLiv','Liverpool');
-(function(){
-  const clients=['AT&T','MacStore','iShop','Liverpool'];
-  const colors=['#00A8E0','#555','#FF6D00','#C62828'];
-  new Chart(document.getElementById('chartQShare'),{
-    type:'bar',
-    data:{labels:['Q1','Q2','Q3','Q4'],datasets:clients.map((name,i)=>({label:name,backgroundColor:colors[i],borderWidth:0,data:['Q1','Q2','Q3','Q4'].map((_,qi)=>{const tot=clients.reduce((s,c)=>s+(qValorAll[c][qi]||0),0);return tot?Math.round((qValorAll[name][qi]||0)/tot*100):0;})}))},
-    options:{responsive:true,maintainAspectRatio:false,
-      plugins:{legend:{position:'bottom',labels:{font:{size:11},boxWidth:10,padding:12}},tooltip:{callbacks:{label:c=>` ${c.dataset.label}: ${c.parsed.y}%`}}},
-      scales:{x:{stacked:true,grid:{display:false}},y:{stacked:true,max:100,ticks:{callback:v=>v+'%'},grid:{color:'#e2e8f0'}}}
-    }
-  });
-})();
-(function(){
-  const clients=['AT&T','MacStore','iShop','Liverpool'];
-  const colors=['#00A8E0','#555','#FF6D00','#C62828'];
-  new Chart(document.getElementById('chartQGrowth'),{
-    type:'line',
-    data:{labels:['Q1','Q2','Q3','Q4'],datasets:clients.map((name,i)=>({label:name,data:qValorAll[name],borderColor:colors[i],backgroundColor:'transparent',borderWidth:2.5,pointRadius:5,pointBackgroundColor:colors[i],tension:.3}))},
-    options:{responsive:true,maintainAspectRatio:false,
-      plugins:{legend:{position:'bottom',labels:{font:{size:11},boxWidth:10,padding:12}},tooltip:{callbacks:{label:c=>` ${c.dataset.label}: $${(c.parsed.y/1e6).toFixed(2)} M`}}},
-      scales:{x:{grid:{display:false}},y:{ticks:{callback:v=>'$'+(v/1e6).toFixed(1)+'M'},grid:{color:'#e2e8f0'}}}
-    }
-  });
-})();
+/* Q category / share / growth charts removed */
 
 /* ══════════ MARCA ══════════ */
 let marcaState={cliente:'all',mode:'pcs'};
+// Separate filter state just for the detail table
+let tblState={cliente:'all',marca:'all',cat:'all'};
 let marcaBarChart=null,marcaLineChart=null;
 const MONTHS_H2_KEYS=['Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
 
@@ -1135,9 +983,11 @@ function getMarcaSummary(){
 function getTableRows(){
   const rows=[];
   for(const [marca,clientes] of Object.entries(marcaRaw)){
+    if(tblState.marca!=='all'&&marca!==tblState.marca)continue;
     for(const [cliente,cats] of Object.entries(clientes)){
-      if(marcaState.cliente!=='all'&&cliente!==marcaState.cliente)continue;
+      if(tblState.cliente!=='all'&&cliente!==tblState.cliente)continue;
       for(const [cat,mData] of Object.entries(cats)){
+        if(tblState.cat!=='all'&&cat!==tblState.cat)continue;
         const totPcs=MONTHS_H2_KEYS.reduce((s,m)=>s+(mData.pcs[m]||0),0);
         const totVal=MONTHS_H2_KEYS.reduce((s,m)=>s+(mData.val[m]||0),0);
         if(totPcs===0&&totVal===0)continue;
@@ -1147,6 +997,23 @@ function getTableRows(){
   }
   rows.sort((a,b)=>marcaState.mode==='pcs'?b.totPcs-a.totPcs:b.totVal-a.totVal);
   return rows;
+}
+
+/* Table filter chips */
+const tblChipClasses={
+  cliente:{all:'on',ATT:'on-att',MacStore:'on-macstore',iShop:'on-ishop',Liverpool:'on-liverpool'},
+  marca:{all:'on'},
+  cat:{all:'on'},
+};
+function setTblFilter(type,btn){
+  const val=btn.dataset.val;
+  const barId=type==='cliente'?'tblClienteFilter':type==='marca'?'tblMarcaFilter':'tblCatFilter';
+  document.querySelectorAll(`#${barId} .chip`).forEach(b=>{
+    Object.values(tblChipClasses[type]).forEach(c=>b.classList.remove(c));b.classList.remove('on');
+  });
+  btn.classList.add(tblChipClasses[type][val]||'on');
+  tblState[type]=val;
+  renderMarcaTable();
 }
 function fmtNum(v,mode){
   if(mode==='pcs')return v>0?v.toLocaleString('es-MX'):'—';
@@ -1204,9 +1071,6 @@ function toggleMarcaMode(mode){
   renderMarca();
 }
 setTimeout(renderMarca,200);
-
-/* Init KPIs */
-applyFilters();
 </script>
 </body>
 </html>
