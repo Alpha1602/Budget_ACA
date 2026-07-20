@@ -119,7 +119,6 @@
   <div class="tab" onclick="switchTab('quarter',this)">📊 Dashboard by Quarter</div>
   <div class="tab" onclick="switchTab('h2',this)">📈 Dashboard H2</div>
   <div class="tab" onclick="switchTab('marca',this)">🏷️ Por Marca</div>
-  <div class="tab" onclick="switchTab('purchases',this)">🛒 Purchases</div>
 </div>
 
 <!-- ══ GLOBAL METRIC TOGGLE ══ -->
@@ -195,18 +194,27 @@
 <!-- ─── TAB 1: PROYECCIÓN 2026 ─── -->
 <div class="section" id="section-anual">
 
-  <div class="grid-2">
-    <div class="card">
-      <div class="card-title" id="anualLineTitle">Valor Mensual por Cliente (MXN) <span>Budget 2026 + FCST H2</span></div>
-      <div class="legend" id="legendAnual"></div>
-      <canvas id="chartAnualLinea" class="canvas-tall"></canvas>
+  <!-- Dynamic dual-axis chart with client selector -->
+  <div class="card">
+    <div class="card-title">
+      <span id="anualDualTitle">Valor Mensual por Cliente (MXN) — 2026</span>
+      <div class="chip-row" id="anualClientFilter">
+        <button class="chip on" data-c="all" onclick="setAnualClient(this)">Todos</button>
+        <button class="chip" data-c="AT&T" onclick="setAnualClient(this)">AT&amp;T</button>
+        <button class="chip" data-c="MacStore" onclick="setAnualClient(this)">MacStore</button>
+        <button class="chip" data-c="iShop" onclick="setAnualClient(this)">iShop</button>
+        <button class="chip" data-c="Liverpool" onclick="setAnualClient(this)">Liverpool</button>
+        <button class="chip" data-c="MercadoLibre" onclick="setAnualClient(this)">ML</button>
+        <button class="chip" data-c="Coppel" onclick="setAnualClient(this)">Coppel</button>
+      </div>
     </div>
-    <div class="card">
-      <div class="card-title" id="shareTitle">Share por Cliente — Mes a Mes</div>
-      <canvas id="chartShare100" class="canvas-tall"></canvas>
-    </div>
+    <canvas id="chartAnualDual" style="max-height:380px"></canvas>
   </div>
 
+  <!-- KPI summary row -->
+  <div id="anualKpiRow" class="kpi-grid" style="padding:0 0 14px"></div>
+
+  <!-- Annual table -->
   <div class="card">
     <div class="card-title">
       Tabla Anual 2026 por Cliente
@@ -221,151 +229,111 @@
       <div class="table-wrap"><table>
         <thead><tr>
           <th>Cliente</th>
-          <th class="num">Ene</th><th class="num">Feb</th><th class="num">Mar</th><th class="num">Abr</th><th class="num">May</th>
-          <th class="num h2-col">Jun</th><th class="num h2-col">Jul</th><th class="num h2-col">Ago</th>
+          <th class="num">Ene</th><th class="num">Feb</th><th class="num">Mar</th><th class="num">Abr</th><th class="num">May</th><th class="num">Jun</th>
+          <th class="num h2-col">Jul</th><th class="num h2-col">Ago</th>
           <th class="num h2-col">Sep</th><th class="num h2-col">Oct</th><th class="num h2-col">Nov</th><th class="num h2-col">Dic</th>
           <th class="num">TOTAL</th>
         </tr></thead>
         <tbody>
           <tr>
             <td><span class="dot" style="background:var(--att)"></span>AT&amp;T</td>
-            <td class="num">$7.5 M</td><td class="num">$5.0 M</td><td class="num">$4.2 M</td><td class="num">$4.3 M</td><td class="num">$4.1 M</td>
-            <td class="num h2-col">$4.3 M</td><td class="num h2-col">$4.3 M</td><td class="num h2-col">$6.4 M</td>
-            <td class="num h2-col">$6.6 M</td><td class="num h2-col">$6.5 M</td><td class="num h2-col">$7.6 M</td><td class="num h2-col">$8.7 M</td>
-            <td class="num"><strong>$69.4 M</strong></td>
+            <td class="num">$7.5M</td><td class="num">$5.0M</td><td class="num">$4.2M</td><td class="num">$4.3M</td><td class="num">$4.1M</td><td class="num">$4.3M</td>
+            <td class="num h2-col">$4.3M</td><td class="num h2-col">$6.4M</td>
+            <td class="num h2-col">$6.6M</td><td class="num h2-col">$6.5M</td><td class="num h2-col">$7.6M</td><td class="num h2-col">$8.7M</td>
+            <td class="num"><strong>$69.4M</strong></td>
           </tr>
           <tr>
             <td><span class="dot" style="background:var(--macstore)"></span>MacStore</td>
-            <td class="num">$3.5 M</td><td class="num">$2.3 M</td><td class="num">$1.5 M</td><td class="num">$1.5 M</td><td class="num">$1.4 M</td>
-            <td class="num h2-col">$1.5 M</td><td class="num h2-col">$1.4 M</td><td class="num h2-col">$2.4 M</td>
-            <td class="num h2-col">$2.5 M</td><td class="num h2-col">$3.3 M</td><td class="num h2-col">$3.8 M</td><td class="num h2-col">$4.1 M</td>
-            <td class="num"><strong>$29.2 M</strong></td>
+            <td class="num">$3.5M</td><td class="num">$2.3M</td><td class="num">$1.5M</td><td class="num">$1.5M</td><td class="num">$1.4M</td><td class="num">$1.5M</td>
+            <td class="num h2-col">$1.4M</td><td class="num h2-col">$2.4M</td>
+            <td class="num h2-col">$2.5M</td><td class="num h2-col">$3.3M</td><td class="num h2-col">$3.8M</td><td class="num h2-col">$4.1M</td>
+            <td class="num"><strong>$29.2M</strong></td>
           </tr>
           <tr>
             <td><span class="dot" style="background:var(--ishop)"></span>iShop</td>
-            <td class="num">$0.8 M</td><td class="num">$2.0 M</td><td class="num">$2.7 M</td><td class="num">$1.1 M</td><td class="num">$1.9 M</td>
-            <td class="num h2-col">$1.2 M</td><td class="num h2-col">$1.5 M</td><td class="num h2-col">$2.1 M</td>
-            <td class="num h2-col">$4.0 M</td><td class="num h2-col">$2.3 M</td><td class="num h2-col">$3.2 M</td><td class="num h2-col">$2.2 M</td>
-            <td class="num"><strong>$25.0 M</strong></td>
+            <td class="num">$0.8M</td><td class="num">$2.0M</td><td class="num">$2.7M</td><td class="num">$1.1M</td><td class="num">$1.9M</td><td class="num">$1.2M</td>
+            <td class="num h2-col">$1.5M</td><td class="num h2-col">$2.1M</td>
+            <td class="num h2-col">$4.0M</td><td class="num h2-col">$2.3M</td><td class="num h2-col">$3.2M</td><td class="num h2-col">$2.2M</td>
+            <td class="num"><strong>$25.0M</strong></td>
           </tr>
           <tr>
             <td><span class="dot" style="background:var(--liverpool)"></span>Liverpool</td>
-            <td class="num" style="color:var(--muted)">—</td><td class="num" style="color:var(--muted)">—</td><td class="num" style="color:var(--muted)">—</td><td class="num" style="color:var(--muted)">—</td><td class="num" style="color:var(--muted)">—</td>
-            <td class="num h2-col" style="color:var(--muted)">—</td><td class="num h2-col">$0.1 M</td><td class="num h2-col">$0.3 M</td>
-            <td class="num h2-col">$0.4 M</td><td class="num h2-col">$0.4 M</td><td class="num h2-col">$0.5 M</td><td class="num h2-col">$0.5 M</td>
-            <td class="num"><strong>$2.2 M</strong></td>
+            <td class="num">—</td><td class="num">—</td><td class="num">—</td><td class="num">—</td><td class="num">—</td><td class="num">$0.0M</td>
+            <td class="num h2-col">$0.1M</td><td class="num h2-col">$0.3M</td>
+            <td class="num h2-col">$0.4M</td><td class="num h2-col">$0.4M</td><td class="num h2-col">$0.5M</td><td class="num h2-col">$0.5M</td>
+            <td class="num"><strong>$2.2M</strong></td>
           </tr>
           <tr>
             <td><span class="dot" style="background:var(--ml)"></span>Mercado Libre</td>
-            <td class="num" style="color:var(--muted)">—</td><td class="num" style="font-size:10px">$8K</td><td class="num" style="font-size:10px">$36K</td><td class="num" style="font-size:10px">$52K</td><td class="num" style="font-size:10px">$58K</td>
-            <td class="num h2-col" style="font-size:10px">$60K</td><td class="num h2-col" style="font-size:10px">$60K</td><td class="num h2-col" style="font-size:10px">$60K</td>
-            <td class="num h2-col" style="font-size:10px">$60K</td><td class="num h2-col" style="font-size:10px">$60K</td><td class="num h2-col" style="font-size:10px">$80K</td><td class="num h2-col" style="font-size:10px">$60K</td>
-            <td class="num"><strong>$0.6 M</strong></td>
+            <td class="num">—</td><td class="num">$0.0M</td><td class="num">$0.0M</td><td class="num">$0.1M</td><td class="num">$0.1M</td><td class="num">$0.1M</td>
+            <td class="num h2-col">$0.1M</td><td class="num h2-col">$0.1M</td>
+            <td class="num h2-col">$0.1M</td><td class="num h2-col">$0.1M</td><td class="num h2-col">$0.1M</td><td class="num h2-col">$0.1M</td>
+            <td class="num"><strong>$0.6M</strong></td>
           </tr>
           <tr>
             <td><span class="dot" style="background:var(--coppel)"></span>Coppel</td>
-            <td class="num" style="color:var(--muted)">—</td><td class="num" style="color:var(--muted)">—</td><td class="num" style="color:var(--muted)">—</td><td class="num">$0.4 M</td><td class="num" style="color:var(--muted)">—</td>
-            <td class="num h2-col" colspan="7" style="color:var(--muted)">—</td>
-            <td class="num"><strong>$0.4 M</strong></td>
+            <td class="num">—</td><td class="num">—</td><td class="num">—</td><td class="num">$0.4M</td><td class="num">—</td><td class="num">—</td>
+            <td class="num h2-col">—</td><td class="num h2-col">—</td>
+            <td class="num h2-col">—</td><td class="num h2-col">—</td><td class="num h2-col">—</td><td class="num h2-col">—</td>
+            <td class="num"><strong>$0.4M</strong></td>
           </tr>
         </tbody>
         <tfoot><tr>
           <td>TOTAL</td>
-          <td class="num">$11.8 M</td><td class="num">$9.2 M</td><td class="num">$8.4 M</td><td class="num">$7.4 M</td><td class="num">$7.4 M</td>
-          <td class="num">$7.1 M</td><td class="num">$7.4 M</td><td class="num">$11.2 M</td>
-          <td class="num">$13.5 M</td><td class="num">$12.7 M</td><td class="num">$15.1 M</td><td class="num">$15.7 M</td>
-          <td class="num"><strong>$126.8 M</strong></td>
+          <td class="num">$11.8M</td><td class="num">$9.2M</td><td class="num">$8.4M</td><td class="num">$7.4M</td><td class="num">$7.4M</td><td class="num">$7.1M</td>
+          <td class="num h2-col">$7.4M</td><td class="num h2-col">$11.2M</td>
+          <td class="num h2-col">$13.5M</td><td class="num h2-col">$12.7M</td><td class="num h2-col">$15.1M</td><td class="num h2-col">$15.7M</td>
+          <td class="num"><strong>$126.8M</strong></td>
         </tr></tfoot>
       </table></div>
-      <p class="note">* Fuente: Budget 2026 (H1) + FCST Consenso (H2) · Columnas sombreadas = H2</p>
     </div>
 
-    <!-- PIEZAS TABLE — full year (H1 Budget + H2 Consenso) -->
+    <!-- PIEZAS TABLE -->
     <div id="anualTablePcs" style="display:none">
       <div class="table-wrap"><table>
         <thead><tr>
           <th>Cliente</th>
-          <th class="num">Ene</th><th class="num">Feb</th><th class="num">Mar</th><th class="num">Abr</th><th class="num">May</th>
-          <th class="num h2-col">Jun</th><th class="num h2-col">Jul</th><th class="num h2-col">Ago</th>
+          <th class="num">Ene</th><th class="num">Feb</th><th class="num">Mar</th><th class="num">Abr</th><th class="num">May</th><th class="num">Jun</th>
+          <th class="num h2-col">Jul</th><th class="num h2-col">Ago</th>
           <th class="num h2-col">Sep</th><th class="num h2-col">Oct</th><th class="num h2-col">Nov</th><th class="num h2-col">Dic</th>
           <th class="num">TOTAL</th>
         </tr></thead>
         <tbody>
-          <tr>
-            <td><span class="dot" style="background:var(--att)"></span>AT&amp;T</td>
-            <td class="num">30,710</td><td class="num">20,985</td><td class="num">18,176</td><td class="num">19,397</td><td class="num">18,409</td>
-            <td class="num h2-col">19,345</td><td class="num h2-col">19,863</td><td class="num h2-col">24,194</td>
-            <td class="num h2-col">25,188</td><td class="num h2-col">26,254</td><td class="num h2-col">30,225</td><td class="num h2-col">35,221</td>
-            <td class="num"><strong>287,967</strong></td>
-          </tr>
-          <tr>
-            <td><span class="dot" style="background:var(--macstore)"></span>MacStore</td>
-            <td class="num">8,009</td><td class="num">4,668</td><td class="num">3,011</td><td class="num">2,947</td><td class="num">2,521</td>
-            <td class="num h2-col">2,908</td><td class="num h2-col">2,452</td><td class="num h2-col">5,032</td>
-            <td class="num h2-col">5,290</td><td class="num h2-col">7,151</td><td class="num h2-col">7,919</td><td class="num h2-col">8,637</td>
-            <td class="num"><strong>60,545</strong></td>
-          </tr>
-          <tr>
-            <td><span class="dot" style="background:var(--ishop)"></span>iShop</td>
-            <td class="num">1,884</td><td class="num">4,502</td><td class="num">5,686</td><td class="num">2,687</td><td class="num">4,318</td>
-            <td class="num h2-col">2,733</td><td class="num h2-col">3,450</td><td class="num h2-col">4,624</td>
-            <td class="num h2-col">8,977</td><td class="num h2-col">5,189</td><td class="num h2-col">7,146</td><td class="num h2-col">4,890</td>
-            <td class="num"><strong>56,086</strong></td>
-          </tr>
-          <tr>
-            <td><span class="dot" style="background:var(--liverpool)"></span>Liverpool</td>
-            <td class="num" style="color:var(--muted)">—</td><td class="num" style="color:var(--muted)">—</td><td class="num" style="color:var(--muted)">—</td><td class="num" style="color:var(--muted)">—</td><td class="num" style="color:var(--muted)">—</td>
-            <td class="num h2-col" style="color:var(--muted)">—</td><td class="num h2-col">220</td><td class="num h2-col">630</td>
-            <td class="num h2-col">874</td><td class="num h2-col">973</td><td class="num h2-col">1,089</td><td class="num h2-col">1,223</td>
-            <td class="num"><strong>5,009</strong></td>
-          </tr>
-          <tr>
-            <td><span class="dot" style="background:var(--ml)"></span>Mercado Libre</td>
-            <td class="num" style="color:var(--muted)">—</td><td class="num">25</td><td class="num">70</td><td class="num">123</td><td class="num">156</td>
-            <td class="num h2-col">118</td><td class="num h2-col" style="color:var(--muted)">—</td><td class="num h2-col" style="color:var(--muted)">—</td>
-            <td class="num h2-col" style="color:var(--muted)">—</td><td class="num h2-col" style="color:var(--muted)">—</td><td class="num h2-col" style="color:var(--muted)">—</td><td class="num h2-col" style="color:var(--muted)">—</td>
-            <td class="num"><strong>492</strong></td>
-          </tr>
-          <tr>
-            <td><span class="dot" style="background:var(--coppel)"></span>Coppel</td>
-            <td class="num" style="color:var(--muted)">—</td><td class="num" style="color:var(--muted)">—</td><td class="num" style="color:var(--muted)">—</td><td class="num">1,470</td><td class="num" style="color:var(--muted)">—</td>
-            <td class="num h2-col" colspan="7" style="color:var(--muted)">—</td>
-            <td class="num"><strong>1,470</strong></td>
-          </tr>
+          <tr><td><span class="dot" style="background:var(--att)"></span>AT&amp;T</td>
+            <td class="num">30,710</td><td class="num">20,985</td><td class="num">18,176</td><td class="num">19,397</td><td class="num">18,409</td><td class="num">19,345</td>
+            <td class="num h2-col">19,863</td><td class="num h2-col">24,194</td><td class="num h2-col">25,188</td><td class="num h2-col">26,254</td><td class="num h2-col">30,225</td><td class="num h2-col">35,221</td>
+            <td class="num"><strong>287,967</strong></td></tr>
+          <tr><td><span class="dot" style="background:var(--macstore)"></span>MacStore</td>
+            <td class="num">8,009</td><td class="num">4,668</td><td class="num">3,011</td><td class="num">2,947</td><td class="num">2,521</td><td class="num">2,908</td>
+            <td class="num h2-col">2,452</td><td class="num h2-col">5,032</td><td class="num h2-col">5,290</td><td class="num h2-col">7,151</td><td class="num h2-col">7,919</td><td class="num h2-col">8,637</td>
+            <td class="num"><strong>60,545</strong></td></tr>
+          <tr><td><span class="dot" style="background:var(--ishop)"></span>iShop</td>
+            <td class="num">1,884</td><td class="num">4,502</td><td class="num">5,686</td><td class="num">2,687</td><td class="num">4,318</td><td class="num">2,733</td>
+            <td class="num h2-col">3,450</td><td class="num h2-col">4,624</td><td class="num h2-col">8,977</td><td class="num h2-col">5,189</td><td class="num h2-col">7,146</td><td class="num h2-col">4,890</td>
+            <td class="num"><strong>56,086</strong></td></tr>
+          <tr><td><span class="dot" style="background:var(--liverpool)"></span>Liverpool</td>
+            <td class="num">—</td><td class="num">—</td><td class="num">—</td><td class="num">—</td><td class="num">—</td><td class="num">0</td>
+            <td class="num h2-col">220</td><td class="num h2-col">630</td><td class="num h2-col">874</td><td class="num h2-col">973</td><td class="num h2-col">1,089</td><td class="num h2-col">1,223</td>
+            <td class="num"><strong>5,009</strong></td></tr>
+          <tr><td><span class="dot" style="background:var(--ml)"></span>Mercado Libre</td>
+            <td class="num">—</td><td class="num">25</td><td class="num">70</td><td class="num">123</td><td class="num">156</td><td class="num">118</td>
+            <td class="num h2-col">—</td><td class="num h2-col">—</td><td class="num h2-col">—</td><td class="num h2-col">—</td><td class="num h2-col">—</td><td class="num h2-col">—</td>
+            <td class="num"><strong>492</strong></td></tr>
+          <tr><td><span class="dot" style="background:var(--coppel)"></span>Coppel</td>
+            <td class="num">—</td><td class="num">—</td><td class="num">—</td><td class="num">1,470</td><td class="num">—</td><td class="num">—</td>
+            <td class="num h2-col">—</td><td class="num h2-col">—</td><td class="num h2-col">—</td><td class="num h2-col">—</td><td class="num h2-col">—</td><td class="num h2-col">—</td>
+            <td class="num"><strong>1,470</strong></td></tr>
         </tbody>
         <tfoot><tr>
           <td>TOTAL</td>
-          <td class="num">40,603</td><td class="num">30,180</td><td class="num">26,943</td><td class="num">26,624</td><td class="num">25,404</td>
-          <td class="num">25,104</td><td class="num">25,985</td><td class="num">34,480</td>
-          <td class="num">40,329</td><td class="num">39,567</td><td class="num">46,379</td><td class="num">49,971</td>
+          <td class="num">40,603</td><td class="num">30,180</td><td class="num">26,943</td><td class="num">26,624</td><td class="num">25,404</td><td class="num">25,104</td>
+          <td class="num h2-col">25,985</td><td class="num h2-col">34,480</td><td class="num h2-col">40,329</td><td class="num h2-col">39,567</td><td class="num h2-col">46,379</td><td class="num h2-col">49,971</td>
           <td class="num"><strong>411,569</strong></td>
         </tr></tfoot>
       </table></div>
-      <p class="note">* H1 Piezas = Budget 2026 · H2 = FCST Consenso (Jun–Dic) · Columnas sombreadas = H2</p>
     </div>
   </div>
-
-  <div class="grid-2">
-    <div class="card">
-      <div class="card-title" id="catATTTitle"><span class="dot" style="background:var(--att)"></span>AT&amp;T — Categoría por Mes H2</div>
-      <canvas id="chartCatATT"></canvas>
-    </div>
-    <div class="card">
-      <div class="card-title" id="catMacTitle"><span class="dot" style="background:var(--macstore)"></span>MacStore — Categoría por Mes H2</div>
-      <canvas id="chartCatMac"></canvas>
-    </div>
-    <div class="card">
-      <div class="card-title" id="catIShopTitle"><span class="dot" style="background:var(--ishop)"></span>iShop — Categoría por Mes H2</div>
-      <canvas id="chartCatIShop"></canvas>
-    </div>
-    <div class="card">
-      <div class="card-title" id="catLivTitle"><span class="dot" style="background:var(--liverpool)"></span>Liverpool — Categoría por Mes H2</div>
-      <canvas id="chartCatLiv"></canvas>
-    </div>
-  </div>
-
 </div><!-- /section-anual -->
-
 
 <!-- ─── TAB 2: DASHBOARD BY QUARTER ─── -->
 <div class="section" id="section-quarter">
@@ -537,67 +505,21 @@
 <!-- ─── TAB 4: POR MARCA ─── -->
 <div class="section" id="section-marca">
 
-  <div class="card">
-    <div class="card-title">
-      Vista por Marca · Cliente · Categoría · Mes
-      <div style="display:flex;gap:14px;flex-wrap:wrap;align-items:center">
-        <div style="display:flex;align-items:center;gap:8px">
-          <span style="font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.5px">Cliente</span>
-          <div class="chip-row" id="marcaClienteFilter">
-            <button class="chip on" data-cliente="all" onclick="filterMarca(this,'cliente')">Todos</button>
-            <button class="chip" data-cliente="ATT" onclick="filterMarca(this,'cliente')">AT&amp;T</button>
-            <button class="chip" data-cliente="MacStore" onclick="filterMarca(this,'cliente')">MacStore</button>
-            <button class="chip" data-cliente="iShop" onclick="filterMarca(this,'cliente')">iShop</button>
-            <button class="chip" data-cliente="Liverpool" onclick="filterMarca(this,'cliente')">Liverpool</button>
-          </div>
-        </div>
-        <div style="display:flex;align-items:center;gap:8px">
-          <span style="font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.5px">Vista</span>
-          <div class="metric-toggle" id="marcaToggle">
-            <button onclick="syncMarcaMode('pcs')">Piezas</button>
-            <button class="active" onclick="syncMarcaMode('val')">Valor MXN</button>
-          </div>
+  <!-- Filter bar -->
+  <div class="card" style="padding:12px 18px;margin-bottom:14px">
+    <div style="display:flex;flex-wrap:wrap;gap:16px;align-items:center">
+      <div style="display:flex;align-items:center;gap:8px">
+        <span class="filter-label" style="margin-bottom:0">Cliente</span>
+        <div class="chip-row" id="marcaClienteFilter">
+          <button class="chip on" data-cliente="all" onclick="filterMarca(this,'cliente')">Todos</button>
+          <button class="chip" data-cliente="ATT" onclick="filterMarca(this,'cliente')">AT&amp;T</button>
+          <button class="chip" data-cliente="MacStore" onclick="filterMarca(this,'cliente')">MacStore</button>
+          <button class="chip" data-cliente="iShop" onclick="filterMarca(this,'cliente')">iShop</button>
+          <button class="chip" data-cliente="Liverpool" onclick="filterMarca(this,'cliente')">Liverpool</button>
         </div>
       </div>
-    </div>
-    <div class="kpi-grid" style="padding:0;margin-bottom:0" id="marcaKpis"></div>
-  </div>
-
-  <div class="grid-2">
-    <div class="card">
-      <div class="card-title" id="marcaBarTitle">Valor MXN por Marca — H2 2026</div>
-      <canvas id="chartMarcaBar" class="canvas-tall"></canvas>
-    </div>
-    <div class="card">
-      <div class="card-title" id="marcaLineTitle">Valor MXN por Mes — por Marca</div>
-      <div class="legend" id="marcaLegend"></div>
-      <canvas id="chartMarcaLine" class="canvas-tall"></canvas>
-    </div>
-  </div>
-
-  <!-- BEHAVIOR CHART -->
-  <div class="card">
-    <div class="card-title" id="behaviorTitle">Comportamiento Mensual — Valor MXN (filtro actual)</div>
-    <div class="legend" id="behaviorLegend"></div>
-    <canvas id="chartBehavior" class="canvas-tall"></canvas>
-  </div>
-
-  <div class="card">
-    <div class="card-title">Detalle por Marca · Cliente · Categoría · Mes</div>
-    <!-- Filtros de tabla -->
-    <div style="display:flex;flex-wrap:wrap;gap:14px;align-items:flex-start;margin-bottom:14px;padding-bottom:14px;border-bottom:1px solid var(--border)">
-      <div>
-        <div class="filter-label">Cliente</div>
-        <div class="chip-row" id="tblClienteFilter">
-          <button class="chip on" data-val="all" onclick="setTblFilter('cliente',this)">Todos</button>
-          <button class="chip" data-val="ATT" onclick="setTblFilter('cliente',this)">AT&amp;T</button>
-          <button class="chip" data-val="MacStore" onclick="setTblFilter('cliente',this)">MacStore</button>
-          <button class="chip" data-val="iShop" onclick="setTblFilter('cliente',this)">iShop</button>
-          <button class="chip" data-val="Liverpool" onclick="setTblFilter('cliente',this)">Liverpool</button>
-        </div>
-      </div>
-      <div>
-        <div class="filter-label">Marca</div>
+      <div style="display:flex;align-items:center;gap:8px">
+        <span class="filter-label" style="margin-bottom:0">Marca</span>
         <div class="chip-row" id="tblMarcaFilter">
           <button class="chip on" data-val="all" onclick="setTblFilter('marca',this)">Todas</button>
           <button class="chip" data-val="Quikcell" onclick="setTblFilter('marca',this)">Quikcell</button>
@@ -605,17 +527,53 @@
           <button class="chip" data-val="Nomad" onclick="setTblFilter('marca',this)">Nomad</button>
           <button class="chip" data-val="Tech21" onclick="setTblFilter('marca',this)">Tech21</button>
           <button class="chip" data-val="Uniq" onclick="setTblFilter('marca',this)">Uniq</button>
-          <button class="chip" data-val="TECH21" onclick="setTblFilter('marca',this)">TECH21</button>
         </div>
       </div>
-      <div>
-        <div class="filter-label">Categoría</div>
+      <div style="display:flex;align-items:center;gap:8px">
+        <span class="filter-label" style="margin-bottom:0">Vista</span>
+        <div class="metric-toggle">
+          <button onclick="syncMarcaMode('pcs')" id="marcaPcsBtnTop">Piezas</button>
+          <button class="active" onclick="syncMarcaMode('val')" id="marcaValBtnTop">Valor MXN</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- KPIs -->
+  <div class="kpi-grid" style="padding:0 0 14px" id="marcaKpis"></div>
+
+  <!-- Charts grid -->
+  <div class="grid-2">
+    <div class="card">
+      <div class="card-title" id="marcaBarTitle">Valor MXN por Marca — H2 2026</div>
+      <canvas id="chartMarcaBar" class="canvas-tall"></canvas>
+    </div>
+    <div class="card">
+      <div class="card-title" id="marcaLineTitle">Tendencia Mensual por Marca</div>
+      <div class="legend" id="marcaLegend"></div>
+      <canvas id="chartMarcaLine" class="canvas-tall"></canvas>
+    </div>
+  </div>
+
+  <!-- Behavior chart (dynamic, appears with selection) -->
+  <div class="card">
+    <div class="card-title" id="behaviorTitle">Comportamiento Mensual — Valor MXN por Marca</div>
+    <div class="legend" id="behaviorLegend"></div>
+    <canvas id="chartBehavior" class="canvas-tall"></canvas>
+  </div>
+
+  <!-- Detail table -->
+  <div class="card">
+    <div class="card-title">
+      Detalle por Marca · Cliente · Categoría
+      <div style="display:flex;align-items:center;gap:8px">
+        <span class="filter-label" style="margin-bottom:0">Categoría</span>
         <div class="chip-row" id="tblCatFilter">
           <button class="chip on" data-val="all" onclick="setTblFilter('cat',this)">Todas</button>
-          <button class="chip" data-val="Cases iPhone" onclick="setTblFilter('cat',this)">Cases iPhone</button>
-          <button class="chip" data-val="Cases iPad" onclick="setTblFilter('cat',this)">Cases iPad</button>
-          <button class="chip" data-val="Cases Macbook" onclick="setTblFilter('cat',this)">Cases Macbook</button>
-          <button class="chip" data-val="Cases Airpods" onclick="setTblFilter('cat',this)">Cases Airpods</button>
+          <button class="chip" data-val="Cases iPhone" onclick="setTblFilter('cat',this)">iPhone</button>
+          <button class="chip" data-val="Cases iPad" onclick="setTblFilter('cat',this)">iPad</button>
+          <button class="chip" data-val="Cases Macbook" onclick="setTblFilter('cat',this)">MacBook</button>
+          <button class="chip" data-val="Cases Airpods" onclick="setTblFilter('cat',this)">AirPods</button>
           <button class="chip" data-val="Micas" onclick="setTblFilter('cat',this)">Micas</button>
           <button class="chip" data-val="Others" onclick="setTblFilter('cat',this)">Others</button>
         </div>
@@ -624,11 +582,11 @@
     <div class="table-wrap">
       <table id="marcaTable" style="min-width:900px">
         <thead><tr>
-          <th style="min-width:110px">Marca</th>
-          <th style="min-width:90px">Cliente</th>
-          <th style="min-width:120px">Categoría</th>
-          <th class="num">Jun</th><th class="num">Jul</th><th class="num">Aug</th><th class="num">Sep</th><th class="num">Oct</th><th class="num">Nov</th><th class="num">Dec</th>
-          <th class="num">TOTAL</th>
+          <th style="min-width:100px">Marca</th>
+          <th style="min-width:80px">Cliente</th>
+          <th style="min-width:130px">Categoría</th>
+          <th class="num">Jun</th><th class="num">Jul</th><th class="num">Ago</th><th class="num">Sep</th><th class="num">Oct</th><th class="num">Nov</th><th class="num">Dic</th>
+          <th class="num">TOTAL H2</th>
         </tr></thead>
         <tbody id="marcaTableBody"></tbody>
       </table>
@@ -636,57 +594,6 @@
   </div>
 
 </div><!-- /section-marca -->
-
-
-<!-- ─── TAB 5: PURCHASES ─── -->
-<div class="section" id="section-purchases">
-
-  <div id="poKpis" class="kpi-grid" style="padding:16px 0 8px"></div>
-
-  <div class="grid-2">
-    <div class="card">
-      <div class="card-title" id="poChartTitle">PO por Marca — Valor MXN (Jul–Dic)</div>
-      <canvas id="chartPO" class="canvas-tall"></canvas>
-    </div>
-    <div class="card">
-      <div class="card-title" id="poPcsChartTitle">PO por Marca — Piezas (Jul–Dic)</div>
-      <canvas id="chartPOPcs" class="canvas-tall"></canvas>
-    </div>
-  </div>
-
-  <div class="card">
-    <div class="card-title">
-      Detalle de Purchases por Marca &amp; Categoría
-      <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
-        <div class="chip-row" id="poMarcaFilter">
-          <button class="chip on" data-marca="all" onclick="setPOMarca(this)">Todas</button>
-          <button class="chip" data-marca="Nomad" onclick="setPOMarca(this)">Nomad</button>
-          <button class="chip" data-marca="Quikcell" onclick="setPOMarca(this)">Quikcell</button>
-          <button class="chip" data-marca="Speck" onclick="setPOMarca(this)">Speck</button>
-          <button class="chip" data-marca="Tech21" onclick="setPOMarca(this)">Tech21</button>
-          <button class="chip" data-marca="Uniq" onclick="setPOMarca(this)">Uniq</button>
-        </div>
-        <button onclick="exportPOExcel()" style="padding:6px 14px;background:#16a34a;color:white;border:none;border-radius:6px;font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap">⬇ Exportar Excel</button>
-      </div>
-    </div>
-    <div class="table-wrap">
-      <table id="poTable" style="min-width:1200px">
-        <thead><tr>
-          <th style="min-width:90px">Marca</th>
-          <th style="min-width:110px">Item</th>
-          <th style="min-width:260px">Descripción</th>
-          <th style="min-width:140px">Categoría</th>
-          <th class="num">Jul</th><th class="num">Aug</th><th class="num">Sep</th>
-          <th class="num">Oct</th><th class="num">Nov</th><th class="num">Dec</th>
-          <th class="num">TOTAL</th>
-          <th style="min-width:200px;font-size:10px">Comentarios</th>
-        </tr></thead>
-        <tbody id="poTableBody"></tbody>
-      </table>
-    </div>
-  </div>
-
-</div><!-- /section-purchases -->
 
 </div><!-- /content -->
 
@@ -818,16 +725,19 @@ function setGlobalMetric(m) {
   showMode(m==='valor'?'val':'pcs');
   // Sync marca toggle
   marcaState.mode = m==='valor'?'val':'pcs';
-  document.querySelectorAll('#marcaToggle button').forEach((b,i)=>
-    b.classList.toggle('active',(i===0&&m==='piezas')||(i===1&&m==='valor')));
+  const mValBtn = document.getElementById('marcaValBtnTop');
+  const mPcsBtn = document.getElementById('marcaPcsBtnTop');
+  if(mValBtn) mValBtn.classList.toggle('active', m==='valor');
+  if(mPcsBtn) mPcsBtn.classList.toggle('active', m==='piezas');
   renderMarca();
-  buildPurchasesSection();
 }
 
 function syncMarcaMode(mode) {
   marcaState.mode = mode;
-  document.querySelectorAll('#marcaToggle button').forEach((b,i)=>
-    b.classList.toggle('active',(i===0&&mode==='pcs')||(i===1&&mode==='val')));
+  const mValBtn = document.getElementById('marcaValBtnTop');
+  const mPcsBtn = document.getElementById('marcaPcsBtnTop');
+  if(mValBtn) mValBtn.classList.toggle('active', mode==='val');
+  if(mPcsBtn) mPcsBtn.classList.toggle('active', mode==='pcs');
   // Sync back to global
   gMetric = mode==='val'?'valor':'piezas';
   document.getElementById('gBtnVal').classList.toggle('active', gMetric==='valor');
@@ -861,77 +771,124 @@ function showMode(mode) {
 }
 
 /* ══════ TAB 1 CHARTS ══════ */
-let chartAnualLinea=null, chartShare100inst=null;
 let chartCatATT=null, chartCatMac=null, chartCatIShop=null, chartCatLiv=null;
 
+let chartAnualDualInst = null;
+let anualSelectedClient = 'all';
+
+function setAnualClient(btn) {
+  const key = btn.dataset.c;
+  anualSelectedClient = key;
+  document.querySelectorAll('#anualClientFilter .chip').forEach(b => {
+    b.classList.remove('on','on-att','on-macstore','on-ishop','on-liverpool','on-ml','on-coppel');
+  });
+  const clsMap = {all:'on','AT&T':'on-att','MacStore':'on-macstore','iShop':'on-ishop','Liverpool':'on-liverpool','MercadoLibre':'on-ml','Coppel':'on-coppel'};
+  btn.classList.add(clsMap[key] || 'on');
+  buildAnualDualChart();
+  buildAnualKpis();
+}
+
+function buildAnualDualChart() {
+  if (chartAnualDualInst) chartAnualDualInst.destroy();
+  const isInvoice = avbMode !== 'projection';
+  const clients = anualSelectedClient === 'all'
+    ? ['AT&T','MacStore','iShop','Liverpool','MercadoLibre','Coppel']
+    : [anualSelectedClient];
+
+  // Bar datasets: H1 light, H2 teal (valor, left axis)
+  const h1Color = '#93C5FD'; // blue-300
+  const h2Color = '#2DD4BF'; // teal-400
+
+  const valMonths = MONTHS_FULL.map((_,mi) =>
+    clients.reduce((s,c) => s + ((valorFull[c]||[])[mi]||0), 0)
+  );
+  const pcsMonths = MONTHS_FULL.map((_,mi) =>
+    clients.reduce((s,c) => s + ((piezasAnual[c]||[])[mi]||0), 0)
+  );
+
+  const barDatasets = [
+    {
+      type:'bar', label:'H1 Valor',
+      data: valMonths.map((v,i) => i < 6 ? v : 0),
+      backgroundColor: h1Color, borderRadius:4, yAxisID:'y', order:2
+    },
+    {
+      type:'bar', label:'H2 Valor',
+      data: valMonths.map((v,i) => i >= 6 ? v : 0),
+      backgroundColor: h2Color, borderRadius:4, yAxisID:'y', order:2
+    },
+    {
+      type:'line', label:'Piezas',
+      data: pcsMonths,
+      borderColor:'#F97316', backgroundColor:'transparent',
+      borderWidth:2.5, pointRadius:4, pointBackgroundColor:'#F97316',
+      tension:.35, yAxisID:'y2', order:1
+    }
+  ];
+
+  const titleParts = anualSelectedClient === 'all' ? 'Todos los Clientes' : anualSelectedClient;
+  document.getElementById('anualDualTitle').textContent =
+    `Proyección 2026 — ${titleParts}`;
+
+  chartAnualDualInst = new Chart(document.getElementById('chartAnualDual'), {
+    data: { labels: MONTHS_FULL, datasets: barDatasets },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: {
+        legend: { display: false },
+        tooltip: { callbacks: {
+          label: c => {
+            if (c.dataset.yAxisID === 'y2')
+              return ` Piezas: ${(c.parsed.y||0).toLocaleString('es-MX')}`;
+            return ` Valor: $${((c.parsed.y||0)/1e6).toFixed(2)} M`;
+          }
+        }}
+      },
+      scales: {
+        x: { grid: { display: false } },
+        y: {
+          position:'left',
+          ticks: { callback: v => '$'+(v/1e6).toFixed(1)+'M' },
+          grid: { color:'#e2e8f0' },
+          title: { display:true, text:'Valor MXN', color:'#64748b', font:{size:11} }
+        },
+        y2: {
+          position:'right',
+          ticks: { callback: v => v>=1000?(v/1000).toFixed(0)+'K':v },
+          grid: { display:false },
+          title: { display:true, text:'Piezas', color:'#F97316', font:{size:11} }
+        }
+      }
+    }
+  });
+}
+
+function buildAnualKpis() {
+  const clients = anualSelectedClient === 'all'
+    ? ['AT&T','MacStore','iShop','Liverpool','MercadoLibre','Coppel']
+    : [anualSelectedClient];
+  const totVal = clients.reduce((s,c)=>(valorFull[c]||[]).reduce((a,b)=>a+b,0)+s, 0);
+  const totPcs = clients.reduce((s,c)=>(piezasAnual[c]||[]).reduce((a,b)=>a+b,0)+s, 0);
+  const h1Val  = clients.reduce((s,c)=>(valorFull[c]||[]).slice(0,6).reduce((a,b)=>a+b,0)+s, 0);
+  const h2Val  = clients.reduce((s,c)=>(valorFull[c]||[]).slice(6).reduce((a,b)=>a+b,0)+s, 0);
+  document.getElementById('anualKpiRow').innerHTML = [
+    {label:'Valor Total Anual', val:'$'+(totVal/1e6).toFixed(1)+' M', sub:'2026 Budget'},
+    {label:'H1 Invoice',        val:'$'+(h1Val/1e6).toFixed(1)+' M', sub:'Ene–Jun'},
+    {label:'H2 Proyección',     val:'$'+(h2Val/1e6).toFixed(1)+' M', sub:'Jul–Dic'},
+    {label:'Piezas Anuales',    val:totPcs.toLocaleString('es-MX'), sub:'unidades'},
+  ].map(k=>`<div class="kpi-card">
+    <div class="kpi-label">${k.label}</div>
+    <div class="kpi-value" style="font-size:22px">${k.val}</div>
+    <div class="kpi-sub">${k.sub}</div>
+  </div>`).join('');
+}
+
 function buildAnualCharts() {
-  buildAnualLine();
-  buildShare100();
+  buildAnualDualChart();
+  buildAnualKpis();
   buildCatCharts();
 }
 
-function buildAnualLine() {
-  if (chartAnualLinea) chartAnualLinea.destroy();
-  const isVal = gMetric==='valor';
-  const src = isVal?valorFull:piezasAnual;
-  const clients = ['AT&T','MacStore','iShop','Liverpool','MercadoLibre'];
-  const colors = ['#00A8E0','#555555','#FF6D00','#C62828','#7B1FA2'];
-  document.getElementById('anualLineTitle').textContent = isVal
-    ? 'Valor Mensual por Cliente (MXN) — Budget 2026 + FCST H2'
-    : 'Piezas Mensuales por Cliente — Budget H1 + FCST H2';
-  chartAnualLinea = new Chart(document.getElementById('chartAnualLinea'),{
-    type:'line',
-    data:{labels:MONTHS_FULL,datasets:clients.map((name,i)=>({
-      label:name, data:(src[name]||[]).map(v=>v||0),
-      borderColor:colors[i],backgroundColor:'transparent',
-      borderWidth:2.5,pointRadius:4,pointBackgroundColor:colors[i],tension:.35,
-    }))},
-    options:{responsive:true,maintainAspectRatio:false,
-      plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>isVal
-        ?` ${c.dataset.label}: $${(c.parsed.y/1e6).toFixed(2)} M`
-        :` ${c.dataset.label}: ${(c.parsed.y||0).toLocaleString('es-MX')} pcs`}}},
-      scales:{x:{grid:{display:false}},y:{ticks:{callback:v=>isVal?'$'+(v/1e6).toFixed(1)+'M':v>=1000?(v/1000).toFixed(0)+'K':v},grid:{color:'#e2e8f0'}}}
-    }
-  });
-  // Legend pills
-  const legendEl=document.getElementById('legendAnual');
-  legendEl.innerHTML='';
-  clients.forEach((name,i)=>{
-    const pill=document.createElement('div');
-    pill.className='legend-item';
-    pill.innerHTML=`<span class="legend-dot" style="background:${colors[i]}"></span>${name}`;
-    pill.addEventListener('click',()=>{
-      const ds=chartAnualLinea.data.datasets[i];
-      ds.hidden=!ds.hidden; pill.classList.toggle('hidden',ds.hidden); chartAnualLinea.update();
-    });
-    legendEl.appendChild(pill);
-  });
-}
-
-function buildShare100() {
-  if (chartShare100inst) chartShare100inst.destroy();
-  const isVal = gMetric==='valor';
-  const src = isVal?valorFull:piezasAnual;
-  const clients = ['AT&T','MacStore','iShop','Liverpool','MercadoLibre'];
-  const colors = ['#00A8E0','#555','#FF6D00','#C62828','#7B1FA2'];
-  document.getElementById('shareTitle').textContent = isVal
-    ? 'Share de Valor por Cliente — Mes a Mes'
-    : 'Share de Piezas por Cliente — Mes a Mes';
-  chartShare100inst = new Chart(document.getElementById('chartShare100'),{
-    type:'bar',
-    data:{labels:MONTHS_FULL,datasets:clients.map((name,i)=>({
-      label:name,backgroundColor:colors[i],borderWidth:0,
-      data:MONTHS_FULL.map((_,mi)=>{
-        const tot=clients.reduce((s,c)=>s+((src[c][mi])||0),0);
-        return tot?Math.round(((src[name][mi]||0)/tot)*100):0;
-      })
-    }))},
-    options:{responsive:true,maintainAspectRatio:false,
-      plugins:{legend:{position:'bottom',labels:{font:{size:11},boxWidth:10,padding:12}},tooltip:{callbacks:{label:c=>` ${c.dataset.label}: ${c.parsed.y}%`}}},
-      scales:{x:{stacked:true,grid:{display:false}},y:{stacked:true,max:100,ticks:{callback:v=>v+'%'},grid:{color:'#e2e8f0'}}}
-    }
-  });
-}
 
 function makeCatChart(id,key,oldChart) {
   if (oldChart) oldChart.destroy();
@@ -1302,172 +1259,6 @@ function filterMarca(btn,type){
 
 /* ══════ TAB 5: PURCHASES ══════ */
 const MONTHS_PO = ['Jul','Aug','Sep','Oct','Nov','Dec'];
-const purchasesFlat = [{"m":"Speck","i":"127573-9166","d":"Speck Transfer Pro Pocket Universal Sleeve 13\"/14\" - Sweater Grey/Coastal Blue","c":"13\" Sleeves","n":"Poner PO 40 Mediados Julio","p":[0,0,0,22,12,12],"v":[11643.52,19118.8,11212.92,19751.71,11716.73,14235.78]},{"m":"Speck","i":"150226-7265","d":"Speck Balance Folio Case for iPad 10th Gen - Plumberry/Crushed Purple/Crepe Pink","c":"iPad 10th /11th - 10.9\"/11\" (2022-2025)","n":"PO 350 Med Julio | Volar 352 - PO / FCST 1,400 resto del año","p":[55,268,140,155,397,195],"v":[57438.27,156209.41,77366.31,71501.65,176585.37,90189.85]},{"m":"Speck","i":"150226-9969","d":"Speck Balance Folio Case for iPad 10th Gen - Almond Milk /Mocha/Charcoal","c":"iPad 10th /11th - 10.9\"/11\" (2022-2025)","n":"PO 130 Med Julio | PO / FCST 650 resto del año","p":[0,0,97,80,280,70],"v":[58355.36,109614.08,81680.97,64676.6,156842.32,69942.99]},{"m":"Speck","i":"150226-D143","d":"Speck Balance Folio Case for iPad 10th Gen - Black/Black/White","c":"iPad 10th /11th - 10.9\"/11\" (2022-2025)","n":"PO 180 Med Julio | PO / FCST 650 resto del año","p":[0,0,106,80,300,70],"v":[28422.6,115585.24,63477.14,37896.8,142113.0,33159.7]},{"m":"Speck","i":"144896-9352","d":"Speck Smartshell Case with Microban for Macbook Pro 14\" M1/M2 - Swell Blue","c":"MacBook Pro 14\" M1/M2 Cases","n":"PO 50 Med Julio | PO FCST / 200","p":[0,0,11,30,90,40],"v":[17654.6,25836.0,12918.0,12918.0,38754.0,17224.0]},{"m":"Speck","i":"150225-3085","d":"Speck Smartshell Case for Macbook Air 13\" M2 2022 - Obsidian","c":"MacBook Air 13\" M4/M3/M2","n":"PO 230 Med Julio | PO FCST / 400","p":[0,0,16,55,200,90],"v":[57851.55,119371.46,68478.79,50888.74,118867.65,74524.51]},{"m":"Speck","i":"150225-3086","d":"Speck Smartshell Macbook Air M2/M3 Cozy Pink/Cozy Pink/Swtrgrey","c":"MacBook Air 13\" M4/M3/M2","n":"PO 80 Med Julio | PO FCST / 300","p":[0,0,0,0,130,136],"v":[56193.64,73441.27,46290.19,52928.93,73945.08,69900.16]},{"m":"Speck","i":"150225-9992","d":"Speck Smartshell Macbook Air M2/M3 Clear/Clear/Sweatergrey","c":"MacBook Air 13\" M4/M3/M2","n":"PO 230 Med Julio | 50 Air - 190 Barco NAPs - FCST / PO 1,000 resto del año","p":[0,52,110,75,334,266],"v":[98479.1,153053.52,103792.72,77452.91,153557.33,125228.26]},{"m":"Speck","i":"150950-3260","d":"Speck Stylefolio iPad 11\" (2022-2025) Deep Sea Pull Up/Parchment/Early Grey","c":"iPad 10th /11th - 10.9\"/11\" (2022-2025)","n":"","p":[0,0,0,0,0,26],"v":[22167.64,26701.93,23679.07,23679.07,28717.17,31236.22]},{"m":"Speck","i":"150989-3264","d":"Speck Balance Folio iPad 11\" (2022-2025) Ibis Pink/Deep Malachite/Jelly Mint","c":"iPad 10th /11th - 10.9\"/11\" (2022-2025)","n":"","p":[0,0,0,0,0,0],"v":[30228.6,36274.32,30228.6,31236.22,37785.75,41312.42]},{"m":"Speck","i":"150989-3266","d":"Speck Balance Folio iPad 11\" (2022-2025) Sable/Blue Granite/Black","c":"iPad 10th /11th - 10.9\"/11\" (2022-2025)","n":"","p":[0,0,0,0,0,0],"v":[20152.4,24182.88,1511.43,0.0,0.0,0.0]},{"m":"Speck","i":"150422-1041","d":"Speck Car Vent Mount for MagSafe Black iPhone 15 Car","c":"Car Vent","n":"","p":[0,0,0,0,0,0],"v":[8844.0,7738.5,7370.0,7738.5,9212.5,9949.5]},{"m":"Speck","i":"150423-1041","d":"Speck Wallet for MagSafe® Black iPhone 15 Wallet","c":"Wallet","n":"PO 50 Med Julio","p":[0,0,0,2,40,38],"v":[13056.75,11824.14,12910.75,8334.13,16075.34,16690.54]},{"m":"Speck","i":"150439-3205","d":"Speck Presidio®2 Grip Magsafe® Clicklock™ Black / Slate Grey iPhone 15","c":"iPhone 16e / 15 / 14 / 13","n":"","p":[0,0,0,57,50,20],"v":[0.0,15501.6,7750.8,31003.2,19377.0,7750.8]},{"m":"Speck","i":"150491-5085","d":"Speck GemShell® iPhone 15","c":"iPhone 16e / 15 / 14 / 13","n":"","p":[0,0,0,0,70,30],"v":[3871.6,9679.0,5807.4,5807.4,15486.4,5807.4]},{"m":"Speck","i":"150989-3267","d":"Speck Balance Folio iPad 11\" (2022-2025) Ceramic Grey/Autumn Sky/Black","c":"iPad 10th /11th - 10.9\"/11\" (2022-2025)","n":"PO 200 Mediados Julio | Volar 216 - PO / FCST 700 resto del año","p":[70,120,80,77,122,127],"v":[46767.73,71824.4,55608.02,47775.35,55608.02,58127.07]},{"m":"Speck","i":"150990-9323","d":"Speck Case-E-Run iPad 11\" (2022-2025) Charge Blue/Brave Blue","c":"iPad 10th /11th - 10.9\"/11\" (2022-2025)","n":"PO FCST / 200","p":[0,0,0,0,74,97],"v":[29923.08,36270.4,29016.32,33096.74,39897.44,43977.86]},{"m":"Speck","i":"150553-3240","d":"PRESIDIO CLEAR +MS (CLEAR/CLEAR/CHROME FINISH)","c":"iPhone 16e / 15 / 14 / 13","n":"","p":[20,50,30,30,80,30],"v":[7750.8,19377.0,11626.2,11626.2,31003.2,11626.2]},{"m":"Speck","i":"150584-3085","d":"Speck Smartshell for Mackbook Air 15\" - Obsidian/Sweater Grey","c":"MacBook Air 15\" M2/M3","n":"PO 40 Med Julio | PO FCST / 150","p":[0,0,0,31,56,47],"v":[16150.8,18304.24,8075.4,17227.52,30148.16,25302.92]},{"m":"Speck","i":"150584-9992","d":"Speck Smartshell for Mackbook Air 15\" - Clear/Sweater Grey","c":"MacBook Air 15\" M2/M3","n":"PO 40 Med Julio | PO FCST / 300","p":[0,0,5,80,80,100],"v":[21534.4,26918.0,10767.2,43068.8,43068.8,53836.0]},{"m":"Speck","i":"150585-1568","d":"Speck Tagimals 4-Pack - Mulicolor","c":"AirTag","n":"PO 150 Med Julio","p":[0,0,8,84,100,51],"v":[24212.92,28558.24,16219.4,28581.48,34111.88,23631.99]},{"m":"Speck","i":"150698-9508","d":"Speck iPhone 16 Gemshell Clear/ Platinum Glitter","c":"iPhone 16","n":"","p":[0,0,0,0,0,0],"v":[4696.42,5902.17,8179.39,5592.34,5592.34,6178.43]},{"m":"Speck","i":"142573-1050","d":"Speck Balance Folio with Microban for iPad mini 6 - Black","c":"iPad mini 6","n":"Pushback iShop","p":[0,0,0,0,0,0],"v":[41328.0,0.0,0.0,0.0,0.0,0.0]},{"m":"Speck","i":"150954-3240","d":"Speck Presidio Perfect-Clear + MS iPhone 17 Clear","c":"iPhone 17","n":"","p":[281,23,14,16,10,11],"v":[11884.56,11884.56,7234.08,8267.52,5167.2,5683.92]},{"m":"Speck","i":"150957-D143","d":"Speck Presidio2 + MS iPhone 17 Black/Slate Grey/White","c":"iPhone 17","n":"","p":[0,0,0,0,0,0],"v":[4262.94,4262.94,4262.94,4262.94,4262.94,4262.94]},{"m":"Speck","i":"150958-D143","d":"Speck Presidio2 Grip + MS iPhone 17 Black","c":"iPhone 17","n":"","p":[0,0,0,0,0,0],"v":[5813.1,0.0,0.0,0.0,0.0,0.0]},{"m":"Speck","i":"150972-3240","d":"Speck Presidio Perfect-Clear  iPhone 17 Pro Clear","c":"iPhone 17 Pro","n":"","p":[0,0,0,0,0,0],"v":[227473.23,185343.31,90576.91,148449.55,143058.47,123771.92]},{"m":"Speck","i":"150975-D143","d":"Speck Presidio2  + MS iPhone 17 Pro Black/Slate Grey/White","c":"iPhone 17 Pro","n":"","p":[0,0,0,0,0,0],"v":[3100.32,0.0,0.0,0.0,0.0,0.0]},{"m":"Speck","i":"150976-D143","d":"Speck Presidio2 Grip + MS iPhone 17 Pro Black","c":"iPhone 17 Pro","n":"","p":[0,0,0,0,0,0],"v":[2712.78,1550.16,50380.2,0.0,0.0,0.0]},{"m":"Speck","i":"150978-9221","d":"Speck Presidio Lux iPhone 17 Pro Glitter/Gold","c":"iPhone 17 Pro","n":"","p":[0,0,0,0,0,0],"v":[25802.0,27645.0,36860.0,32252.5,34556.25,34556.25]},{"m":"Speck","i":"150981-3240","d":"Speck Presidio Perfect-Clear  iPhone 17 Pro Max Clear","c":"iPhone 17 Pro Max","n":"","p":[0,0,0,0,0,0],"v":[113067.7,73202.8,0.0,0.0,0.0,0.0]},{"m":"Speck","i":"150984-D143","d":"Speck Presidio2 + MS iPhone 17 Pro Max Black/Slate Grey/White","c":"iPhone 17 Pro Max","n":"","p":[27,0,0,0,0,0],"v":[16664.22,0.0,0.0,0.0,0.0,0.0]},{"m":"Speck","i":"150986-D143","d":"Speck Presidio2 Grip iPhone 17 Pro Max Black","c":"iPhone 17 Pro Max","n":"","p":[0,0,0,0,0,0],"v":[33849.65,9215.0,0.0,0.0,0.0,0.0]},{"m":"Speck","i":"150987-9221","d":"Speck Presidio Lux iPhone 17 Pro Max Glitter/Gold","c":"iPhone 17 Pro Max","n":"","p":[0,0,0,0,0,0],"v":[69112.5,69112.5,92150.0,92150.0,0.0,0.0]},{"m":"Speck","i":"151117-D143","d":"Speck iPad Mini 2026 AP 2038","c":"iPad mini 6","n":"PO 450 Med Aug | PO FCST / 500 resto del año (una vez que se confrime disponiblidad volamos 240air, resto Nps?","p":[0,270,100,100,100,100],"v":[0.0,146404.0,43060.0,43060.0,43060.0,43060.0]},{"m":"Speck","i":"140999-1050","d":"Speck Presidio Pro Folio Case for iPad Pro 11\" 2/M1/M2 /Air 10.9\" 4/5 - Black","c":"iPad Pro 11\" 2/3","n":"PO 130 Med Julio | PO FCST / 250","p":[0,0,1,60,98,52],"v":[50688.54,93506.21,31390.87,46125.1,68787.18,46827.9]},{"m":"Speck","i":"140548-1050","d":"Speck Balance Folio Case with Microban for iPad Pro 11\" M1/Air 10.9\" - Black","c":"iPad Pro 11\" 2/3/4/Air 4/5","n":"PO 200 Mediados Julio | PO FCST / 300","p":[0,0,21,70,110,60],"v":[39486.0,76664.0,24552.8,34676.2,52907.8,31881.6]},{"m":"Speck","i":"150991-3263","d":"Speck Balance Folio for iPad Air 10.9\"/Pro 11\" - Piccard's Blue","c":"iPad Pro 11\" 2/3/4/Air 4/5","n":"","p":[0,0,0,0,12,26],"v":[38754.0,35739.8,6028.4,18946.4,27127.8,11195.6]},{"m":"Speck","i":"150525-D143","d":"Speck BALANCE FOLIO APPLE 11\" IPAD PRO CASES - Black","c":"iPad Pro 11\" M3/M4","n":"PO 50 Med Julio | PO FCST /100","p":[0,0,12,25,35,15],"v":[17224.0,19377.0,6459.0,10765.0,15071.0,6459.0]},{"m":"Speck","i":"150992-5085","d":"Speck Gemshell Grip + MS iPhone 17 Clear","c":"iPhone 17","n":"","p":[0,0,0,0,0,0],"v":[4029.48,4029.48,4029.48,4029.48,4029.48,4029.48]},{"m":"Speck","i":"151008-3261","d":"Speck Presidio2 + MS iPhone 17 Deep Sea/Silver Metallic/Spell Blue","c":"iPhone 17","n":"","p":[0,0,0,0,0,0],"v":[4650.48,0.0,0.0,0.0,0.0,0.0]},{"m":"Speck","i":"151020-3261","d":"Speck Presidio2  + MS iPhone 17 Pro Deep Sea/Silver Metallic/Spell Blue","c":"iPhone 17 Pro","n":"","p":[0,0,0,0,0,0],"v":[12788.82,6588.18,7750.8,0.0,0.0,0.0]},{"m":"Speck","i":"151089-1212","d":"Speck SmartShell for Apple MacBook Neo - Clear","c":"MacBook Neo","n":"No colocar PO hasta revisar ST de iShop | Volar 200 - 296 barco NAPs PO / FCST 2,600 resto del año","p":[0,593,400,400,600,600],"v":[0.0,258360.0,172240.0,172240.0,258360.0,258360.0]},{"m":"Speck","i":"151096-3261","d":"Speck  Presidio2 Grip + MagSafe/CC  Deep Sea  iPhone 18 Pro","c":"iPhone 18 Pro","n":"FCST 350","p":[0,0,199,35,35,35],"v":[0.0,0.0,77508.62,13564.01,13564.01,13564.01]},{"m":"Speck","i":"151096-D143","d":"Speck  Presidio2 Grip + MagSafe/CC  Black  iPhone 18 Pro","c":"iPhone 18 Pro","n":"FCST300","p":[0,0,0,2,95,80],"v":[0.0,0.0,69542.46,34663.58,40476.72,34663.58]},{"m":"Speck","i":"151098-3240","d":"Speck  Presidio Perfect Clear + C-MagSafe/CC  Clear  iPhone 18 Pro","c":"iPhone 18 Pro","n":"FCST 500","p":[0,0,0,56,120,180],"v":[0.0,0.0,108511.2,69757.2,46504.8,69757.2]},{"m":"Speck","i":"151103-3296","d":"Speck  CandyShell Icon + MagSafe/CC  Black Licorice  iPhone 18 Pro","c":"iPhone 18 Pro","n":"","p":[0,200,0,0,67,68],"v":[0.0,0.0,0.0,0.0,26997.25,27400.19]},{"m":"Speck","i":"151103-3297","d":"Speck  CandyShell Icon + MagSafe/CC  Vanilla Frost  iPhone 18 Pro","c":"iPhone 18 Pro","n":"","p":[0,200,0,0,67,68],"v":[0.0,0.0,0.0,0.0,26997.25,27400.19]},{"m":"Speck","i":"151103-3303","d":"Speck  CandyShell Icon + MagSafe/CC  Bubblegum Pop  iPhone 18 Pro","c":"iPhone 18 Pro","n":"","p":[0,200,0,0,76,77],"v":[0.0,0.0,0.0,0.0,30623.74,31026.69]},{"m":"Speck","i":"151104-3288","d":"Speck  Presidio Lux Grip + C-MagSafe/CC  Sable  iPhone 18 Pro","c":"iPhone 18 Pro","n":"FCST 200","p":[0,200,0,0,67,68],"v":[0.0,0.0,0.0,0.0,26997.25,27400.19]},{"m":"Speck","i":"151104-9984","d":"Speck  Presidio Lux Grip + C-MagSafe/CC  Obsidian  iPhone 18 Pro","c":"iPhone 18 Pro","n":"FCST 200","p":[0,280,220,20,87,88],"v":[0.0,0.0,85259.48,7750.86,34748.11,35151.05]},{"m":"Speck","i":"151106-9221","d":"Speck  Presidio Lux + C-MagSafe/CC  Gold Glitter  iPhone 18 Pro","c":"iPhone 18 Pro","n":"FCST 350, air 350, naps 250","p":[0,0,0,0,32,202],"v":[0.0,0.0,127233.04,88147.47,85326.87,85729.81]},{"m":"Speck","i":"151108-3261","d":"Speck  Presidio2 Grip + MagSafe/CC  Deep Sea  iPhone 18 Pro Max","c":"iPhone 18 Pro Max","n":"Se quito demanda de Jul y Ago para proyectar en iP18 | FCST 350","p":[0,0,0,100,150,80],"v":[0.0,0.0,85259.48,46505.17,58131.47,31003.45]},{"m":"Speck","i":"151108-D143","d":"Speck  Presidio2 Grip + MagSafe/CC  Black  iPhone 18 Pro Max","c":"iPhone 18 Pro Max","n":"FCST 700","p":[60,0,224,200,165,165],"v":[0.0,0.0,154586.64,84828.88,71264.87,71264.87]},{"m":"Speck","i":"151110-3240","d":"Speck  Presidio Perfect Clear + C-MagSafe/CC  Clear  iPhone 18 Pro Max","c":"iPhone 18 Pro Max","n":"FCST 1,500, air 500, naps 340","p":[0,0,0,120,680,550],"v":[0.0,0.0,200661.2,177408.8,292811.2,238770.5]},{"m":"Speck","i":"151115-3296","d":"Speck  CandyShell Icon + MagSafe/CC  Black Licorice  iPhone 18 Pro Max","c":"iPhone 18 Pro Max","n":"","p":[0,300,0,0,101,102],"v":[0.0,0.0,0.0,0.0,40697.34,41100.28]},{"m":"Speck","i":"151115-3297","d":"Speck  CandyShell Icon + MagSafe/CC  Vanilla Frost  iPhone 18 Pro Max","c":"iPhone 18 Pro Max","n":"","p":[0,300,0,0,101,102],"v":[0.0,0.0,0.0,0.0,40697.34,41100.28]},{"m":"Speck","i":"151115-3303","d":"Speck  CandyShell Icon + MagSafe/CC  Bubblegum Pop  iPhone 18 Pro Max","c":"iPhone 18 Pro Max","n":"","p":[0,300,0,0,101,102],"v":[0.0,0.0,0.0,0.0,40697.34,41100.28]},{"m":"Speck","i":"151116-3288","d":"Speck  Presidio Lux Grip + C-MagSafe/CC  Sable  iPhone 18 Pro Max","c":"iPhone 18 Pro Max","n":"FCST 200","p":[0,300,0,0,101,102],"v":[0.0,0.0,0.0,0.0,40697.34,41100.28]},{"m":"Speck","i":"151116-9984","d":"Speck  Presidio Lux Grip + C-MagSafe/CC  Obsidian  iPhone 18 Pro Max","c":"iPhone 18 Pro Max","n":"FCST 300","p":[0,356,250,30,131,132],"v":[0.0,0.0,96885.78,11626.29,52323.63,52726.58]},{"m":"Speck","i":"150527-D143","d":"Speck BALANCE FOLIO APPLE 13\" IPAD PRO CASES - Black","c":"iPad Pro 13\" M4","n":"PO 50 Med Julio | PO FCST /100","p":[0,0,11,25,25,18],"v":[14470.68,20155.59,14470.68,12920.25,12920.25,9302.58]},{"m":"Speck","i":"151118-9221","d":"Speck  Presidio Lux + C-MagSafe/CC  Gold Glitter  iPhone 18 Pro Max","c":"iPhone 18 Pro Max","n":"FCST 3,000, air 900, naps 300","p":[0,0,0,625,1204,1215],"v":[0.0,0.0,308252.13,427120.6,496704.88,501137.26]},{"m":"Speck","i":"151119-5085","d":"Speck  Presidio Perfect Clear Fold + MagSafe  Clear  iPhone 18 FOLD","c":"iPhone 18 Fold","n":"FCST 400","p":[0,236,327,163,131,132],"v":[0.0,0.0,157007.29,68709.22,55815.01,56217.96]},{"m":"Quikcell","i":"GQC2232","d":"Quikcell Tempered Glass Screen Protector for iPhone 17 / Pro","c":"iPhone 17 / 17 Pro","n":"","p":[0,0,0,0,0,0],"v":[15206.56,15808.8,20626.72,16260.48,19422.24,21379.52]},{"m":"Nomad","i":"NM00736685","d":"Nomad Sport Band - 45mm | Ultra Orange","c":"49/45/44/42 mm","n":"Pon PO 200 piezas entrega finales de Julio","p":[0,0,0,0,249,193],"v":[126717.2,160668.7,156968.78,146585.2,297775.34,192727.04]},{"m":"Nomad","i":"NM009162858","d":"Nomad Modern Leather Case - iPhone 18 Pro Max | Brown | Nomad Leather","c":"iPhone 18 Pro Max","n":"450 Mediados de Agosto","p":[0,0,0,123,410,350],"v":[0.0,0.0,213268.43,177416.38,191627.59,163205.17]},{"m":"Nomad","i":"NM009179858","d":"Nomad Modern Leather Case - iPhone 18 Pro Max | Black | Nomad Leather","c":"iPhone 18 Pro Max","n":"450 Mediados de Agosto","p":[0,0,0,220,420,380],"v":[0.0,0.0,220179.61,186890.52,196364.66,177416.38]},{"m":"Nomad","i":"NM009247858","d":"Nomad Modern Leather Case - iPhone 18 Pro | Brown | Nomad Leather","c":"iPhone 18 Pro","n":"","p":[0,0,0,52,210,200],"v":[0.0,0.0,176408.77,102919.4,98182.33,93445.26]},{"m":"Nomad","i":"NM009254858","d":"Nomad Modern Leather Case - iPhone 18 Pro | Black | Nomad Leather","c":"iPhone 18 Pro","n":"","p":[0,0,0,147,250,220],"v":[0.0,0.0,171801.31,117130.6,117130.6,102919.4]},{"m":"Nomad","i":"NM011116858","d":"Nomad Stratos Band - 49mm | Black Titanium | Ultra Orange FKM","c":"49/45/44/42 mm","n":"","p":[0,0,0,0,0,0],"v":[57916.56,69982.51,69982.51,57916.56,69982.51,77222.08]},{"m":"Nomad","i":"NM011123858","d":"Nomad Stratos Band - 49mm | Natural Titanium | Ultra Orange FKM","c":"49/45/44/42 mm","n":"","p":[0,0,0,0,0,0],"v":[62742.94,60329.75,45850.61,55503.37,65156.13,72395.7]},{"m":"Nomad","i":"NM011284858","d":"Nomad Modern Leather Case - Airpods Pro 3 | Rustic Brown | Horween","c":"Airpods Pro 3","n":"Pon PO 600 lo mas rapido posible","p":[0,0,0,0,107,321],"v":[146285.72,116500.02,118547.31,136316.11,137725.49,157490.97]},{"m":"Nomad","i":"NM011291858","d":"Nomad Modern Leather Case - Airpods Pro 3 | Black | Horween","c":"Airpods Pro 3","n":"","p":[0,0,0,0,0,316],"v":[89544.0,134822.1,146512.59,138933.55,163279.97,185456.25]},{"m":"Nomad","i":"NM011697858","d":"Nomad Rocky Point Band - 46mm/49mm | Carbon Black | Black Hardware","c":"49/45/44/42 mm","n":"","p":[0,0,12,62,75,82],"v":[61491.66,67540.02,55443.3,62499.72,75604.5,82660.92]},{"m":"Nomad","i":"NM01187585","d":"Nomad AC Adapter - 65W | Slim | Carbide","c":"65W","n":"","p":[0,0,0,0,0,0],"v":[10974.32,10974.32,3919.4,10190.44,10190.44,9406.56]},{"m":"Nomad","i":"NM014278858","d":"Nomad Modern Leather Case - iPhone 17 Pro Max | Brown | Nomad Leather","c":"iPhone 17 Pro Max","n":"","p":[0,0,0,0,0,0],"v":[107742.6,123069.8,0.0,0.0,0.0,0.0]},{"m":"Nomad","i":"NM014285858","d":"Nomad Modern Leather Case - iPhone 17 Pro Max | Black | Nomad Leather","c":"iPhone 17 Pro Max","n":"","p":[0,0,0,0,0,0],"v":[153260.8,132112.4,0.0,0.0,0.0,0.0]},{"m":"Nomad","i":"NM014322858","d":"Nomad Modern Leather Case - iPhone 17 Pro | Brown | Nomad Leather","c":"iPhone 17 Pro","n":"","p":[0,0,0,0,0,0],"v":[30478.84,30478.84,0.0,0.0,0.0,0.0]},{"m":"Nomad","i":"NM014339858","d":"Nomad Modern Leather Case - iPhone 17 Pro | Black | Nomad Leather","c":"iPhone 17 Pro","n":"","p":[0,0,0,0,0,0],"v":[55787.2,53181.8,0.0,0.0,0.0,0.0]},{"m":"Nomad","i":"NM014803858","d":"Nomad Rocky Point Band - 46mm/49mm | Storm | Black Hardware","c":"49/45/44/42 mm","n":"","p":[0,1,69,140,180,127],"v":[57614.46,55520.8,66609.45,122673.04,156714.42,116624.69]},{"m":"Nomad","i":"NM014827858","d":"Nomad Rocky Point Band - 46mm/49mm | Atlantic | Black Hardware","c":"49/45/44/42 mm","n":"","p":[0,0,0,51,40,65],"v":[49007.19,29078.64,11088.66,85762.57,45130.04,65523.85]},{"m":"Nomad","i":"NM014919858","d":"Nomad Sport Band - 49/45/44mm/42mm | M/L | Naval","c":"49/45/44/42 mm","n":"","p":[0,3,80,90,110,80],"v":[56181.94,50829.02,47749.92,56181.94,68119.42,55139.76]},{"m":"Nomad","i":"NM1Am10000","d":"Nomad Sport Strap - 45/44mm/42mm | M/L | Black | FKM | V2","c":"49/45/44/42 mm","n":"Pon PO 300 piezas entrega finales de Julio","p":[0,0,0,83,250,387],"v":[134959.76,165456.92,162157.2,256992.73,259725.92,257183.5]},{"m":"Quikcell","i":"QC-LIQUIDG","d":"Quikcell Ultra LIQUID GLASS Screen Protector","c":"Universal","n":"","p":[0,0,0,0,0,0],"v":[1084405.0,1084405.0,1084405.0,1549150.0,2323725.0,2323725.0]},{"m":"Quikcell","i":"QCC3FT-BLK","d":"Quikcell USB-C to USB-C cable 3 ft. 3A current; PVC+Nylon","c":"3 ft","n":"Revisar transicion de negro a blanco ATT","p":[0,0,0,0,0,0],"v":[968944.9,1026014.44,1083083.98,1197068.4,1339510.26,1339510.26]},{"m":"Quikcell","i":"QCC6FT-BLK","d":"Quikcell CHARGE & SYNC CABLE USB-C to USB-C - 6 ft - Black","c":"6 ft","n":"","p":[0,0,0,0,0,0],"v":[648608.36,686698.08,724968.32,801328.28,896642.84,896642.84]},{"m":"Quikcell","i":"QCPD25W-WT","d":"Quikcell PD 25W Single USB-C Port Wall Charger White","c":"25W","n":"","p":[0,0,0,0,0,0],"v":[1062962.48,1125435.04,1187907.6,1312852.72,1469150.24,1469150.24]},{"m":"Quikcell","i":"QCPD35W-WT","d":"Quikcell 35W PD A+C Dual Ports Wall Charger White","c":"35W","n":"","p":[0,0,0,0,0,0],"v":[667897.44,707085.3,746273.16,824932.85,923186.47,923186.47]},{"m":"Quikcell","i":"QCVPA2005","d":"Quikcell 37W DUAL PORT A+C CAR CHARGER - Black","c":"37W","n":"","p":[0,0,0,0,0,0],"v":[60111.62,61640.51,65066.06,71510.73,80858.42,82135.76]},{"m":"Tech21","i":"T21-10260","d":"Tech21 EvoLite for iPhone 15 - Clear","c":"iPhone 16e / 15 / 14 / 13","n":"","p":[0,0,10,20,80,30],"v":[6452.7,11257.76,7207.59,4553.43,17458.83,6955.96]},{"m":"Tech21","i":"T21-10441","d":"Tech21 EvoLite for iPhone 15 - Lavender","c":"iPhone 16e / 15 / 14 / 13","n":"No colocar PO viene devolucion y Ericka revisa con el comprador demanda de julio y agosto","p":[0,31,20,30,50,20],"v":[4301.8,8603.6,4301.8,6452.7,10754.5,4301.8]},{"m":"Tech21","i":"T21-10857","d":"Tech21 EvoCrystal w/MagSafe for iPhone 16 - Black","c":"iPhone 16","n":"","p":[0,0,0,0,0,0],"v":[0.0,0.0,1033.44,516.72,516.72,516.72]},{"m":"Tech21","i":"T21-11240","d":"Tech21 EvoLite for AirPods 4 - Clear","c":"Airpods 4","n":"","p":[0,0,0,0,0,40],"v":[10206.86,7698.66,10433.29,9980.43,10433.29,10433.29]},{"m":"Tech21","i":"T21-11304","d":"Tech21 EvoCrystal iPhone 17 Black","c":"iPhone 17","n":"","p":[0,0,0,0,0,0],"v":[25350.38,26257.14,30337.56,25350.38,26257.14,26257.14]},{"m":"Tech21","i":"T21-11323","d":"Tech21 EvoClear iPhone 17 Pro Clear","c":"iPhone 17 Pro","n":"Se ajusto demanda de jul y ago de acuerdo a OH Lyde","p":[0,0,0,0,0,0],"v":[11237.5,7750.0,0.0,0.0,0.0,0.0]},{"m":"Tech21","i":"T21-11324","d":"Tech21 EvoCrystal iPhone 17 Pro Black","c":"iPhone 17 Pro","n":"","p":[0,0,0,0,0,0],"v":[17642.92,4533.8,0.0,0.0,0.0,0.0]},{"m":"Tech21","i":"T21-11331","d":"Tech21 EvoPro w/MagSafe Clear/Black iPhone 17 Pro","c":"iPhone 17 Pro","n":"","p":[0,0,0,0,0,0],"v":[0.0,0.0,98193.9,0.0,0.0,0.0]},{"m":"Tech21","i":"T21-11334","d":"Tech21 EvoClear iPhone 17 Pro Max Clear","c":"iPhone 17 Pro Max","n":"Se ajusto demanda de jul y ago de acuerdo a OH Lyde","p":[0,0,0,0,0,0],"v":[19375.0,6587.5,0.0,0.0,0.0,0.0]},{"m":"Tech21","i":"T21-11335","d":"Tech21 EvoCrystal iPhone 17 Pro Max Black","c":"iPhone 17 Pro Max","n":"","p":[0,0,0,0,0,0],"v":[14054.78,13601.4,0.0,0.0,0.0,0.0]},{"m":"Tech21","i":"T21-11342","d":"Tech21 EvoPro w/MagSafe Clear/Black iPhone 17 Pro Max","c":"iPhone 17 Pro Max","n":"","p":[0,0,0,0,0,0],"v":[18088.35,15504.3,0.0,0.0,0.0,51681.0]},{"m":"Tech21","i":"T21-11353","d":"Tech21 EvoCrystal iPhone 17 Pro Iridescent","c":"iPhone 17 Pro","n":"","p":[0,0,0,0,0,0],"v":[10427.74,11334.5,14961.54,11334.5,13601.4,14961.54]},{"m":"Tech21","i":"T21-11357","d":"Tech21 EvoCrystal iPhone 17 Pro Max Iridescent","c":"iPhone 17 Pro Max","n":"","p":[0,0,0,0,0,0],"v":[29923.08,24482.52,32189.98,29469.7,35363.64,38990.68]},{"m":"Tech21","i":"T21-11364","d":"Tech21 EvoSparkle iPhone 17 Pro Focus","c":"iPhone 17 Pro","n":"","p":[0,0,0,0,0,0],"v":[5425.0,0.0,0.0,0.0,0.0,0.0]},{"m":"Tech21","i":"T21-11366","d":"Tech21 EvoSparkle iPhone 17 Pro Max Focus","c":"iPhone 17 Pro Max","n":"","p":[0,0,0,0,0,0],"v":[27125.0,0.0,0.0,0.0,0.0,0.0]},{"m":"Tech21","i":"T21-11371","d":"Tech21 EvoSparkle iPhone 17 Lunar","c":"iPhone 17","n":"","p":[0,0,0,0,0,0],"v":[3100.0,0.0,0.0,0.0,0.0,0.0]},{"m":"Tech21","i":"T21-11373","d":"Tech21 EvoSparkle iPhone 17 Pro Lunar","c":"iPhone 17 Pro","n":"","p":[0,0,0,0,0,0],"v":[3100.0,0.0,0.0,0.0,0.0,0.0]},{"m":"Tech21","i":"T21-11376","d":"Tech21 EvoSparkle iPhone 17 Pro Max Lunar","c":"iPhone 17 Pro Max","n":"","p":[0,0,0,0,0,0],"v":[27125.0,0.0,0.0,0.0,0.0,0.0]},{"m":"Tech21","i":"T21-11408","d":"Tech21 Tempered Glass iPhone 18 Pro","c":"iPhone 18 Pro","n":"FCST PO 1,500","p":[0,0,210,711,517,251],"v":[0.0,0.0,167711.43,327590.19,238205.52,115647.17]},{"m":"Tech21","i":"T21-11441","d":"Tech21 Tempered Glass iPhone 18 Pro Max","c":"iPhone 18 Pro Max","n":"FCST PO 3,000","p":[0,0,0,1076,1240,416],"v":[0.0,0.0,285201.58,513731.44,571324.66,191670.21]},{"m":"Tech21","i":"T21-11443","d":"Tech21 Apple MacBook Air 13 EvoShell - Clear","c":"MacBook Air 13\" M4/M3/M2","n":"PO 450 Med Julio | 180 Urgente NAPs (allocation)- 1,100 PO resto del año - Tener principios de Nov","p":[0,171,108,204,300,150],"v":[124910.64,182586.36,82053.58,124910.64,181930.0,95458.4]},{"m":"Tech21","i":"T21-11515","d":"Tech21 FlexFolio - Apple iPad Air 10.9-11-inch (2020-2025) / iPad Pro 11-inch (2018-2021) Case - Clear","c":"iPad Pro 11\" 2/3/4/Air 4/5","n":"PO 100 Med Julio | 70 Urgente Naps (allocation) - 650 PO resto del año","p":[0,64,80,80,105,194],"v":[112524.92,113605.62,88773.73,88062.64,101914.83,124983.06]},{"m":"Tech21","i":"T21-11516","d":"Tech21 FlexFolio - Apple iPad Air 10.9-11-inch (2020-2025) / iPad Pro 11-inch (2018-2021) Case - Tint","c":"iPad Pro 11\" 2/3/4/Air 4/5","n":"PO 60 Med Julio | Volar 60 - PO / FCST 600 resto del año","p":[30,30,40,64,100,149],"v":[41556.57,46534.2,48280.59,42591.87,65165.15,95145.41]},{"m":"Tech21","i":"T21-11612","d":"Tech21  EvoGuard w/MagSafe/CC  Black  iPhone 18 Pro","c":"iPhone 18 Pro","n":"","p":[0,0,0,0,0,13],"v":[0.0,0.0,10336.21,7752.16,12920.26,12920.26]},{"m":"Tech21","i":"T21-11613","d":"Tech21  EvoGuard w/MagSafe/CC  Orchid  iPhone 18 Pro","c":"iPhone 18 Pro","n":"","p":[0,80,220,20,15,15],"v":[0.0,0.0,113698.28,10336.21,7752.16,7752.16]},{"m":"Tech21","i":"T21-11617","d":"Tech21 Apple AP-1041 EvoPulse Fauxven w/MagSafe/CC - Black","c":"iPhone 18 Pro","n":"FCST 220","p":[0,80,220,180,30,30],"v":[0.0,0.0,85250.0,69750.0,11625.0,11625.0]},{"m":"Tech21","i":"T21-11628","d":"Tech21  EvoPulse Satin Mirror w/MagSafe/CC  Deep Sea  iPhone 18 Pro","c":"iPhone 18 Pro","n":"FCST 120","p":[0,200,0,0,59,60],"v":[0.0,0.0,0.0,0.0,23773.69,24176.64]},{"m":"Tech21","i":"T21-11630","d":"Tech21  EvoPulse Satin Mirror w/MagSafe/CC  Lilac  iPhone 18 Pro","c":"iPhone 18 Pro","n":"FCST 70","p":[0,182,60,60,60,60],"v":[0.0,0.0,27644.74,27644.74,27644.74,27644.74]},{"m":"Tech21","i":"T21-11640","d":"Tech21  EvoCrystal w/C-MagSafe/CC  Black  iPhone 18 Pro","c":"iPhone 18 Pro","n":"400 air, 656 naps, evisar demanda","p":[0,0,0,0,0,0],"v":[0.0,0.0,131379.75,81236.29,69200.77,64074.76]},{"m":"Tech21","i":"T21-11641","d":"Tech21  EvoCrystal w/C-MagSafe/CC  Gold  iPhone 18 Pro","c":"iPhone 18 Pro","n":"","p":[0,190,84,60,99,88],"v":[0.0,0.0,38702.64,27644.74,42203.52,37077.52]},{"m":"Tech21","i":"T21-11646","d":"Tech21  EvoCrystal w/C-MagSafe/CC  Neo Green  iPhone 18 Pro","c":"iPhone 18 Pro","n":"","p":[0,182,42,30,20,14],"v":[0.0,0.0,19351.32,13822.37,9214.91,6450.44]},{"m":"Tech21","i":"T21-11653","d":"Tech21  EvoCrystal Satin Mirror w/C-MagSafe/CC  Cherry  iPhone 18 Pro","c":"iPhone 18 Pro","n":"fcst 150","p":[0,200,0,0,67,68],"v":[0.0,0.0,0.0,0.0,26997.25,27400.19]},{"m":"Tech21","i":"T21-11655","d":"Tech21  EvoClear w/C-MagSafe/CC  Clear  iPhone 18 Pro","c":"iPhone 18 Pro","n":"FCST 350","p":[0,0,37,100,120,80],"v":[0.0,0.0,116250.0,38750.0,46500.0,31000.0]},{"m":"Tech21","i":"T21-11671","d":"Tech21  EvoGuard w/MagSafe/CC  Black  iPhone 18 Pro Max","c":"iPhone 18 Pro Max","n":"FCST 120","p":[0,0,42,20,30,130],"v":[0.0,0.0,129202.59,10336.21,15504.31,15504.31]},{"m":"Tech21","i":"T21-11672","d":"Tech21  EvoGuard w/MagSafe/CC  Orchid  iPhone 18 Pro Max","c":"iPhone 18 Pro Max","n":"FCST 100","p":[0,56,250,30,20,20],"v":[0.0,0.0,129202.59,15504.31,10336.21,10336.21]},{"m":"Tech21","i":"T21-11676","d":"Tech21 Apple AP-1042 EvoPulse Fauxven w/MagSafe/CC - Black","c":"iPhone 18 Pro Max","n":"FCST 100","p":[0,56,250,30,30,30],"v":[0.0,0.0,96875.0,11625.0,11625.0,11625.0]},{"m":"Tech21","i":"T21-11687","d":"Tech21  EvoPulse Satin Mirror w/MagSafe/CC  Deep Sea  iPhone 18 Pro Max","c":"iPhone 18 Pro Max","n":"FCST 200","p":[0,300,0,0,84,85],"v":[0.0,0.0,0.0,0.0,33847.29,34250.24]},{"m":"Tech21","i":"T21-11689","d":"Tech21  EvoPulse Satin Mirror w/MagSafe/CC  Lilac  iPhone 18 Pro Max","c":"iPhone 18 Pro Max","n":"","p":[0,134,60,60,60,60],"v":[0.0,0.0,27644.74,27644.74,27644.74,27644.74]},{"m":"Tech21","i":"T21-11699","d":"Tech21  EvoCrystal w/C-MagSafe/CC  Black  iPhone 18 Pro Max","c":"iPhone 18 Pro Max","n":"FCST 2,800, 1k air, 656 naps","p":[0,194,913,1133,1108,1113],"v":[0.0,0.0,376442.5,460755.04,452473.29,454141.2]},{"m":"Tech21","i":"T21-11700","d":"Tech21  EvoCrystal w/C-MagSafe/CC  Gold  iPhone 18 Pro Max","c":"iPhone 18 Pro Max","n":"FCST 200","p":[0,194,148,73,188,183],"v":[0.0,0.0,68190.36,33634.44,81764.84,79403.31]},{"m":"Tech21","i":"T21-11702","d":"Tech21  EvoCrystal w/C-MagSafe/CC  Quartz Pink  iPhone 18 Pro Max","c":"iPhone 18 Pro Max","n":"FCST 150","p":[0,56,250,50,80,30],"v":[0.0,0.0,96875.0,19375.0,31000.0,11625.0]},{"m":"Tech21","i":"T21-11705","d":"Tech21  EvoCrystal w/C-MagSafe/CC  Neo Green  iPhone 18 Pro Max","c":"iPhone 18 Pro Max","n":"","p":[0,134,74,35,52,49],"v":[0.0,0.0,34095.18,16126.1,23958.78,22576.54]},{"m":"Tech21","i":"T21-11712","d":"Tech21  EvoCrystal Satin Mirror w/C-MagSafe/CC  Cherry  iPhone 18 Pro Max","c":"iPhone 18 Pro Max","n":"FCST 200","p":[0,300,0,0,84,85],"v":[0.0,0.0,0.0,0.0,33847.29,34250.24]},{"m":"Tech21","i":"T21-11714","d":"Tech21  EvoClear w/C-MagSafe/CC  Clear  iPhone 18 Pro Max","c":"iPhone 18 Pro Max","n":"FCST 1,200","p":[25,0,10,400,460,200],"v":[0.0,0.0,108500.0,155000.0,178250.0,77500.0]},{"m":"Tech21","i":"T21-11730","d":"Tech21  EvoClear w/MagSafe  Clear  iPhone 18 FOLD","c":"iPhone 18 Fold","n":"FCST 400","p":[0,236,327,183,151,152],"v":[0.0,0.0,171005.13,81587.24,68693.03,69095.97]},{"m":"Tech21","i":"T21-11740","d":"Tech21 Apple AP-1041 EvoClear w/C-MagSafe/CC - Mandala Pattern","c":"iPhone 18 Pro","n":"FCST 150","p":[0,0,320,45,80,80],"v":[0.0,0.0,155017.24,19377.16,34448.28,34448.28]},{"m":"Tech21","i":"T21-11741","d":"Tech21 Apple AP-1042 EvoClear w/C-MagSafe/CC - Mandala Pattern","c":"iPhone 18 Pro Max","n":"FCST 200","p":[0,32,280,50,100,100],"v":[0.0,0.0,120568.97,21530.17,43060.34,43060.34]},{"m":"Nomad","i":"TB-Nomad-Fold","d":"Nomad iPhone 2026 Fold","c":"iPhone 18 Fold","n":"","p":[0,200,50,20,20,20],"v":[0.0,0.0,56012.93,22405.17,22405.17,22405.17]},{"m":"Uniq","i":"UNIQ-45MM-REVPNKBEG","d":"UNIQ REVIX REVERSIBLE MAGNETIC APPLE WATCH STRAP 49/46/45/44MM - BLUSH (PINK/BEIGE)","c":"49/45/44/42 mm","n":"","p":[0,0,0,0,46,84],"v":[56262.57,53728.22,51193.87,48152.65,45618.3,42577.08]},{"m":"Uniq","i":"UNIQ-49MM-OSTABLK","d":"UNIQ OSTA APPLE WATCH STEEL STRAP WITH SELF-ADJUSTABLE LINKS 49/46/45/44MM - MIDNIGHT (BLACK)","c":"49/45/44/42 mm","n":"","p":[0,0,0,98,123,119],"v":[55999.35,51851.25,109233.3,87801.45,85036.05,82270.65]},{"m":"Uniq","i":"UNIQ-49MM-STRVMSIL","d":"UNIQ STROVA MAG APPLE WATCH SELF-ADJUSTABLE STEEL LINK BAND 49/46/45/44MM - TITANIUM (SILVER)","c":"49/45/44/42 mm","n":"","p":[0,0,0,0,112,119],"v":[96789.0,92640.9,89875.5,87801.45,85036.05,82270.65]},{"m":"Uniq","i":"UNIQ-AIRPODS(2024)-GLSPCBLU","d":"UNIQ GLASE PRO AIRPODS 4TH GEN LOCK CASE - CLOUDY BLUE (CLOUDY BLUE)","c":"Airpods 4th","n":"","p":[0,0,0,5,64,64],"v":[11777.38,12881.51,10489.23,11777.38,11777.38,11777.38]},{"m":"Uniq","i":"UNIQ-AIRPODS(2024)-GLSPCPNK","d":"UNIQ GLASE PRO AIRPODS 4TH GEN LOCK CASE - CANDY PINK (CANDY PINK)","c":"Airpods 4th","n":"","p":[0,0,0,55,101,103],"v":[17482.05,20610.41,17850.09,18586.18,18586.18,18954.22]},{"m":"Uniq","i":"UNIQ-AIRPODS(2024)-GLSPGCLR","d":"UNIQ GLASE PRO AIRPODS 4TH GEN LOCK CASE - GLOSSY CLEAR (GLOSSY CLEAR)","c":"Airpods 4th","n":"","p":[150,250,128,115,115,115],"v":[21530.52,18402.16,23554.76,21162.48,21162.48,21162.48]},{"m":"Uniq","i":"UNIQ-AIRPODS(2024)-GLSPGSMK","d":"UNIQ GLASE PRO AIRPODS 4TH GEN LOCK CASE - GLOSSY SMOKE (GLOSSY SMOKE)","c":"Airpods 4th","n":"","p":[0,0,0,55,101,103],"v":[17482.05,20610.41,17850.09,18586.18,18586.18,18954.22]},{"m":"Uniq","i":"UNIQ-AIRPODS(2024)-GLSPLLIM","d":"UNIQ GLASE PRO AIRPODS 4TH GEN LOCK CASE - LIGHT LIME (LIGHT LIME)","c":"Airpods 4th","n":"","p":[0,200,57,64,64,64],"v":[11777.38,12881.51,10489.23,11777.38,11777.38,11777.38]},{"m":"Uniq","i":"UNIQ-AIRPODS(2024)-NEXOBLK","d":"UNIQ NEXO ACTIVE HYBRID SILICONE AIRPODS 4TH GEN (2024) CASE WITH SPORTS EAR HOOKS - BLACK (BLACK)","c":"Airpods 4","n":"","p":[0,0,0,0,0,0],"v":[19465.52,20293.84,21122.16,21950.48,22778.8,23607.12]},{"m":"Uniq","i":"UNIQ-AIRPODS(2024)-NEXOPBLU","d":"UNIQ NEXO ACTIVE HYBRID SILICONE AIRPODS 4TH GEN (2024) CASE WITH SPORTS EAR HOOKS - PACIFIC BLUE (PACIFIC BLUE)","c":"Airpods 4","n":"","p":[0,0,0,0,0,0],"v":[19672.6,20293.84,20500.92,21122.16,21536.32,22157.56]},{"m":"Uniq","i":"UNIQ-IP6.3P(2025)-COMAMFCLRLL","d":"UNIQ HYBRID IPHONE 17 PRO MAGCLICK CHARGING COMBAT ACTIVE - FROST CLEAR / LUME-LIME (FROST CLEAR / LUME-LIME)","c":"iPhone 17 Pro","n":"","p":[0,0,0,0,0,0],"v":[19341.12,19341.12,0.0,0.0,0.0,0.0]},{"m":"Uniq","i":"UNIQ-IP6.3P(2025)-COMAMFSMKO","d":"UNIQ HYBRID IPHONE 17 PRO MAGCLICK CHARGING COMBAT ACTIVE - FROST SMOKE / ORANGE (FROST SMOKE / ORANGE)","c":"iPhone 17 Pro","n":"","p":[0,0,0,0,0,0],"v":[8864.68,9267.62,10073.5,0.0,0.0,0.0]},{"m":"Uniq","i":"UNIQ-IP6.3P(2025)-KEVAMCBLK","d":"UNIQ HYBRID IPHONE 17 PRO MAGCLICK CHARGING KEVA - CARBON BLACK (CARBON BLACK)","c":"iPhone 17 Pro","n":"","p":[0,0,0,0,0,0],"v":[19398.4,15518.72,0.0,0.0,0.0,0.0]},{"m":"Uniq","i":"UNIQ-IP6.3P(2026)-CLARMGMNT","d":"UNIQ HYBRID IPHONE 18 PRO (2026) 6.3 MAGCLICK CHARGING CLARIO (ECO) - GLACIER MINT","c":"iPhone 18 Pro","n":"","p":[0,0,0,100,150,100],"v":[0.0,0.0,0.0,46074.57,69111.85,46074.57]},{"m":"Uniq","i":"UNIQ-IP6.3P(2026)-COMMBWHT","d":"UNIQ HYBRID IPHONE 18 PRO (2026) 6.3 MAGCLICK CHARGING COMBAT - BLANC WHITE","c":"iPhone 18 Pro","n":"","p":[0,0,100,100,100,100],"v":[0.0,0.0,46074.57,46074.57,46074.57,46074.57]},{"m":"Uniq","i":"UNIQ-IP6.3P(2026)-COMMDBRG","d":"UNIQ HYBRID IPHONE 18 PRO (2026) 6.3 MAGCLICK CHARGING COMBAT - DEEP BURGUNDY","c":"iPhone 18 Pro","n":"","p":[0,0,100,100,100,100],"v":[0.0,0.0,46074.57,46074.57,46074.57,46074.57]},{"m":"Uniq","i":"UNIQ-IP6.3P(2026)-KEVAMCBLK","d":"UNIQ HYBRID IPHONE 18 PRO (2026) 6.3 MAGCLICK CHARGING KEVA - CARBON BLACK","c":"iPhone 18 Pro","n":"","p":[0,0,0,23,50,50],"v":[0.0,0.0,23037.28,23037.28,23037.28,23037.28]},{"m":"Uniq","i":"UNIQ-IP6.3P(2026)-SWVLCLR","d":"UNIQ HYBRID IPHONE 18 PRO (2026) 6.3 SWIVIX WITH 360 ROTATING KICKSTAND - LUCENT CLEAR","c":"iPhone 18 Pro","n":"","p":[0,0,0,100,150,100],"v":[0.0,0.0,0.0,46074.57,69111.85,46074.57]},{"m":"Uniq","i":"UNIQ-IP6.9P(2025)-COMAMFCLRTQ","d":"UNIQ HYBRID IPHONE 17 PRO MAX MAGCLICK CHARGING COMBAT ACTIVE - FROST CLEAR / TURQUOISE (FROST CLEAR / TURQUOISE)","c":"iPhone 17 Pro Max","n":"","p":[0,0,0,0,0,0],"v":[72126.26,76155.66,0.0,0.0,0.0,0.0]},{"m":"Uniq","i":"UNIQ-IP6.9P(2025)-COMAMFSMKO","d":"UNIQ HYBRID IPHONE 17 PRO MAX MAGCLICK CHARGING COMBAT ACTIVE - FROST SMOKE / ORANGE (FROST SMOKE / ORANGE)","c":"iPhone 17 Pro Max","n":"","p":[0,0,0,0,0,0],"v":[123702.58,132164.32,0.0,0.0,0.0,0.0]},{"m":"Uniq","i":"UNIQ-IP6.9P(2025)-KEVAMCBLK","d":"UNIQ HYBRID IPHONE 17 PRO MAX MAGCLICK CHARGING KEVA - CARBON BLACK (CARBON BLACK)","c":"iPhone 17 Pro Max","n":"","p":[0,0,0,0,0,0],"v":[98654.72,100317.44,0.0,0.0,0.0,0.0]},{"m":"Uniq","i":"UNIQ-IP6.9P(2026)-CLARMGMNT","d":"UNIQ HYBRID IPHONE 18 PRO MAX (2026) 6.9 MAGCLICK CHARGING CLARIO (ECO) - GLACIER MINT","c":"iPhone 18 Pro Max","n":"","p":[0,0,0,20,180,150],"v":[0.0,0.0,0.0,55289.48,82934.22,69111.85]},{"m":"Uniq","i":"UNIQ-IP6.9P(2026)-COMMBWHT","d":"UNIQ HYBRID IPHONE 18 PRO MAX (2026) 6.9 MAGCLICK CHARGING COMBAT - BLANC WHITE","c":"iPhone 18 Pro Max","n":"","p":[0,0,0,100,100,100],"v":[0.0,0.0,46074.57,46074.57,46074.57,46074.57]},{"m":"Uniq","i":"UNIQ-IP6.9P(2026)-COMMDBRG","d":"UNIQ HYBRID IPHONE 18 PRO MAX (2026) 6.9 MAGCLICK CHARGING COMBAT - DEEP BURGUNDY","c":"iPhone 18 Pro Max","n":"","p":[0,0,0,100,100,100],"v":[0.0,0.0,46074.57,46074.57,46074.57,46074.57]},{"m":"Uniq","i":"UNIQ-IP6.9P(2026)-KEVAMCBLK","d":"UNIQ HYBRID IPHONE 18 PRO MAX (2026) 6.9 MAGCLICK CHARGING KEVA - CARBON BLACK","c":"iPhone 18 Pro Max","n":"","p":[0,0,0,71,200,200],"v":[0.0,0.0,92149.14,92149.14,92149.14,92149.14]},{"m":"Uniq","i":"UNIQ-IP6.9P(2026)-SWVLCLR","d":"UNIQ HYBRID IPHONE 18 PRO MAX (2026) 6.9 SWIVIX WITH 360 ROTATING KICKSTAND - LUCENT CLEAR","c":"iPhone 18 Pro Max","n":"","p":[0,0,0,20,180,150],"v":[0.0,0.0,0.0,55289.48,82934.22,69111.85]}];
-const poMarcaColors = {'Nomad':'#FF6D00','Quikcell':'#2563eb','Speck':'#00BFA5','Tech21':'#C62828','Uniq':'#7B1FA2'};
-
-let poFilter = 'all';
-let chartPOinst = null, chartPOPcsinst = null;
-
-function getFilteredPO() {
-  return poFilter === 'all' ? purchasesFlat : purchasesFlat.filter(r => r.m === poFilter);
-}
-
-function setPOMarca(btn) {
-  document.querySelectorAll('#poMarcaFilter .chip').forEach(b=>b.classList.remove('on'));
-  btn.classList.add('on');
-  poFilter = btn.dataset.marca;
-  buildPurchasesSection();
-}
-
-function buildPurchasesSection() {
-  renderPOKpis();
-  renderPOCharts();
-  renderPOTable();
-}
-
-function renderPOKpis() {
-  const isVal = gMetric==='valor';
-  const kpiEl = document.getElementById('poKpis');
-  if (!kpiEl) return;
-  const byMarca = {};
-  purchasesFlat.forEach(r => {
-    if (!byMarca[r.m]) byMarca[r.m] = 0;
-    byMarca[r.m] += (isVal ? r.v : r.p).reduce((s,v)=>s+v,0);
-  });
-  const totByMarca = Object.entries(byMarca).filter(([,v])=>v>0).sort((a,b)=>b[1]-a[1]);
-  const grand = totByMarca.reduce((s,[,v])=>s+v,0);
-  const fmt = v => isVal ? '$'+(v/1e6).toFixed(2)+' M' : v.toLocaleString('es-MX');
-  kpiEl.innerHTML = [
-    `<div class="kpi-card"><div class="kpi-label">Total Purchases H2</div><div class="kpi-value">${fmt(grand)}</div><div class="kpi-sub">${isVal?'valor MXN':'piezas'} Jul–Dic</div></div>`,
-    ...totByMarca.map(([marca,tot]) =>
-      `<div class="kpi-card"><div class="kpi-label" style="color:${poMarcaColors[marca]||'#333'}">${marca}</div><div class="kpi-value" style="font-size:20px">${fmt(tot)}</div><div class="kpi-sub">${isVal?'valor H2':'piezas H2'}</div></div>`
-    )
-  ].join('');
-}
-
-function renderPOCharts() {
-  const marcas = Object.keys(poMarcaColors);
-  const byMarca = {};
-  marcas.forEach(m => byMarca[m] = {val:MONTHS_PO.map(()=>0), pcs:MONTHS_PO.map(()=>0)});
-  purchasesFlat.forEach(r => {
-    if (!byMarca[r.m]) return;
-    r.v.forEach((v,i) => byMarca[r.m].val[i] += v);
-    r.p.forEach((v,i) => byMarca[r.m].pcs[i] += v);
-  });
-  const valDs = marcas.map(m => ({label:m, data:byMarca[m].val, backgroundColor:poMarcaColors[m], borderRadius:3}));
-  if(chartPOinst) chartPOinst.destroy();
-  chartPOinst = new Chart(document.getElementById('chartPO'),{
-    type:'bar', data:{labels:MONTHS_PO,datasets:valDs},
-    options:{responsive:true,maintainAspectRatio:false,
-      plugins:{legend:{position:'bottom',labels:{font:{size:11},boxWidth:12,padding:12}},
-        tooltip:{callbacks:{label:c=>` ${c.dataset.label}: $${(c.parsed.y/1e6).toFixed(2)} M`}}},
-      scales:{x:{stacked:true,grid:{display:false}},y:{stacked:true,ticks:{callback:v=>'$'+(v/1e6).toFixed(1)+'M'},grid:{color:'#e2e8f0'}}}
-    }
-  });
-  const pcsDs = marcas.map(m => ({label:m, data:byMarca[m].pcs, backgroundColor:poMarcaColors[m], borderRadius:3}));
-  if(chartPOPcsinst) chartPOPcsinst.destroy();
-  chartPOPcsinst = new Chart(document.getElementById('chartPOPcs'),{
-    type:'bar', data:{labels:MONTHS_PO,datasets:pcsDs},
-    options:{responsive:true,maintainAspectRatio:false,
-      plugins:{legend:{position:'bottom',labels:{font:{size:11},boxWidth:12,padding:12}},
-        tooltip:{callbacks:{label:c=>` ${c.dataset.label}: ${c.parsed.y.toLocaleString('es-MX')} pcs`}}},
-      scales:{x:{stacked:true,grid:{display:false}},y:{stacked:true,ticks:{callback:v=>v>=1000?(v/1000).toFixed(0)+'K':v},grid:{color:'#e2e8f0'}}}
-    }
-  });
-}
-
-function renderPOTable() {
-  const isVal = gMetric==='valor';
-  const rows = getFilteredPO();
-  const tbody = document.getElementById('poTableBody');
-  if (!tbody) return;
-  const fmt = (v,isV) => {
-    if(!isV) return v>0?v.toLocaleString('es-MX'):'<span style="color:var(--muted)">—</span>';
-    return v>0?'$'+(v/1000).toFixed(0)+'K':'<span style="color:var(--muted)">—</span>';
-  };
-  let html = '';
-  const marcas = [...new Set(rows.map(r=>r.m))];
-  marcas.forEach(marca => {
-    const mRows = rows.filter(r=>r.m===marca);
-    mRows.forEach((r, ri) => {
-      const src = isVal ? r.v : r.p;
-      const tot = src.reduce((s,v)=>s+v,0);
-      const marcaCell = ri===0
-        ? `<td rowspan="${mRows.length}" style="font-weight:700;color:${poMarcaColors[marca]||'#333'};vertical-align:middle;border-right:2px solid var(--border)">${marca}</td>`
-        : '';
-      html += `<tr>${marcaCell}<td style="font-size:11px;padding-left:${ri===0?'10px':'16px'};white-space:nowrap">${r.i}</td><td style="font-size:11px">${r.d}</td><td style="font-size:11px">${r.c}</td>${src.map(v=>`<td class="num">${fmt(v,isVal)}</td>`).join('')}<td class="num" style="background:var(--surface2);font-weight:700">${fmt(tot,isVal)}</td><td style="font-size:10px;color:var(--muted);min-width:180px">${r.n||''}</td></tr>`;
-    });
-    const subTot = MONTHS_PO.map((_,i)=>mRows.reduce((s,r)=>s+(isVal?r.v[i]:r.p[i]),0));
-    const subGrand = subTot.reduce((s,v)=>s+v,0);
-    html += `<tr style="background:#f0f4ff"><td colspan="4" style="font-weight:700;color:${poMarcaColors[marca]||'#333'};padding-left:10px">Subtotal ${marca}</td>${subTot.map(v=>`<td class="num" style="font-weight:700">${fmt(v,isVal)}</td>`).join('')}<td class="num" style="font-weight:800;background:#dbeafe">${fmt(subGrand,isVal)}</td><td></td></tr>`;
-  });
-  const grandTot = MONTHS_PO.map((_,i)=>rows.reduce((s,r)=>s+(isVal?r.v[i]:r.p[i]),0));
-  const grandSum = grandTot.reduce((s,v)=>s+v,0);
-  html += `<tr style="background:var(--surface2)"><td colspan="4" style="font-weight:800">TOTAL GENERAL</td>${grandTot.map(v=>`<td class="num" style="font-weight:700">${fmt(v,isVal)}</td>`).join('')}<td class="num" style="font-weight:800">${fmt(grandSum,isVal)}</td><td></td></tr>`;
-  tbody.innerHTML = html;
-}
-
-function exportPOExcel() {
-  const isVal = gMetric==='valor';
-  const rows = getFilteredPO();
-  const headers = ['Marca','Item','Descripción','Categoría','Jul','Aug','Sep','Oct','Nov','Dec','TOTAL','Comentarios'];
-  const lines = [headers.join(',')];
-  rows.forEach(r => {
-    const src = isVal ? r.v : r.p;
-    const tot = src.reduce((s,v)=>s+v,0);
-    const esc = s => `"${String(s||'').replace(/"/g,'""')}"`;
-    lines.push([esc(r.m),esc(r.i),esc(r.d),esc(r.c),...src.map(v=>v.toFixed(isVal?2:0)),tot.toFixed(isVal?2:0),esc(r.n)].join(','));
-  });
-  const blob = new Blob(['﻿'+lines.join('\r\n')],{type:'text/csv;charset=utf-8;'});
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a'); a.href=url; a.download='purchases_h2.csv'; a.click();
-  setTimeout(()=>URL.revokeObjectURL(url),1000);
-}
-
-
-/* ══════ TAB 0: ATTAINMENT VS BUDGET ══════ */
-const MONTHS_AVB = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
-
-// 2025 SI/ST Actual — source: Budget 2026 sheet "SI / ST 2025"
-const avb2025Val = {
-  'AT&T':         [4554278,3312629,3878055,3524123,3332978,4731181,3991004,4162015,4347690,5165849,4643763,6045190],
-  'iShop':        [2154412,1128500,1011377,1552961,1493031,1911616,1308203,706144,4492569,1946738,3555789,1446499],
-  'MacStore':     [3119711,1812800,1377849,1311543,1347496,1411025,1537789,1513778,1704153,1930539,2456461,2364890],
-  'MercadoLibre': [0,31957,21719,23686,21112,18586,8478,4341,2498,2016,0,0],
-  'Coppel':       [0,0,0,0,0,0,0,0,0,0,0,0],
-  'Liverpool':    [0,0,0,0,0,0,0,0,0,0,0,0],
-};
-const avb2025Pcs = {
-  'AT&T':         [19033,14310,16708,15231,14173,18107,15518,16042,16202,18647,18135,24735],
-  'iShop':        [4687,2418,2011,3492,3542,4184,3210,1656,10736,4228,8086,3203],
-  'MacStore':     [7390,4383,3367,3046,3224,3388,3385,3390,3657,4008,5467,5884],
-  'MercadoLibre': [0,1,1,42,35,30,15,10,5,3,0,0],
-  'Coppel':       [0,0,0,0,0,0,0,0,0,0,0,0],
-  'Liverpool':    [0,0,0,0,0,0,0,0,0,0,0,0],
-};
-
-// 2026 Budget — H1 (Jan-Jun) = Invoice (no sombreado) · H2 (Jul-Dec) = Projection (sombreado)
-const avb2026Val = {
-  'AT&T':         [7506310,4966820,4172841,4289140,4051382,4319528,4347350,6350498,6551788,6528682,7582561,8733239],
-  'MacStore':     [3498968,2258704,1498288,1516132,1368618,1528990,1366707,2396343,2538858,3337211,3782938,4143965],
-  'iShop':        [800677,1989708,2678803,1120086,1928305,1219616,1542131,2069922,3954698,2311776,3161928,2205242],
-  'Liverpool':    [0,0,0,0,0,0,79541,278983,379891,421115,469262,524847],
-  'MercadoLibre': [0,8423,35843,51897,58065,37476,21314,60000,60000,60000,80000,60000],
-  'Coppel':       [0,0,0,445377,0,0,0,0,0,0,0,0],
-};
-const avb2026Pcs = {
-  'AT&T':         [30710,20985,18176,19397,18409,19345,19863,24194,25188,26254,30225,35221],
-  'MacStore':     [8009,4668,3011,2947,2521,2908,2452,5032,5290,7151,7919,8637],
-  'iShop':        [1884,4502,5686,2687,4318,2733,3450,4624,8977,5189,7146,4890],
-  'Liverpool':    [0,0,0,0,0,0,220,630,874,973,1089,1223],
-  'MercadoLibre': [0,25,70,123,156,118,0,0,0,0,0,0],
-  'Coppel':       [0,0,0,1470,0,0,0,0,0,0,0,0],
-};
-
-const avbRetailColors = {
-  'AT&T':'#00A8E0','MacStore':'#555555','iShop':'#FF6D00',
-  'Liverpool':'#C62828','Coppel':'#388E3C','MercadoLibre':'#7B1FA2'
-};
 
 let avbMode = 'invoice';
 let chartAVBRetailInst = null, chartAVBMonthlyInst = null;
@@ -1652,7 +1443,6 @@ buildQSection();
 buildH2Charts();
 buildValorChart('all');
 setTimeout(renderMarca,200);
-setTimeout(buildPurchasesSection,400);
 buildAVBSection();
 </script>
 </body>
