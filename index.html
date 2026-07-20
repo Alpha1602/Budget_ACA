@@ -181,26 +181,6 @@
 
   <!-- ─── PROYECCIÓN 2026 (fusionado) ──────────────── -->
 
-  <!-- Dynamic dual-axis chart with client selector -->
-  <div class="card">
-    <div class="card-title">
-      <span id="anualDualTitle">Valor Mensual por Cliente (MXN) — 2026</span>
-      <div class="chip-row" id="anualClientFilter">
-        <button class="chip on" data-c="all" onclick="setAnualClient(this)">Todos</button>
-        <button class="chip" data-c="AT&T" onclick="setAnualClient(this)">AT&amp;T</button>
-        <button class="chip" data-c="MacStore" onclick="setAnualClient(this)">MacStore</button>
-        <button class="chip" data-c="iShop" onclick="setAnualClient(this)">iShop</button>
-        <button class="chip" data-c="Liverpool" onclick="setAnualClient(this)">Liverpool</button>
-        <button class="chip" data-c="MercadoLibre" onclick="setAnualClient(this)">ML</button>
-        <button class="chip" data-c="Coppel" onclick="setAnualClient(this)">Coppel</button>
-      </div>
-    </div>
-    <canvas id="chartAnualDual" style="max-height:380px"></canvas>
-  </div>
-
-  <!-- KPI summary row -->
-  <div id="anualKpiRow" class="kpi-grid" style="padding:0 0 14px"></div>
-
   <!-- Annual table -->
   <div class="card">
     <div class="card-title">
@@ -320,6 +300,28 @@
       </table></div>
     </div>
   </div>
+
+  <!-- Dynamic dual-axis chart with client selector -->
+  <div class="card">
+    <div class="card-title">
+      <span id="anualDualTitle">Valor Mensual por Cliente (MXN) — 2026</span>
+      <div class="chip-row" id="anualClientFilter">
+        <button class="chip on" data-c="all" onclick="setAnualClient(this)">Todos</button>
+        <button class="chip" data-c="AT&T" onclick="setAnualClient(this)">AT&amp;T</button>
+        <button class="chip" data-c="MacStore" onclick="setAnualClient(this)">MacStore</button>
+        <button class="chip" data-c="iShop" onclick="setAnualClient(this)">iShop</button>
+        <button class="chip" data-c="Liverpool" onclick="setAnualClient(this)">Liverpool</button>
+        <button class="chip" data-c="MercadoLibre" onclick="setAnualClient(this)">ML</button>
+        <button class="chip" data-c="Coppel" onclick="setAnualClient(this)">Coppel</button>
+      </div>
+    </div>
+    <canvas id="chartAnualDual" style="max-height:380px"></canvas>
+  </div>
+
+  <!-- KPI summary row -->
+  <div id="anualKpiRow" class="kpi-grid" style="padding:0 0 14px"></div>
+
+
 </div><!-- /section-attainment -->
 
 <!-- ─── TAB 2: DASHBOARD BY QUARTER ─── -->
@@ -410,12 +412,7 @@
   </div>
 
   <!-- Participation charts: 2025 vs 2026 -->
-  <div class="grid-2">
-    <div class="card" style="display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:200px;text-align:center">
-      <div class="card-title" style="margin-bottom:12px">Participación por Marca — 2025</div>
-      <div style="font-size:36px;margin-bottom:8px">📊</div>
-      <div style="color:var(--muted);font-size:13px;max-width:220px;line-height:1.5">Sin datos de participación por marca en 2025.<br>El tracking por marca inició en 2026.</div>
-    </div>
+  <div>
     <div class="card">
       <div class="card-title">Participación por Marca — 2026 FCST</div>
       <canvas id="chartPart2026" style="max-height:220px"></canvas>
@@ -460,10 +457,9 @@
           <th style="min-width:100px">Marca</th>
           <th style="min-width:80px">Cliente</th>
           <th style="min-width:130px">Categoría</th>
-          <th class="num" style="color:var(--muted)">Ene</th><th class="num" style="color:var(--muted)">Feb</th><th class="num" style="color:var(--muted)">Mar</th><th class="num" style="color:var(--muted)">Abr</th><th class="num" style="color:var(--muted)">May</th>
           <th class="num">Jun</th><th class="num">Jul</th><th class="num">Ago</th>
           <th class="num">Sep</th><th class="num">Oct</th><th class="num">Nov</th><th class="num">Dic</th>
-          <th class="num">TOTAL 2026</th>
+          <th class="num">TOTAL</th>
         </tr></thead>
         <tbody id="marcaTableBody"></tbody>
       </table>
@@ -510,7 +506,7 @@
       <table id="clteTable" style="min-width:700px">
         <thead><tr>
           <th style="min-width:160px">Categoría</th>
-          <th class="num">Jun</th><th class="num">Jul</th><th class="num">Ago</th>
+          <th class="num">Ene</th><th class="num">Feb</th><th class="num">Mar</th><th class="num">Abr</th><th class="num">May</th><th class="num">Jun</th><th class="num">Jul</th><th class="num">Ago</th>
           <th class="num">Sep</th><th class="num">Oct</th><th class="num">Nov</th><th class="num">Dic</th>
           <th class="num" style="background:var(--surface2)">TOTAL</th>
         </tr></thead>
@@ -776,74 +772,47 @@ function setAnualClient(btn) {
 
 function buildAnualDualChart() {
   if (chartAnualDualInst) chartAnualDualInst.destroy();
-  const isInvoice = avbMode !== 'projection';
   const clients = anualSelectedClient === 'all'
     ? ['AT&T','MacStore','iShop','Liverpool','MercadoLibre','Coppel']
     : [anualSelectedClient];
 
-  // Bar datasets: H1 light, H2 teal (valor, left axis)
-  const h1Color = '#93C5FD'; // blue-300
-  const h2Color = '#2DD4BF'; // teal-400
-
-  const valMonths = MONTHS_FULL.map((_,mi) =>
+  const val2026 = MONTHS_FULL.map((_,mi) =>
     clients.reduce((s,c) => s + ((valorFull[c]||[])[mi]||0), 0)
   );
-  const pcsMonths = MONTHS_FULL.map((_,mi) =>
+  const val2025 = MONTHS_FULL.map((_,mi) =>
+    clients.reduce((s,c) => s + ((avb2025Val[c]||[])[mi]||0), 0)
+  );
+  const pcs2026 = MONTHS_FULL.map((_,mi) =>
     clients.reduce((s,c) => s + ((piezasAnual[c]||[])[mi]||0), 0)
   );
 
-  const barDatasets = [
-    {
-      type:'bar', label:'H1 Valor',
-      data: valMonths.map((v,i) => i < 6 ? v : 0),
-      backgroundColor: h1Color, borderRadius:4, yAxisID:'y', order:2
-    },
-    {
-      type:'bar', label:'H2 Valor',
-      data: valMonths.map((v,i) => i >= 6 ? v : 0),
-      backgroundColor: h2Color, borderRadius:4, yAxisID:'y', order:2
-    },
-    {
-      type:'line', label:'Piezas',
-      data: pcsMonths,
-      borderColor:'#F97316', backgroundColor:'transparent',
-      borderWidth:2.5, pointRadius:4, pointBackgroundColor:'#F97316',
-      tension:.35, yAxisID:'y2', order:1
-    }
-  ];
-
   const titleParts = anualSelectedClient === 'all' ? 'Todos los Clientes' : anualSelectedClient;
-  document.getElementById('anualDualTitle').textContent =
-    `Proyección 2026 — ${titleParts}`;
+  document.getElementById('anualDualTitle').textContent = `2025 vs 2026 — ${titleParts}`;
 
   chartAnualDualInst = new Chart(document.getElementById('chartAnualDual'), {
-    data: { labels: MONTHS_FULL, datasets: barDatasets },
+    data: {
+      labels: MONTHS_FULL,
+      datasets: [
+        {type:'bar', label:'2025 Real', data:val2025, backgroundColor:'#CBD5E1', borderRadius:4, yAxisID:'y', order:2},
+        {type:'bar', label:'2026 Invoice (Ene–Jul)', data:val2026.map((v,i)=>i<7?v:0), backgroundColor:'#2DD4BF', borderRadius:4, yAxisID:'y', order:2},
+        {type:'bar', label:'2026 Proyección (Ago–Dic)', data:val2026.map((v,i)=>i>=7?v:0), backgroundColor:'#93C5FD', borderRadius:4, yAxisID:'y', order:2},
+        {type:'line', label:'2026 Piezas', data:pcs2026, borderColor:'#F97316', backgroundColor:'transparent', borderWidth:2.5, pointRadius:4, pointBackgroundColor:'#F97316', tension:.35, yAxisID:'y2', order:1}
+      ]
+    },
     options: {
-      responsive: true, maintainAspectRatio: false,
+      responsive:true, maintainAspectRatio:false,
       plugins: {
-        legend: { display: false },
-        tooltip: { callbacks: {
-          label: c => {
-            if (c.dataset.yAxisID === 'y2')
-              return ` Piezas: ${(c.parsed.y||0).toLocaleString('es-MX')}`;
-            return ` Valor: $${((c.parsed.y||0)/1e6).toFixed(2)} M`;
-          }
+        legend: {display:true, position:'bottom', labels:{font:{size:11},boxWidth:12,padding:12}},
+        tooltip: {mode:'index', intersect:false, callbacks:{
+          label: c => c.dataset.yAxisID==='y2'
+            ? ` ${c.dataset.label}: ${(c.parsed.y||0).toLocaleString('es-MX')} pcs`
+            : ` ${c.dataset.label}: $${((c.parsed.y||0)/1e6).toFixed(2)} M`
         }}
       },
       scales: {
-        x: { grid: { display: false } },
-        y: {
-          position:'left',
-          ticks: { callback: v => '$'+(v/1e6).toFixed(1)+'M' },
-          grid: { color:'#e2e8f0' },
-          title: { display:true, text:'Valor MXN', color:'#64748b', font:{size:11} }
-        },
-        y2: {
-          position:'right',
-          ticks: { callback: v => v>=1000?(v/1000).toFixed(0)+'K':v },
-          grid: { display:false },
-          title: { display:true, text:'Piezas', color:'#F97316', font:{size:11} }
-        }
+        x: {stacked:false, grid:{display:false}},
+        y: {position:'left', ticks:{callback:v=>'$'+(v/1e6).toFixed(1)+'M'}, grid:{color:'#e2e8f0'}, title:{display:true,text:'Valor MXN',color:'#64748b',font:{size:11}}},
+        y2: {position:'right', ticks:{callback:v=>v>=1000?(v/1000).toFixed(0)+'K':v}, grid:{display:false}, title:{display:true,text:'Piezas 2026',color:'#F97316',font:{size:11}}}
       }
     }
   });
@@ -1206,7 +1175,7 @@ function renderMarcaCharts(summary){
       labels: MONTHS_H2_KEYS,
       datasets: marcas.map(m=>({
         label:m,
-        data: MONTHS_H2_KEYS.map(mes=>isVal?(summary[m].byMes_val[mes]||0):(summary[m].byMes_pcs[mes]||0)),
+        data: MONTHS_FULL.map(mes=>isVal?(summary[m].byMes_val[mes]||0):(summary[m].byMes_pcs[mes]||0)),
         backgroundColor: (marcaColors[m]||'#90A4AE')+(stacked?'':'99'),
         borderColor: marcaColors[m]||'#90A4AE',
         borderWidth: chartType==='line'?2.5:0,
@@ -1320,10 +1289,9 @@ function renderMarcaTable(){
     const dot=`<span class="dot" style="background:${dotColor}"></span>`;
     const mc=newMarca?`<td style="font-weight:700;color:${marcaColors[marca]||'#333'}">${marca}</td>`:`<td style="color:var(--muted);padding-left:16px">↳</td>`;
     const cc=newCliente?`<td>${dot}${cliente}</td>`:`<td style="color:var(--muted)">↳</td>`;
-    const h1cells='<td class="num" style="color:var(--muted)">—</td>'.repeat(5);
     const cells=MONTHS_H2_KEYS.map(m=>`<td class="num">${fmtNum(isVal?(mData.val[m]||0):(mData.pcs[m]||0),marcaState.mode)}</td>`).join('');
     const tot=isVal?totVal:totPcs;
-    html+=`<tr>${mc}${cc}<td style="font-size:11px;color:var(--muted)">${cat}</td>${h1cells}${cells}<td class="num" style="background:var(--surface2);font-weight:700">${fmtNum(tot,marcaState.mode)}</td></tr>`;
+    html+=`<tr>${mc}${cc}<td style="font-size:11px;color:var(--muted)">${cat}</td>${cells}<td class="num" style="background:var(--surface2);font-weight:700">${fmtNum(tot,marcaState.mode)}</td></tr>`;
   });
   if(tbody) tbody.innerHTML=html;
 }
@@ -1649,10 +1617,11 @@ function buildClienteTab(){
   document.getElementById('clteKpis').innerHTML=kpiHtml;
 
   // Chart: stacked bars, months on x-axis, categories as datasets
-  const MONTH_LABELS=['Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
+  const MONTH_LABELS=['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
+  const ALL_MK=['Ene','Feb','Mar','Abr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
   const datasets=cats.map(cat=>({
     label:cat,
-    data:MONTHS_H2_KEYS.map(m=>catData[cat][m]||0),
+    data:['Ene','Feb','Mar','Abr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'].map(m=>catData[cat][m]||0),
     backgroundColor:catColors[cat]||'#94a3b8',
     borderRadius:2
   }));
@@ -1686,12 +1655,12 @@ function buildClienteTab(){
   const fmtCell=v=>isVal?(v>0?'$'+(v/1000).toFixed(0)+'K':'—'):(v>0?v.toLocaleString('es-MX'):'—');
   let tblHtml='';
   cats.forEach(cat=>{
-    const cells=MONTHS_H2_KEYS.map(m=>`<td class="num">${fmtCell(catData[cat][m]||0)}</td>`).join('');
-    const tot=Object.values(catData[cat]).reduce((a,b)=>a+b,0);
+    const cells=ALL_MK.map(m=>`<td class="num">${fmtCell(catData[cat][m]||0)}</td>`).join('');
+    const tot=ALL_MK.reduce((s,m)=>s+(catData[cat][m]||0),0);
     tblHtml+=`<tr><td style="font-weight:600">${cat}</td>${cells}<td class="num" style="background:var(--surface2);font-weight:700">${fmtCell(tot)}</td></tr>`;
   });
   // Total row
-  const totCells=MONTHS_H2_KEYS.map(m=>{
+  const totCells=ALL_MK.map(m=>{
     const v=cats.reduce((s,c)=>s+(catData[c][m]||0),0);
     return `<td class="num" style="font-weight:700">${fmtCell(v)}</td>`;
   }).join('');
