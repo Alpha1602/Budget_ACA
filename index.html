@@ -117,7 +117,6 @@
   <div class="tab active" onclick="switchTab('attainment',this)">📊 Attainment vs Budget</div>
   <div class="tab" onclick="switchTab('anual',this)">📅 Proyección 2026</div>
   <div class="tab" onclick="switchTab('quarter',this)">📊 Dashboard by Quarter</div>
-  <div class="tab" onclick="switchTab('h2',this)">📈 Dashboard H2</div>
   <div class="tab" onclick="switchTab('marca',this)">🏷️ Por Marca</div>
 </div>
 
@@ -367,118 +366,6 @@
 
 </div><!-- /section-quarter -->
 
-<!-- ─── TAB 3: INSIGHTS H2 ─── -->
-<div class="section" id="section-h2">
-
-  <div class="card" style="padding:20px 24px;margin-bottom:14px">
-    <div style="font-size:13px;font-weight:700;color:var(--muted);letter-spacing:.05em;text-transform:uppercase;margin-bottom:16px">
-      📝 Comentarios & Estrategia H2 2026
-    </div>
-
-    <!-- KPI summary row -->
-    <div class="kpi-grid" style="padding:0 0 20px">
-      <div class="kpi-card">
-        <div class="kpi-label">Total H2 Valor</div>
-        <div class="kpi-value" style="font-size:22px">$57.0 M</div>
-        <div class="kpi-sub">Jul–Dic 2026 · Budget</div>
-      </div>
-      <div class="kpi-card">
-        <div class="kpi-label">Total H2 Piezas</div>
-        <div class="kpi-value" style="font-size:22px">261,815</div>
-        <div class="kpi-sub">unidades proyectadas</div>
-      </div>
-      <div class="kpi-card">
-        <div class="kpi-label">Cliente Principal</div>
-        <div class="kpi-value" style="font-size:22px;color:var(--att)">AT&T</div>
-        <div class="kpi-sub">~78% del valor H2</div>
-      </div>
-      <div class="kpi-card">
-        <div class="kpi-label">Mayor Crecimiento</div>
-        <div class="kpi-value" style="font-size:22px;color:var(--liverpool)">Liverpool</div>
-        <div class="kpi-sub">nuevo canal activo H2</div>
-      </div>
-    </div>
-
-    <!-- Insights grid -->
-    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:16px">
-
-      <div style="background:var(--surface2);border-radius:10px;padding:16px;border-left:4px solid var(--att)">
-        <div style="font-weight:700;color:var(--att);margin-bottom:8px">📱 AT&T</div>
-        <ul style="margin:0;padding-left:18px;font-size:13px;line-height:1.8;color:var(--text)">
-          <li>Canal más grande: <strong>$44.4 M</strong> en valor H2</li>
-          <li>Crecimiento esperado en Q4 con modelos nuevos</li>
-          <li>Piezas: <strong>180,290</strong> unidades H2</li>
-          <li>Enfoque en iPhone + accesorios premium Speck/Nomad</li>
-        </ul>
-      </div>
-
-      <div style="background:var(--surface2);border-radius:10px;padding:16px;border-left:4px solid var(--macstore)">
-        <div style="font-weight:700;color:var(--macstore);margin-bottom:8px">🍎 MacStore</div>
-        <ul style="margin:0;padding-left:18px;font-size:13px;line-height:1.8;color:var(--text)">
-          <li>Canal: <strong>$19.1 M</strong> en valor H2</li>
-          <li>Alto ASP — menor volumen, mayor ticket</li>
-          <li>Piezas: <strong>39,389</strong> unidades H2</li>
-          <li>Q4 impulsado por temporada navideña</li>
-        </ul>
-      </div>
-
-      <div style="background:var(--surface2);border-radius:10px;padding:16px;border-left:4px solid var(--ishop)">
-        <div style="font-weight:700;color:var(--ishop);margin-bottom:8px">🛍️ iShop</div>
-        <ul style="margin:0;padding-left:18px;font-size:13px;line-height:1.8;color:var(--text)">
-          <li>Canal: <strong>$16.5 M</strong> en valor H2</li>
-          <li>Piezas: <strong>37,009</strong> unidades H2</li>
-          <li>Variación por mes — monitorear Sep/Oct</li>
-          <li>Oportunidad en categoría Micas y iPad</li>
-        </ul>
-      </div>
-
-      <div style="background:var(--surface2);border-radius:10px;padding:16px;border-left:4px solid var(--liverpool)">
-        <div style="font-weight:700;color:var(--liverpool);margin-bottom:8px">🏬 Liverpool</div>
-        <ul style="margin:0;padding-left:18px;font-size:13px;line-height:1.8;color:var(--text)">
-          <li>Canal nuevo: arranca <strong>Jul 2026</strong></li>
-          <li>Valor H2: <strong>$2.2 M</strong> — crecimiento gradual</li>
-          <li>Piezas: <strong>5,009</strong> unidades</li>
-          <li>Prioridad: asegurar presencia en puntos clave</li>
-        </ul>
-      </div>
-
-      <div style="background:var(--surface2);border-radius:10px;padding:16px;border-left:4px solid var(--ml)">
-        <div style="font-weight:700;color:var(--ml);margin-bottom:8px">🛒 MercadoLibre</div>
-        <ul style="margin:0;padding-left:18px;font-size:13px;line-height:1.8;color:var(--text)">
-          <li>Canal digital: <strong>$440 K</strong> en valor H2</li>
-          <li>Bajo volumen pero alta visibilidad</li>
-          <li>Estrategia: pricing competitivo</li>
-          <li>Reviews y ratings clave para conversión</li>
-        </ul>
-      </div>
-
-      <div style="background:var(--surface2);border-radius:10px;padding:16px;border-left:4px solid #f59e0b">
-        <div style="font-weight:700;color:#d97706;margin-bottom:8px">⚡ Prioridades Generales H2</div>
-        <ul style="margin:0;padding-left:18px;font-size:13px;line-height:1.8;color:var(--text)">
-          <li>Ejecutar lanzamiento iPhone nuevos modelos</li>
-          <li>Activar Liverpool como canal estratégico</li>
-          <li>Fortalecer sell-out en temporada Sep–Dic</li>
-          <li>Asegurar inventario para Q4 Black Friday / Navidad</li>
-        </ul>
-      </div>
-
-    </div>
-  </div>
-
-  <!-- Editable notes area -->
-  <div class="card" style="padding:20px 24px">
-    <div style="font-size:13px;font-weight:700;color:var(--muted);letter-spacing:.05em;text-transform:uppercase;margin-bottom:12px">
-      📋 Notas del Equipo
-    </div>
-    <textarea id="insightNotes" 
-      placeholder="Agrega comentarios, acuerdos de reunión o notas de seguimiento aquí..."
-      style="width:100%;min-height:120px;border:1px solid var(--border);border-radius:8px;padding:12px;font-size:13px;font-family:inherit;resize:vertical;background:var(--surface2);color:var(--text);line-height:1.7"
-      oninput="localStorage && localStorage.setItem('insightNotes', this.value)"
-    ></textarea>
-  </div>
-
-</div><!-- /section-h2 -->
-
 <!-- ─── TAB 4: POR MARCA ─── -->
 <div class="section" id="section-marca">
 
@@ -540,9 +427,15 @@
   <!-- Detail table -->
   <div class="card">
     <div class="card-title">
-      Detalle por Marca · Cliente · Categoría
-      <div style="display:flex;align-items:center;gap:8px">
-        <span class="filter-label" style="margin-bottom:0">Categoría</span>
+      Detalle por Marca · Cliente · Categoría — H2 Jun–Dic 2026
+      <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+        <span class="filter-label" style="margin-bottom:0">Ordenar</span>
+        <div class="metric-toggle" id="tblSortBtns">
+          <button data-s="val" class="active" onclick="setTblSort('val')">Mayor Valor</button>
+          <button data-s="pcs" onclick="setTblSort('pcs')">Mayor Piezas</button>
+          <button data-s="az" onclick="setTblSort('az')">A–Z</button>
+        </div>
+        <span class="filter-label" style="margin-bottom:0;margin-left:8px">Categoría</span>
         <div class="chip-row" id="tblCatFilter">
           <button class="chip on" data-val="all" onclick="setTblFilter('cat',this)">Todas</button>
           <button class="chip" data-val="Cases iPhone" onclick="setTblFilter('cat',this)">iPhone</button>
@@ -786,7 +679,7 @@ function switchTab(id, el) {
   if (id === 'attainment') buildAVBSection();
   else if (id === 'anual')   { buildAnualDualChart(); buildAnualKpis(); buildCatCharts(); }
   else if (id === 'quarter') buildQSection();
-  else if (id === 'h2')      { const n=localStorage&&localStorage.getItem('insightNotes'); const ta=document.getElementById('insightNotes'); if(ta&&n)ta.value=n; }
+
   else if (id === 'marca')   renderMarca();
 }
 
@@ -1132,6 +1025,7 @@ function buildQSection() { buildQKpis(); buildQChart(); buildQTable(); }
 /* ══════ TAB 4: MARCA ══════ */
 let marcaState={cliente:'all',mode:'val'};
 let tblState={cliente:'all',marca:'all',cat:'all'};
+let tblSort='val'; // 'val' | 'pcs' | 'az'
 
 
 function getMarcaSummary(){
@@ -1169,7 +1063,9 @@ function getTableRows(){
       }
     }
   }
-  rows.sort((a,b)=>marcaState.mode==='pcs'?b.totPcs-a.totPcs:b.totVal-a.totVal);
+  if(tblSort==='az') rows.sort((a,b)=>a.marca.localeCompare(b.marca)||a.cliente.localeCompare(b.cliente)||a.cat.localeCompare(b.cat));
+  else if(tblSort==='pcs') rows.sort((a,b)=>b.totPcs-a.totPcs);
+  else rows.sort((a,b)=>b.totVal-a.totVal);
   return rows;
 }
 
@@ -1177,6 +1073,12 @@ const tblChipClasses={
   cliente:{all:'on',ATT:'on-att',MacStore:'on-macstore',iShop:'on-ishop',Liverpool:'on-liverpool'},
   marca:{all:'on'}, cat:{all:'on'},
 };
+function setTblSort(s){
+  tblSort=s;
+  document.querySelectorAll('#tblSortBtns button').forEach(b=>b.classList.toggle('active',b.dataset.s===s));
+  renderMarcaTable();
+}
+
 function setTblFilter(type,btn){
   const val=btn.dataset.val;
   const barId=type==='cliente'?'tblClienteFilter':type==='marca'?'tblMarcaFilter':'tblCatFilter';
@@ -1279,35 +1181,40 @@ function renderMarcaCharts(summary){
 }
 
 function renderParticipationCharts(summary, isVal) {
-  // 2026 H2 participation (from marcaRaw)
+  // 2026 H2 participation
   const marcas2026 = Object.keys(summary).filter(m=>{
     const t = isVal?Object.values(summary[m].val).reduce((a,b)=>a+b,0):Object.values(summary[m].pcs).reduce((a,b)=>a+b,0);
     return t>0;
+  }).sort((a,b)=>{
+    const ta=isVal?Object.values(summary[a].val).reduce((x,y)=>x+y,0):Object.values(summary[a].pcs).reduce((x,y)=>x+y,0);
+    const tb=isVal?Object.values(summary[b].val).reduce((x,y)=>x+y,0):Object.values(summary[b].pcs).reduce((x,y)=>x+y,0);
+    return tb-ta;
   });
   const vals2026 = marcas2026.map(m=>isVal?Object.values(summary[m].val).reduce((a,b)=>a+b,0):Object.values(summary[m].pcs).reduce((a,b)=>a+b,0));
   const total2026 = vals2026.reduce((a,b)=>a+b,0);
 
-  // 2025 participation — use marcaRaw but sum all months for 2025 actuals
-  // We'll derive 2025 brand participation from the H2 data in marcaRaw (same structure, H2 months)
-  // (approximation: all H2 data we have is 2026 budget; for 2025 we'll use quarterly brand split)
-  // Use avb2025Val as proxy: distribute by client, then by marca proportionally from marcaRaw
-  const marcaKeys2025 = marcas2026; // same brands
-  // Build 2025 values from marcaRaw proportional split against avb2025 totals
-  const client2025Val = {};
-  ['AT&T','MacStore','iShop','Liverpool'].forEach(c=>{
-    client2025Val[c] = (avb2025Val[c]||[]).slice(5).reduce((a,b)=>a+b,0); // H2 months Jun-Dec
-  });
+  // 2025 participation — distribute avb2025 totals by brand's H2 2026 share per client
+  // marcaRaw is keyed: {brand: {client: {cat: {val, pcs}}}}
+  const clientNameMap = {'ATT':'AT&T','MacStore':'MacStore','iShop':'iShop','Liverpool':'Liverpool'};
+  const marcaKeys2025 = marcas2026;
   const marcaVals2025 = {};
   marcaKeys2025.forEach(m=>{
     let total = 0;
-    Object.keys(marcaRaw).forEach(clientKey=>{
-      const cName = clientKey==='ATT'?'AT&T':clientKey;
-      const clientTotal2026 = Object.values(marcaRaw[clientKey]||{}).reduce((s,catData)=>{
-        return s + Object.values(catData).reduce((ss,d)=>ss+(isVal?Object.values(d.val).reduce((a,b)=>a+b,0):Object.values(d.pcs).reduce((a,b)=>a+b,0)),0);
-      },0);
-      const marcaClientTotal2026 = Object.values(marcaRaw[clientKey]?.[m]||{}).reduce((s,d)=>s+(isVal?Object.values(d.val).reduce((a,b)=>a+b,0):Object.values(d.pcs).reduce((a,b)=>a+b,0)),0);
-      const share = clientTotal2026 > 0 ? marcaClientTotal2026/clientTotal2026 : 0;
-      total += (client2025Val[cName]||0) * share;
+    const brandClients = Object.keys(marcaRaw[m]||{});
+    brandClients.forEach(client=>{
+      const cName = clientNameMap[client]||client;
+      // This brand's total in this client (2026)
+      const brandClientTotal = Object.values(marcaRaw[m][client]||{}).reduce((s,d)=>
+        s+(isVal?Object.values(d.val).reduce((a,b)=>a+b,0):Object.values(d.pcs).reduce((a,b)=>a+b,0)),0);
+      // All brands' total in this client (2026)
+      const allBrandsClientTotal = Object.keys(marcaRaw).reduce((s,brand)=>
+        s+Object.values(marcaRaw[brand][client]||{}).reduce((ss,d)=>
+          ss+(isVal?Object.values(d.val).reduce((a,b)=>a+b,0):Object.values(d.pcs).reduce((a,b)=>a+b,0)),0),0);
+      const share = allBrandsClientTotal>0 ? brandClientTotal/allBrandsClientTotal : 0;
+      const client2025 = isVal
+        ? (avb2025Val[cName]||[]).reduce((a,b)=>a+b,0)
+        : (avb2025Pcs[cName]||[]).reduce((a,b)=>a+b,0);
+      total += client2025 * share;
     });
     marcaVals2025[m] = total;
   });
@@ -1481,20 +1388,42 @@ function renderAVBCharts() {
   const retails = Object.keys(avbRetailColors).filter(r=>avbGet25(r)>0||avbGet26(r,false)>0);
   const fmtTip = v => isVal ? '$'+(v/1e6).toFixed(2)+' M' : v.toLocaleString('es-MX')+' pcs';
 
-  // ── Chart 1: Grouped bars by retail (2025 vs 2026)
+  // ── Chart 1: Grouped bars by retail (2025 vs 2026) with % delta labels
   const d25 = retails.map(r=>avbGet25(r));
   const d26 = retails.map(r=>avbGet26(r,inv));
+  const pctLabelPlugin = {
+    id:'pctLabels',
+    afterDatasetsDraw(chart) {
+      const ctx = chart.ctx;
+      const ds1 = chart.getDatasetMeta(1); // 2026 bars
+      const base = chart.data.datasets[0].data;
+      ds1.data.forEach((bar, j) => {
+        const v25 = base[j]||0, v26 = chart.data.datasets[1].data[j]||0;
+        if (!v25) return;
+        const pct = ((v26/v25 - 1)*100).toFixed(1);
+        const isPos = parseFloat(pct) >= 0;
+        ctx.save();
+        ctx.fillStyle = isPos ? '#16a34a' : '#dc2626';
+        ctx.font = 'bold 11px system-ui,sans-serif';
+        ctx.textAlign = 'center';
+        ctx.fillText((isPos?'+':'')+pct+'%', bar.x, bar.y - 7);
+        ctx.restore();
+      });
+    }
+  };
   if (chartAVBRetailInst) chartAVBRetailInst.destroy();
   chartAVBRetailInst = new Chart(document.getElementById('chartAVBRetail'), {
     type:'bar',
     data:{
       labels:retails,
       datasets:[
-        {label:'2025 Real', data:d25, backgroundColor:retails.map(r=>avbRetailColors[r]+'66'), borderColor:retails.map(r=>avbRetailColors[r]), borderWidth:2, borderRadius:4},
+        {label:'2025 Real', data:d25, backgroundColor:retails.map(r=>avbRetailColors[r]+'55'), borderColor:retails.map(r=>avbRetailColors[r]), borderWidth:2, borderRadius:4},
         {label:`2026 ${inv?'Invoice H1':'Projection'}`, data:d26, backgroundColor:retails.map(r=>avbRetailColors[r]), borderRadius:4}
       ]
     },
+    plugins:[pctLabelPlugin],
     options:{responsive:true,maintainAspectRatio:false,
+      layout:{padding:{top:24}},
       plugins:{legend:{position:'bottom',labels:{font:{size:11},boxWidth:12,padding:12}},
         tooltip:{callbacks:{label:c=>` ${c.dataset.label}: ${fmtTip(c.parsed.y)}`}}},
       scales:{x:{grid:{display:false}},y:{ticks:{callback:v=>isVal?'$'+(v/1e6).toFixed(1)+'M':v>=1000?(v/1000).toFixed(0)+'K':v},grid:{color:'#e2e8f0'}}}
