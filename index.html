@@ -8,13 +8,13 @@
 <style>
   :root {
     --bg:#f1f5f9; --surface:#ffffff; --surface2:#f8fafc; --border:#e2e8f0;
-    --text:#0f172a; --muted:#64748b; --accent:#2563eb; --green:#16a34a;
+    --text:#0f172a; --muted:#64748b; --accent:#b91c1c; --green:#16a34a;
     --red:#dc2626; --gold:#d97706;
     --att:#00A8E0; --macstore:#555555; --ishop:#FF6D00; --liverpool:#C62828; --coppel:#388E3C; --ml:#7B1FA2;
   }
   *{box-sizing:border-box;margin:0;padding:0}
   body{background:var(--bg);color:var(--text);font-family:'Segoe UI',Arial,sans-serif;min-height:100vh}
-  .header{background:linear-gradient(135deg,#1e3a8a 0%,#1e40af 100%);padding:18px 24px;display:flex;align-items:center;gap:16px}
+  .header{background:linear-gradient(135deg,#7f1d1d 0%,#b91c1c 100%);padding:18px 24px;display:flex;align-items:center;gap:16px}
   .header-logo{font-size:26px;font-weight:800;color:#fff;letter-spacing:-1px}
   .header-sub{color:rgba(255,255,255,0.7);font-size:13px;margin-top:2px}
   .header-badge{margin-left:auto;background:#f59e0b;color:white;padding:4px 12px;border-radius:20px;font-size:11px;font-weight:700;white-space:nowrap}
@@ -119,15 +119,6 @@
   <div class="tab" onclick="switchTab('quarter',this)">📊 Dashboard by Quarter</div>
   <div class="tab" onclick="switchTab('h2',this)">📈 Dashboard H2</div>
   <div class="tab" onclick="switchTab('marca',this)">🏷️ Por Marca</div>
-</div>
-
-<!-- ══ GLOBAL METRIC TOGGLE ══ -->
-<div class="metric-bar">
-  <span class="metric-bar-label">Vista global:</span>
-  <div class="toggle-row" style="margin:0">
-    <button class="toggle-btn active" id="gBtnVal" onclick="setGlobalMetric('valor')">Valor MXN</button>
-    <button class="toggle-btn" id="gBtnPcs" onclick="setGlobalMetric('piezas')">Piezas</button>
-  </div>
 </div>
 
 <!-- ══ CONTENT ══ -->
@@ -714,8 +705,8 @@ let gMetric = 'valor'; // 'valor' | 'piezas'
 function setGlobalMetric(m) {
   gMetric = m;
   if(document.getElementById('section-attainment').classList.contains('active')) buildAVBSection();
-  document.getElementById('gBtnVal').classList.toggle('active', m==='valor');
-  document.getElementById('gBtnPcs').classList.toggle('active', m==='piezas');
+  // global toggle buttons removed
+  // document.getElementById('gBtnVal') no longer exists
   // Sync annual table toggle buttons
   switchAnualTable(m==='valor'?'val':'pcs');
   // Rebuild charts in each tab
@@ -740,8 +731,7 @@ function syncMarcaMode(mode) {
   if(mPcsBtn) mPcsBtn.classList.toggle('active', mode==='pcs');
   // Sync back to global
   gMetric = mode==='val'?'valor':'piezas';
-  document.getElementById('gBtnVal').classList.toggle('active', gMetric==='valor');
-  document.getElementById('gBtnPcs').classList.toggle('active', gMetric==='piezas');
+  // global toggle buttons removed
   renderMarca();
 }
 
@@ -751,7 +741,12 @@ function switchTab(id, el) {
   document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
   document.getElementById('section-'+id).classList.add('active');
   el.classList.add('active');
+  // Rebuild charts so they render correctly after becoming visible
   if (id === 'attainment') buildAVBSection();
+  else if (id === 'anual')   { buildAnualDualChart(); buildAnualKpis(); buildCatCharts(); }
+  else if (id === 'quarter') buildQSection();
+  else if (id === 'h2')      { buildH2Charts(); buildValorChart('all'); }
+  else if (id === 'marca')   renderMarca();
 }
 
 /* ══════ ANNUAL TABLE TOGGLE ══════ */
@@ -1438,12 +1433,8 @@ function renderAVBTable() {
 }
 
 /* ══════ INIT ══════ */
-buildAnualCharts();
-buildQSection();
-buildH2Charts();
-buildValorChart('all');
-setTimeout(renderMarca,200);
 buildAVBSection();
+// Other tabs build on first visit via switchTab
 </script>
 </body>
 </html>
