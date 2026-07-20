@@ -455,8 +455,9 @@
       <table id="marcaTable" style="min-width:800px">
         <thead><tr>
           <th style="min-width:100px">Marca</th>
-          <th style="min-width:80px">Cliente</th>
+          <th style="min-width:80px">Retail</th>
           <th style="min-width:130px">Categoría</th>
+          <th class="num" style="color:var(--muted)">Ene</th><th class="num" style="color:var(--muted)">Feb</th><th class="num" style="color:var(--muted)">Mar</th><th class="num" style="color:var(--muted)">Abr</th><th class="num" style="color:var(--muted)">May</th>
           <th class="num">Jun</th><th class="num">Jul</th><th class="num">Ago</th>
           <th class="num">Sep</th><th class="num">Oct</th><th class="num">Nov</th><th class="num">Dic</th>
           <th class="num">TOTAL</th>
@@ -1427,7 +1428,8 @@ function renderMarcaTable(){
     const dot=`<span class="dot" style="background:${dotColor}"></span>`;
     const mc=newMarca?`<td style="font-weight:700;color:${marcaColors[marca]||'#333'}">${marca}</td>`:`<td style="color:var(--muted);padding-left:16px">↳</td>`;
     const cc=newCliente?`<td>${dot}${cliente}</td>`:`<td style="color:var(--muted)">↳</td>`;
-    const cells=MONTHS_H2_KEYS.map(m=>`<td class="num">${fmtNum(isVal?(mData.val[m]||0):(mData.pcs[m]||0),marcaState.mode)}</td>`).join('');
+    const h1Dash='<td class="num" style="color:var(--muted)">—</td>'.repeat(5);
+    const cells=h1Dash+MONTHS_H2_KEYS.map(m=>`<td class="num">${fmtNum(isVal?(mData.val[m]||0):(mData.pcs[m]||0),marcaState.mode)}</td>`).join('');
     const tot=isVal?totVal:totPcs;
     html+=`<tr>${mc}${cc}<td style="font-size:11px;color:var(--muted)">${cat}</td>${cells}<td class="num" style="background:var(--surface2);font-weight:700">${fmtNum(tot,marcaState.mode)}</td></tr>`;
   });
@@ -1732,7 +1734,7 @@ function buildClienteTab(){
   const h1Total=clientAvbArr.slice(0,5).reduce((a,b)=>a+b,0);
   const grand=catGrand+h1Total;
 
-  let kpiHtml=`<div class="kpi-card"><div class="kpi-label">${cname} TOTAL</div><div class="kpi-value">${fmtKpi(grand)}</div><div class="kpi-sub">${isVal?'valor MXN':'piezas'} Jun–Dic 2026</div></div>`;
+  let kpiHtml=`<div class="kpi-card"><div class="kpi-label">${cname} TOTAL</div><div class="kpi-value">${fmtKpi(grand)}</div><div class="kpi-sub">${isVal?'valor MXN':'piezas'} Ene–Dic 2026</div></div>`;
   totByCat.forEach(({cat,tot})=>{
     const share=grand>0?(tot/grand*100).toFixed(1):'0.0';
     kpiHtml+=`<div class="kpi-card"><div class="kpi-label" style="font-size:10px">${cat}</div><div class="kpi-value" style="font-size:20px">${fmtKpi(tot)}</div><div class="kpi-sub">${share}% del total</div></div>`;
@@ -1780,9 +1782,9 @@ function buildClienteTab(){
     const tot=ALL_MK.reduce((s,m)=>s+(catData[cat][m]||0),0);
     tblHtml+=`<tr><td style="font-weight:600">${cat}</td>${cells}<td class="num" style="background:var(--surface2);font-weight:700">${fmtCell(tot)}</td></tr>`;
   });
-  // Total row
-  const totCells=ALL_MK.map(m=>{
-    const v=cats.reduce((s,c)=>s+(catData[c][m]||0),0);
+  // Total row – Jan-May uses avb2026Val; Jun-Dec uses category sum
+  const totCells=ALL_MK.map((m,i)=>{
+    const v=i<5?(clientAvbArr[i]||0):cats.reduce((s,c)=>s+(catData[c][m]||0),0);
     return `<td class="num" style="font-weight:700">${fmtCell(v)}</td>`;
   }).join('');
   tblHtml+=`<tr style="border-top:2px solid var(--accent)"><td style="font-weight:700">TOTAL</td>${totCells}<td class="num" style="background:var(--accent);color:#fff;font-weight:700">${fmtKpi(grand)}</td></tr>`;
