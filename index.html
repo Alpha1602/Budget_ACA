@@ -454,13 +454,18 @@
     <div class="table-wrap">
       <table id="marcaTable" style="min-width:800px">
         <thead><tr>
-          <th style="min-width:100px">Marca</th>
-          <th style="min-width:80px">Retail</th>
-          <th style="min-width:130px">Categoría</th>
+          <th style="min-width:100px;cursor:pointer;user-select:none" onclick="setTblColSort('marca')" id="thMarca">Marca <span id="thMarcaIcon"></span></th>
+          <th style="min-width:80px;cursor:pointer;user-select:none" onclick="setTblColSort('retail')" id="thRetail">Retail <span id="thRetailIcon"></span></th>
+          <th style="min-width:130px;cursor:pointer;user-select:none" onclick="setTblColSort('cat')" id="thCat">Categoría <span id="thCatIcon"></span></th>
           <th class="num" style="color:var(--muted)">Ene</th><th class="num" style="color:var(--muted)">Feb</th><th class="num" style="color:var(--muted)">Mar</th><th class="num" style="color:var(--muted)">Abr</th><th class="num" style="color:var(--muted)">May</th>
-          <th class="num">Jun</th><th class="num">Jul</th><th class="num">Ago</th>
-          <th class="num">Sep</th><th class="num">Oct</th><th class="num">Nov</th><th class="num">Dic</th>
-          <th class="num">TOTAL</th>
+          <th class="num" style="cursor:pointer" onclick="setTblColSort('Jun')" id="thJun">Jun <span id="thJunIcon"></span></th>
+          <th class="num" style="cursor:pointer" onclick="setTblColSort('Jul')">Jul</th>
+          <th class="num" style="cursor:pointer" onclick="setTblColSort('Aug')">Ago</th>
+          <th class="num" style="cursor:pointer" onclick="setTblColSort('Sep')">Sep</th>
+          <th class="num" style="cursor:pointer" onclick="setTblColSort('Oct')">Oct</th>
+          <th class="num" style="cursor:pointer" onclick="setTblColSort('Nov')">Nov</th>
+          <th class="num" style="cursor:pointer" onclick="setTblColSort('Dec')">Dic</th>
+          <th class="num" style="cursor:pointer" onclick="setTblColSort('total')">TOTAL ↕</th>
         </tr></thead>
         <tbody id="marcaTableBody"></tbody>
       </table>
@@ -536,12 +541,12 @@ const valorFull = {
 };
 // Full year piezas: H1 = Budget 2026, H2 = FCST Consenso
 const piezasAnual = {
-  'AT&T':         [30710,20985,18176,19397,18409,19345,19863,24194,25188,26254,30225,35221],
-  'MacStore':     [8009, 4668, 3011, 2947, 2521, 2908, 2452, 5032, 5290, 7151, 7919, 8637],
-  'iShop':        [1884, 4502, 5686, 2687, 4318, 2733, 3450, 4624, 8977, 5189, 7146, 4890],
-  'Liverpool':    [0,   0,    0,    0,    0,    0,    220,  630,  874,  973,  1089, 1223],
-  'MercadoLibre': [0,   25,   70,   123,  156,  118,  0,    0,    0,    0,    0,    0],
-  'Coppel':       [0,   0,    0,    1470, 0,    0,    0,    0,    0,    0,    0,    0],
+  'AT&T': [0,0,0,0,0,21730,24194,25188,26254,30225,35221,35228],
+  'iShop': [0,0,0,0,0,4395,3450,4624,8977,5189,7146,4890],
+  'MacStore': [0,0,0,0,0,3295,5032,5290,7151,7919,8637,7513],
+  'Liverpool': [0,0,0,0,0,0,220,630,874,973,1089,1223],
+  'MercadoLibre': [0,0,0,0,0,0,0,0,0,0,0,0],
+  'Coppel': [0,0,0,0,0,0,0,0,0,0,0,0],
 };
 // catData: 7 values per cat = Jun..Dec
 const catData = {
@@ -602,10 +607,10 @@ const avb2025Pcs = {
 };
 const avb2026Val = {
   'AT&T':         [7506310,4966820,4172841,4289140,4051382,4319528,4347350,6350498,6551788,6528682,7582561,8733239],
-  'MacStore':     [3498968,2258704,1498288,1516132,1368618,1528990,1366707,2396343,2538858,3337211,3782938,4143965],
   'iShop':        [800677,1989708,2678803,1120086,1928305,1219616,1542131,2069922,3954698,2311776,3161928,2205242],
+  'MacStore':     [3498968,2258704,1498288,1516132,1368618,1528990,1366707,2396343,2538858,3337211,3782938,4143965],
   'Liverpool':    [0,0,0,0,0,0,79541,278983,379891,421115,469262,524847],
-  'MercadoLibre': [0,8423,35843,51897,58065,37476,21314,60000,60000,60000,80000,60000],
+  'MercadoLibre': [0,8423,35843,51897,58065,60000,60000,60000,60000,60000,80000,60000],
   'Coppel':       [0,0,0,445377,0,0,0,0,0,0,0,0],
 };
 const avb2026Pcs = {
@@ -1257,8 +1262,9 @@ function setTblFilter(type,btn){
 }
 
 function fmtNum(v,mode){
-  if(mode==='pcs')return v>0?v.toLocaleString('es-MX'):'—';
-  return v>0?'$'+(v/1000).toFixed(0)+'K':'—';
+  if(mode==='pcs') return v>0?v.toLocaleString('es-MX'):'—';
+  if(v<=0) return '—';
+  return v>=1e6?'$'+(v/1e6).toFixed(1)+'M':'$'+(v/1000).toFixed(0)+'K';
 }
 
 function renderMarcaKpis(summary){
@@ -1418,9 +1424,33 @@ function renderParticipationCharts(summary, isVal) {
   });
 }
 
+let tblColSort = {col:'total', dir:'desc'};
+function setTblColSort(col) {
+  if (tblColSort.col === col) tblColSort.dir = tblColSort.dir==='desc'?'asc':'desc';
+  else { tblColSort = {col, dir: ['marca','retail','cat'].includes(col)?'asc':'desc'}; }
+  renderMarcaTable();
+}
+
 function renderMarcaTable(){
-  const rows=getTableRows(); const isVal=marcaState.mode==='val';
+  let rows=getTableRows(); const isVal=marcaState.mode==='val';
+  // Column sort override
+  const {col,dir} = tblColSort;
+  const sign = dir==='asc'?1:-1;
+  if (col==='marca') rows.sort((a,b)=>sign*a.marca.localeCompare(b.marca));
+  else if (col==='retail') rows.sort((a,b)=>sign*a.cliente.localeCompare(b.cliente));
+  else if (col==='cat') rows.sort((a,b)=>sign*a.cat.localeCompare(b.cat));
+  else if (col==='total') rows.sort((a,b)=>sign*(isVal?b.totVal-a.totVal:b.totPcs-a.totPcs));
+  else rows.sort((a,b)=>sign*((isVal?(b.mData.val[col]||0):(b.mData.pcs[col]||0))-(isVal?(a.mData.val[col]||0):(a.mData.pcs[col]||0))));
+
   const tbody=document.getElementById('marcaTableBody'); let html=''; let lastMarca='',lastCliente='';
+
+  // TOTAL row at top
+  const grandTot = rows.reduce((s,r)=>s+(isVal?r.totVal:r.totPcs),0);
+  const monthTots = MONTHS_H2_KEYS.map(m=>rows.reduce((s,r)=>s+(isVal?(r.mData.val[m]||0):(r.mData.pcs[m]||0)),0));
+  const h1Empty = '<td class="num" style="color:var(--muted)">—</td>'.repeat(5);
+  const totCells = h1Empty + monthTots.map(v=>`<td class="num" style="font-weight:700">${fmtNum(v,marcaState.mode)}</td>`).join('');
+  html += `<tr style="background:var(--surface2);border-bottom:2px solid var(--accent)"><td style="font-weight:700;font-size:12px">TOTAL</td><td></td><td></td>${totCells}<td class="num" style="background:var(--accent);color:#fff;font-weight:700">${fmtNum(grandTot,marcaState.mode)}</td></tr>`;
+
   rows.forEach(({marca,cliente,cat,mData,totPcs,totVal})=>{
     const newMarca=marca!==lastMarca; const newCliente=cliente!==lastCliente||newMarca;
     lastMarca=marca; lastCliente=cliente;
@@ -1732,7 +1762,7 @@ function buildClienteTab(){
   const avbClientKey={'ATT':'AT&T','MacStore':'MacStore','iShop':'iShop','Liverpool':'Liverpool'};
   const clientAvbArr=(avb2026Val[avbClientKey[client]]||[]);
   const h1Total=clientAvbArr.slice(0,5).reduce((a,b)=>a+b,0);
-  const grand=catGrand+h1Total;
+  const grand=clientAvbArr.reduce((a,b)=>a+b,0); // Full year from Budget 2026
 
   let kpiHtml=`<div class="kpi-card"><div class="kpi-label">${cname} TOTAL</div><div class="kpi-value">${fmtKpi(grand)}</div><div class="kpi-sub">${isVal?'valor MXN':'piezas'} Ene–Dic 2026</div></div>`;
   totByCat.forEach(({cat,tot})=>{
@@ -1773,7 +1803,11 @@ function buildClienteTab(){
   document.getElementById('clteLegend').innerHTML=leg;
 
   // Table
-  const fmtCell=v=>isVal?(v>0?'$'+(v/1000).toFixed(0)+'K':'—'):(v>0?v.toLocaleString('es-MX'):'—');
+  const fmtCell=v=>{
+    if(!isVal) return v>0?v.toLocaleString('es-MX'):'—';
+    if(v<=0) return '—';
+    return v>=1e6?'$'+(v/1e6).toFixed(1)+'M':'$'+(v/1000).toFixed(0)+'K';
+  };
   let tblHtml='';
   const h1Cells=ALL_MK.map((_,i)=>`<td class="num" style="color:var(--muted);font-size:11px">${i<5?fmtCell(clientAvbArr[i]||0):'—'}</td>`).join('');
   tblHtml+=`<tr style="background:#f8fafc"><td style="font-size:11px;color:var(--muted)">Total retail (sin categoría)</td>${h1Cells}<td class="num" style="font-weight:700">${fmtCell(h1Total)}</td></tr>`;
@@ -1782,9 +1816,9 @@ function buildClienteTab(){
     const tot=ALL_MK.reduce((s,m)=>s+(catData[cat][m]||0),0);
     tblHtml+=`<tr><td style="font-weight:600">${cat}</td>${cells}<td class="num" style="background:var(--surface2);font-weight:700">${fmtCell(tot)}</td></tr>`;
   });
-  // Total row – Jan-May uses avb2026Val; Jun-Dec uses category sum
-  const totCells=ALL_MK.map((m,i)=>{
-    const v=i<5?(clientAvbArr[i]||0):cats.reduce((s,c)=>s+(catData[c][m]||0),0);
+  // Total row: avb2026Val for all 12 months (Budget source of truth)
+  const totCells=ALL_MK.map((_,i)=>{
+    const v=clientAvbArr[i]||0;
     return `<td class="num" style="font-weight:700">${fmtCell(v)}</td>`;
   }).join('');
   tblHtml+=`<tr style="border-top:2px solid var(--accent)"><td style="font-weight:700">TOTAL</td>${totCells}<td class="num" style="background:var(--accent);color:#fff;font-weight:700">${fmtKpi(grand)}</td></tr>`;
