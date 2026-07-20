@@ -114,7 +114,8 @@
 
 <!-- ══ TABS ══ -->
 <div class="tabs">
-  <div class="tab active" onclick="switchTab('anual',this)">📅 Proyección 2026</div>
+  <div class="tab active" onclick="switchTab('attainment',this)">📊 Attainment vs Budget</div>
+  <div class="tab" onclick="switchTab('anual',this)">📅 Proyección 2026</div>
   <div class="tab" onclick="switchTab('quarter',this)">📊 Dashboard by Quarter</div>
   <div class="tab" onclick="switchTab('h2',this)">📈 Dashboard H2</div>
   <div class="tab" onclick="switchTab('marca',this)">🏷️ Por Marca</div>
@@ -133,8 +134,66 @@
 <!-- ══ CONTENT ══ -->
 <div class="content">
 
+<!-- ─── TAB 0: ATTAINMENT VS BUDGET ─── -->
+<div class="section active" id="section-attainment">
+
+  <!-- KPIs -->
+  <div id="avbKpis" class="kpi-grid" style="padding:16px 0 8px"></div>
+
+  <!-- Invoice / Projection toggle -->
+  <div class="card" style="padding:10px 18px;margin-bottom:14px">
+    <div style="display:flex;align-items:center;gap:16px;flex-wrap:wrap">
+      <span class="metric-bar-label">2026 View:</span>
+      <div style="display:flex;gap:0">
+        <button id="avbInvoiceBtn" onclick="setAVBMode('invoice',this)"
+          style="padding:7px 18px;font-size:12px;font-weight:700;border:1.5px solid #cbd5e1;border-radius:6px 0 0 6px;cursor:pointer;background:#fff;color:#374151;transition:.15s">
+          ⬜ Invoice &nbsp;·&nbsp; H1 (Jan–Jun)
+        </button>
+        <button id="avbProjBtn" onclick="setAVBMode('projection',this)"
+          style="padding:7px 18px;font-size:12px;font-weight:700;border:1.5px solid #9ca3af;border-left:none;border-radius:0 6px 6px 0;cursor:pointer;background:#9ca3af;color:#fff;transition:.15s">
+          ◼ Projection &nbsp;·&nbsp; Full Year
+        </button>
+      </div>
+      <span id="avbModeNote" style="font-size:11px;color:var(--muted)">Mostrando facturas emitidas H1 (Jan–Jun 2026)</span>
+    </div>
+  </div>
+
+  <!-- Charts -->
+  <div class="grid-2">
+    <div class="card">
+      <div class="card-title" id="avbRetailTitle">2025 vs 2026 — Por Retail</div>
+      <canvas id="chartAVBRetail" class="canvas-tall"></canvas>
+    </div>
+    <div class="card">
+      <div class="card-title" id="avbMonthlyTitle">Tendencia Mensual — 2025 vs 2026</div>
+      <canvas id="chartAVBMonthly" class="canvas-tall"></canvas>
+    </div>
+  </div>
+
+  <!-- Table -->
+  <div class="card">
+    <div class="card-title">Retail vs Retail — Año vs Año</div>
+    <div class="table-wrap">
+      <table id="avbTable" style="min-width:800px">
+        <thead><tr>
+          <th>Retail</th>
+          <th class="num">2025 Real</th>
+          <th class="num">2026 Invoice (H1)</th>
+          <th class="num">2026 Projection</th>
+          <th class="num">YoY Invoice</th>
+          <th class="num">YoY Projection</th>
+          <th class="num">Share 2025</th>
+          <th class="num">Share 2026</th>
+        </tr></thead>
+        <tbody id="avbTableBody"></tbody>
+        <tfoot id="avbTableFoot"></tfoot>
+      </table>
+    </div>
+  </div>
+</div>
+
 <!-- ─── TAB 1: PROYECCIÓN 2026 ─── -->
-<div class="section active" id="section-anual">
+<div class="section" id="section-anual">
 
   <div class="grid-2">
     <div class="card">
@@ -747,6 +806,7 @@ let gMetric = 'valor'; // 'valor' | 'piezas'
 
 function setGlobalMetric(m) {
   gMetric = m;
+  if(document.getElementById('section-attainment').classList.contains('active')) buildAVBSection();
   document.getElementById('gBtnVal').classList.toggle('active', m==='valor');
   document.getElementById('gBtnPcs').classList.toggle('active', m==='piezas');
   // Sync annual table toggle buttons
@@ -781,6 +841,7 @@ function switchTab(id, el) {
   document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
   document.getElementById('section-'+id).classList.add('active');
   el.classList.add('active');
+  if (id === 'attainment') buildAVBSection();
 }
 
 /* ══════ ANNUAL TABLE TOGGLE ══════ */
@@ -1363,6 +1424,228 @@ function exportPOExcel() {
   setTimeout(()=>URL.revokeObjectURL(url),1000);
 }
 
+
+/* ══════ TAB 0: ATTAINMENT VS BUDGET ══════ */
+const MONTHS_AVB = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+
+// 2025 SI/ST Actual — source: Budget 2026 sheet "SI / ST 2025"
+const avb2025Val = {
+  'AT&T':         [4554278,3312629,3878055,3524123,3332978,4731181,3991004,4162015,4347690,5165849,4643763,6045190],
+  'iShop':        [2154412,1128500,1011377,1552961,1493031,1911616,1308203,706144,4492569,1946738,3555789,1446499],
+  'MacStore':     [3119711,1812800,1377849,1311543,1347496,1411025,1537789,1513778,1704153,1930539,2456461,2364890],
+  'MercadoLibre': [0,31957,21719,23686,21112,18586,8478,4341,2498,2016,0,0],
+  'Coppel':       [0,0,0,0,0,0,0,0,0,0,0,0],
+  'Liverpool':    [0,0,0,0,0,0,0,0,0,0,0,0],
+};
+const avb2025Pcs = {
+  'AT&T':         [19033,14310,16708,15231,14173,18107,15518,16042,16202,18647,18135,24735],
+  'iShop':        [4687,2418,2011,3492,3542,4184,3210,1656,10736,4228,8086,3203],
+  'MacStore':     [7390,4383,3367,3046,3224,3388,3385,3390,3657,4008,5467,5884],
+  'MercadoLibre': [0,1,1,42,35,30,15,10,5,3,0,0],
+  'Coppel':       [0,0,0,0,0,0,0,0,0,0,0,0],
+  'Liverpool':    [0,0,0,0,0,0,0,0,0,0,0,0],
+};
+
+// 2026 Budget — H1 (Jan-Jun) = Invoice (no sombreado) · H2 (Jul-Dec) = Projection (sombreado)
+const avb2026Val = {
+  'AT&T':         [7506310,4966820,4172841,4289140,4051382,4319528,4347350,6350498,6551788,6528682,7582561,8733239],
+  'MacStore':     [3498968,2258704,1498288,1516132,1368618,1528990,1366707,2396343,2538858,3337211,3782938,4143965],
+  'iShop':        [800677,1989708,2678803,1120086,1928305,1219616,1542131,2069922,3954698,2311776,3161928,2205242],
+  'Liverpool':    [0,0,0,0,0,0,79541,278983,379891,421115,469262,524847],
+  'MercadoLibre': [0,8423,35843,51897,58065,37476,21314,60000,60000,60000,80000,60000],
+  'Coppel':       [0,0,0,445377,0,0,0,0,0,0,0,0],
+};
+const avb2026Pcs = {
+  'AT&T':         [30710,20985,18176,19397,18409,19345,19863,24194,25188,26254,30225,35221],
+  'MacStore':     [8009,4668,3011,2947,2521,2908,2452,5032,5290,7151,7919,8637],
+  'iShop':        [1884,4502,5686,2687,4318,2733,3450,4624,8977,5189,7146,4890],
+  'Liverpool':    [0,0,0,0,0,0,220,630,874,973,1089,1223],
+  'MercadoLibre': [0,25,70,123,156,118,0,0,0,0,0,0],
+  'Coppel':       [0,0,0,1470,0,0,0,0,0,0,0,0],
+};
+
+const avbRetailColors = {
+  'AT&T':'#00A8E0','MacStore':'#555555','iShop':'#FF6D00',
+  'Liverpool':'#C62828','Coppel':'#388E3C','MercadoLibre':'#7B1FA2'
+};
+
+let avbMode = 'invoice';
+let chartAVBRetailInst = null, chartAVBMonthlyInst = null;
+
+function setAVBMode(mode) {
+  avbMode = mode;
+  const iBtn = document.getElementById('avbInvoiceBtn');
+  const pBtn = document.getElementById('avbProjBtn');
+  if (mode === 'invoice') {
+    iBtn.style.background='#fff'; iBtn.style.color='#374151'; iBtn.style.borderColor='#cbd5e1';
+    pBtn.style.background='#e5e7eb'; pBtn.style.color='#6b7280'; pBtn.style.borderColor='#9ca3af';
+    document.getElementById('avbModeNote').textContent = 'Mostrando facturas emitidas H1 (Jan–Jun 2026) — celdas sin sombrear';
+  } else {
+    iBtn.style.background='#e5e7eb'; iBtn.style.color='#6b7280'; iBtn.style.borderColor='#cbd5e1';
+    pBtn.style.background='#6b7280'; pBtn.style.color='#fff'; pBtn.style.borderColor='#6b7280';
+    document.getElementById('avbModeNote').textContent = 'Mostrando proyección año completo H1+H2 (Jan–Dec 2026) — incluye celdas sombreadas';
+  }
+  buildAVBSection();
+}
+
+function avbGet26(retail, useInvoice) {
+  const isVal = gMetric === 'valor';
+  const src = isVal ? avb2026Val : avb2026Pcs;
+  if (!src[retail]) return 0;
+  const months = useInvoice ? src[retail].slice(0,6) : src[retail];
+  return months.reduce((s,v)=>s+v,0);
+}
+function avbGet25(retail) {
+  const isVal = gMetric === 'valor';
+  const src = isVal ? avb2025Val : avb2025Pcs;
+  return src[retail] ? src[retail].reduce((s,v)=>s+v,0) : 0;
+}
+
+function buildAVBSection() {
+  renderAVBKpis();
+  renderAVBCharts();
+  renderAVBTable();
+}
+
+function renderAVBKpis() {
+  const isVal = gMetric === 'valor';
+  const inv = avbMode === 'invoice';
+  const fmt = v => isVal ? '$'+(v/1e6).toFixed(2)+' M' : v.toLocaleString('es-MX');
+  const retails = Object.keys(avbRetailColors);
+
+  const total25 = retails.reduce((s,r)=>s+avbGet25(r),0);
+  const total26 = retails.reduce((s,r)=>s+avbGet26(r,inv),0);
+  const yoy = total25>0 ? ((total26/total25)-1)*100 : 0;
+
+  const el = document.getElementById('avbKpis');
+  if (!el) return;
+  const activeRetails = retails.filter(r=>avbGet25(r)>0||avbGet26(r,false)>0);
+  el.innerHTML = `
+    <div class="kpi-card">
+      <div class="kpi-label">2025 Real (Full Year)</div>
+      <div class="kpi-value">${fmt(total25)}</div>
+      <div class="kpi-sub">SI/ST ${isVal?'valor MXN':'piezas'}</div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-label">2026 ${inv?'Invoice · H1':'Projection · Full Year'}</div>
+      <div class="kpi-value">${fmt(total26)}</div>
+      <div class="kpi-sub">${inv?'Jan–Jun 2026 · No sombreado':'Jan–Dec 2026 · Budget total'}</div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-label">YoY Growth</div>
+      <div class="kpi-value" style="color:${yoy>=0?'var(--green)':'var(--red)'}">${yoy>=0?'+':''}${yoy.toFixed(1)}%</div>
+      <div class="kpi-sub">2025 → 2026 ${inv?'(H1)':'(Full Year)'}</div>
+    </div>
+    ${activeRetails.map(r=>{
+      const v25=avbGet25(r), v26=avbGet26(r,inv);
+      const d=v25>0?((v26/v25)-1)*100:null;
+      return `<div class="kpi-card">
+        <div class="kpi-label" style="color:${avbRetailColors[r]}">${r}</div>
+        <div class="kpi-value" style="font-size:18px">${fmt(v26)}</div>
+        <div class="kpi-delta delta ${d===null?'':d>=0?'pos':'neg'}">${d===null?'—':(d>=0?'+':'')+d.toFixed(1)+'% YoY'}</div>
+      </div>`;
+    }).join('')}
+  `;
+}
+
+function renderAVBCharts() {
+  const isVal = gMetric === 'valor';
+  const inv = avbMode === 'invoice';
+  const nMonths = inv ? 6 : 12;
+  const labels = MONTHS_AVB.slice(0,nMonths);
+  const src25 = isVal ? avb2025Val : avb2025Pcs;
+  const src26 = isVal ? avb2026Val : avb2026Pcs;
+  const retails = Object.keys(avbRetailColors).filter(r=>avbGet25(r)>0||avbGet26(r,false)>0);
+  const fmtTip = v => isVal ? '$'+(v/1e6).toFixed(2)+' M' : v.toLocaleString('es-MX')+' pcs';
+
+  // ── Chart 1: Grouped bars by retail (2025 vs 2026)
+  const d25 = retails.map(r=>avbGet25(r));
+  const d26 = retails.map(r=>avbGet26(r,inv));
+  if (chartAVBRetailInst) chartAVBRetailInst.destroy();
+  chartAVBRetailInst = new Chart(document.getElementById('chartAVBRetail'), {
+    type:'bar',
+    data:{
+      labels:retails,
+      datasets:[
+        {label:'2025 Real', data:d25, backgroundColor:retails.map(r=>avbRetailColors[r]+'66'), borderColor:retails.map(r=>avbRetailColors[r]), borderWidth:2, borderRadius:4},
+        {label:`2026 ${inv?'Invoice H1':'Projection'}`, data:d26, backgroundColor:retails.map(r=>avbRetailColors[r]), borderRadius:4}
+      ]
+    },
+    options:{responsive:true,maintainAspectRatio:false,
+      plugins:{legend:{position:'bottom',labels:{font:{size:11},boxWidth:12,padding:12}},
+        tooltip:{callbacks:{label:c=>` ${c.dataset.label}: ${fmtTip(c.parsed.y)}`}}},
+      scales:{x:{grid:{display:false}},y:{ticks:{callback:v=>isVal?'$'+(v/1e6).toFixed(1)+'M':v>=1000?(v/1000).toFixed(0)+'K':v},grid:{color:'#e2e8f0'}}}
+    }
+  });
+
+  // ── Chart 2: Monthly line 2025 vs 2026
+  const tot25M = labels.map((_,i)=>retails.reduce((s,r)=>s+(src25[r]?src25[r][i]:0),0));
+  const tot26M = labels.map((_,i)=>retails.reduce((s,r)=>s+(src26[r]?src26[r][i]:0),0));
+  if (chartAVBMonthlyInst) chartAVBMonthlyInst.destroy();
+  chartAVBMonthlyInst = new Chart(document.getElementById('chartAVBMonthly'), {
+    type:'line',
+    data:{
+      labels,
+      datasets:[
+        {label:'2025 Real', data:tot25M, borderColor:'#6366f1', backgroundColor:'#6366f115', fill:true, tension:.4, pointRadius:4, borderWidth:2},
+        {label:`2026 ${inv?'Invoice H1':'Projection'}`, data:tot26M, borderColor:'#f59e0b', backgroundColor:'#f59e0b15', fill:true, tension:.4, pointRadius:4, borderWidth:2}
+      ]
+    },
+    options:{responsive:true,maintainAspectRatio:false,
+      plugins:{legend:{position:'bottom',labels:{font:{size:11},boxWidth:12,padding:12}},
+        tooltip:{callbacks:{label:c=>` ${c.dataset.label}: ${fmtTip(c.parsed.y)}`}}},
+      scales:{x:{grid:{display:false}},y:{ticks:{callback:v=>isVal?'$'+(v/1e6).toFixed(1)+'M':v>=1000?(v/1000).toFixed(0)+'K':v},grid:{color:'#e2e8f0'}}}
+    }
+  });
+}
+
+function renderAVBTable() {
+  const isVal = gMetric === 'valor';
+  const src25 = isVal ? avb2025Val : avb2025Pcs;
+  const src26 = isVal ? avb2026Val : avb2026Pcs;
+  const fmt = v => isVal ? '$'+(v/1e6).toFixed(2)+' M' : v.toLocaleString('es-MX');
+  const fmtPct = (v,b) => b>0 ? (v>=b?'+':'')+((v/b-1)*100).toFixed(1)+'%' : '—';
+  const cls = (v,b) => b>0 ? (v>=b?'pos':'neg') : '';
+  const retails = Object.keys(avbRetailColors);
+
+  let tot25=0, totH1=0, totFull=0;
+  let html = '';
+  retails.forEach(r => {
+    const v25 = avbGet25(r);
+    const vH1  = src26[r] ? src26[r].slice(0,6).reduce((s,v)=>s+v,0) : 0;
+    const vFull = src26[r] ? src26[r].reduce((s,v)=>s+v,0) : 0;
+    if (v25===0 && vFull===0) return;
+    tot25+=v25; totH1+=vH1; totFull+=vFull;
+    const s25all = retails.reduce((s,rr)=>s+avbGet25(rr),0);
+    const s26all = retails.reduce((s,rr)=>s+avbGet26(rr,false),0);
+    const sh25 = s25all>0 ? (v25/s25all*100).toFixed(1)+'%' : '—';
+    const sh26 = s26all>0 ? (vFull/s26all*100).toFixed(1)+'%' : '—';
+    html += `<tr>
+      <td><span class="dot" style="background:${avbRetailColors[r]}"></span>${r}</td>
+      <td class="num">${fmt(v25)}</td>
+      <td class="num">${fmt(vH1)}</td>
+      <td class="num">${fmt(vFull)}</td>
+      <td class="num delta ${cls(vH1,v25)}">${fmtPct(vH1,v25)}</td>
+      <td class="num delta ${cls(vFull,v25)}">${fmtPct(vFull,v25)}</td>
+      <td class="num" style="color:var(--muted)">${sh25}</td>
+      <td class="num" style="color:var(--muted)">${sh26}</td>
+    </tr>`;
+  });
+  document.getElementById('avbTableBody').innerHTML = html;
+
+  const s25all = retails.reduce((s,r)=>s+avbGet25(r),0);
+  document.getElementById('avbTableFoot').innerHTML = `<tr>
+    <td>TOTAL</td>
+    <td class="num">${fmt(tot25)}</td>
+    <td class="num">${fmt(totH1)}</td>
+    <td class="num">${fmt(totFull)}</td>
+    <td class="num delta ${cls(totH1,tot25)}">${fmtPct(totH1,tot25)}</td>
+    <td class="num delta ${cls(totFull,tot25)}">${fmtPct(totFull,tot25)}</td>
+    <td class="num">100%</td>
+    <td class="num">100%</td>
+  </tr>`;
+}
+
 /* ══════ INIT ══════ */
 buildAnualCharts();
 buildQSection();
@@ -1370,6 +1653,7 @@ buildH2Charts();
 buildValorChart('all');
 setTimeout(renderMarca,200);
 setTimeout(buildPurchasesSection,400);
+buildAVBSection();
 </script>
 </body>
 </html>
