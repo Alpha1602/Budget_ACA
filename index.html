@@ -115,7 +115,6 @@
 <!-- ══ TABS ══ -->
 <div class="tabs">
   <div class="tab active" onclick="switchTab('attainment',this)">📊 Attainment vs Budget</div>
-  <div class="tab" onclick="switchTab('anual',this)">📅 Proyección 2026</div>
   <div class="tab" onclick="switchTab('quarter',this)">📊 Dashboard by Quarter</div>
   <div class="tab" onclick="switchTab('marca',this)">🏷️ Brand</div>
   <div class="tab" onclick="switchTab('cliente',this)">🏪 Por Cliente</div>
@@ -137,14 +136,14 @@
       <div style="display:flex;gap:0">
         <button id="avbInvoiceBtn" onclick="setAVBMode('invoice',this)"
           style="padding:7px 18px;font-size:12px;font-weight:700;border:1.5px solid #cbd5e1;border-radius:6px 0 0 6px;cursor:pointer;background:#fff;color:#374151;transition:.15s">
-          ⬜ Invoice &nbsp;·&nbsp; H1 (Jan–Jun)
+          ⬜ Invoice &nbsp;·&nbsp; Jan–Jul
         </button>
         <button id="avbProjBtn" onclick="setAVBMode('projection',this)"
           style="padding:7px 18px;font-size:12px;font-weight:700;border:1.5px solid #9ca3af;border-left:none;border-radius:0 6px 6px 0;cursor:pointer;background:#9ca3af;color:#fff;transition:.15s">
           ◼ Projection &nbsp;·&nbsp; Full Year
         </button>
       </div>
-      <span id="avbModeNote" style="font-size:11px;color:var(--muted)">Mostrando facturas emitidas H1 (Jan–Jun 2026)</span>
+      <span id="avbModeNote" style="font-size:11px;color:var(--muted)">Mostrando facturas emitidas Jan–Jul 2026</span>
     </div>
   </div>
 
@@ -178,10 +177,9 @@
       </table>
     </div>
   </div>
-</div>
 
-<!-- ─── TAB 1: PROYECCIÓN 2026 ─── -->
-<div class="section" id="section-anual">
+
+  <!-- ─── PROYECCIÓN 2026 (fusionado) ──────────────── -->
 
   <!-- Dynamic dual-axis chart with client selector -->
   <div class="card">
@@ -322,7 +320,7 @@
       </table></div>
     </div>
   </div>
-</div><!-- /section-anual -->
+</div><!-- /section-attainment -->
 
 <!-- ─── TAB 2: DASHBOARD BY QUARTER ─── -->
 <div class="section" id="section-quarter">
@@ -736,7 +734,6 @@ function switchTab(id, el) {
   el.classList.add('active');
   // Rebuild charts so they render correctly after becoming visible
   if (id === 'attainment') buildAVBSection();
-  else if (id === 'anual')   { buildAnualDualChart(); buildAnualKpis(); buildCatCharts(); }
   else if (id === 'quarter') buildQSection();
 
   else if (id === 'marca')   renderMarca();
@@ -858,11 +855,11 @@ function buildAnualKpis() {
     : [anualSelectedClient];
   const totVal = clients.reduce((s,c)=>(valorFull[c]||[]).reduce((a,b)=>a+b,0)+s, 0);
   const totPcs = clients.reduce((s,c)=>(piezasAnual[c]||[]).reduce((a,b)=>a+b,0)+s, 0);
-  const h1Val  = clients.reduce((s,c)=>(valorFull[c]||[]).slice(0,6).reduce((a,b)=>a+b,0)+s, 0);
+  const h1Val  = clients.reduce((s,c)=>(valorFull[c]||[]).slice(0,7).reduce((a,b)=>a+b,0)+s, 0);
   const h2Val  = clients.reduce((s,c)=>(valorFull[c]||[]).slice(6).reduce((a,b)=>a+b,0)+s, 0);
   document.getElementById('anualKpiRow').innerHTML = [
     {label:'Valor Total Anual', val:'$'+(totVal/1e6).toFixed(1)+' M', sub:'2026 Budget'},
-    {label:'H1 Invoice',        val:'$'+(h1Val/1e6).toFixed(1)+' M', sub:'Ene–Jun'},
+    {label:'Invoice Jan–Jul',    val:'$'+(h1Val/1e6).toFixed(1)+' M', sub:'Ene–Jul'},
     {label:'H2 Proyección',     val:'$'+(h2Val/1e6).toFixed(1)+' M', sub:'Jul–Dic'},
     {label:'Piezas Anuales',    val:totPcs.toLocaleString('es-MX'), sub:'unidades'},
   ].map(k=>`<div class="kpi-card">
@@ -1360,7 +1357,7 @@ function setAVBMode(mode) {
   if (mode === 'invoice') {
     iBtn.style.background='#fff'; iBtn.style.color='#374151'; iBtn.style.borderColor='#cbd5e1';
     pBtn.style.background='#e5e7eb'; pBtn.style.color='#6b7280'; pBtn.style.borderColor='#9ca3af';
-    document.getElementById('avbModeNote').textContent = 'Mostrando facturas emitidas H1 (Jan–Jun 2026) — celdas sin sombrear';
+    document.getElementById('avbModeNote').textContent = 'Mostrando facturas emitidas Jan–Jul 2026 — celdas sin sombrear';
   } else {
     iBtn.style.background='#e5e7eb'; iBtn.style.color='#6b7280'; iBtn.style.borderColor='#cbd5e1';
     pBtn.style.background='#6b7280'; pBtn.style.color='#fff'; pBtn.style.borderColor='#6b7280';
@@ -1373,7 +1370,7 @@ function avbGet26(retail, useInvoice) {
   const isVal = gMetric === 'valor';
   const src = isVal ? avb2026Val : avb2026Pcs;
   if (!src[retail]) return 0;
-  const months = useInvoice ? src[retail].slice(0,6) : src[retail];
+  const months = useInvoice ? src[retail].slice(0,7) : src[retail];
   return months.reduce((s,v)=>s+v,0);
 }
 function avbGet25(retail) {
@@ -1386,6 +1383,10 @@ function buildAVBSection() {
   renderAVBKpis();
   renderAVBCharts();
   renderAVBTable();
+  // Proyección charts (merged tab)
+  if(document.getElementById('chartAnualDual')){
+    buildAnualDualChart(); buildAnualKpis(); buildCatCharts();
+  }
 }
 
 function renderAVBKpis() {
@@ -1412,7 +1413,7 @@ function renderAVBKpis() {
       <div class="kpi-sub">SI/ST ${isVal?'valor MXN':'piezas'}</div>
     </div>
     <div class="kpi-card">
-      <div class="kpi-label">2026 ${inv?'Invoice · H1':'Projection · Full Year'}</div>
+      <div class="kpi-label">2026 ${inv?'Invoice · Jan–Jul':'Projection · Full Year'}</div>
       <div class="kpi-value">${fmt(total26shown)}</div>
       <div class="kpi-sub">${inv?'Ene–Jun 2026 · facturado':'Ene–Dic 2026 · budget total'}</div>
     </div>
@@ -1445,7 +1446,7 @@ function renderAVBKpis() {
 function renderAVBCharts() {
   const isVal = gMetric === 'valor';
   const inv = avbMode === 'invoice';
-  const nMonths = inv ? 6 : 12;
+  const nMonths = inv ? 7 : 12;
   const labels = MONTHS_AVB.slice(0,nMonths);
   const src25 = isVal ? avb2025Val : avb2025Pcs;
   const src26 = isVal ? avb2026Val : avb2026Pcs;
@@ -1457,7 +1458,7 @@ function renderAVBCharts() {
   const d25 = retails.map(r => {
     if (inv) {
       const s = isVal ? avb2025Val : avb2025Pcs;
-      return s[r] ? s[r].slice(0,6).reduce((a,b)=>a+b,0) : 0;
+      return s[r] ? s[r].slice(0,7).reduce((a,b)=>a+b,0) : 0;
     }
     return avbGet25(r);
   });
@@ -1489,7 +1490,7 @@ function renderAVBCharts() {
       labels:retails,
       datasets:[
         {label:inv?'2025 Real H1':'2025 Real Full Year', data:d25, backgroundColor:retails.map(r=>avbRetailColors[r]+'55'), borderColor:retails.map(r=>avbRetailColors[r]), borderWidth:2, borderRadius:4},
-        {label:`2026 ${inv?'Invoice H1':'Projection'}`, data:d26, backgroundColor:retails.map(r=>avbRetailColors[r]), borderRadius:4}
+        {label:`2026 ${inv?'Invoice Jan–Jul':'Projection'}`, data:d26, backgroundColor:retails.map(r=>avbRetailColors[r]), borderRadius:4}
       ]
     },
     plugins:[pctLabelPlugin],
@@ -1533,13 +1534,13 @@ function renderAVBTable() {
   const retails = Object.keys(avbRetailColors);
 
   // Helper: get H1 2025 for a retail
-  const get25H1 = r => src25[r] ? src25[r].slice(0,6).reduce((s,v)=>s+v,0) : 0;
+  const get25H1 = r => src25[r] ? src25[r].slice(0,7).reduce((s,v)=>s+v,0) : 0;
 
   // Update table header dynamically
   const thead = document.querySelector('#avbTable thead tr');
   if (thead) thead.innerHTML = `
     <th>Retail</th>
-    <th class="num">2025 ${inv?'H1 (Ene–Jun)':'Full Year'}</th>
+    <th class="num">2025 ${inv?'Ene–Jul':'Full Year'}</th>
     <th class="num">2026 ${inv?'Invoice H1':'Projection'}</th>
     <th class="num">YoY %</th>
     <th class="num">Share 2025</th>
