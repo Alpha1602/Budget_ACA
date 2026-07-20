@@ -967,7 +967,6 @@ function buildCatCharts() {
 }
 
 /* ══════ TAB 2: QUARTER ══════ */
-let chartQMain=null;
 
 /* ══════ QUARTER STATE ══════ */
 let qMetric = 'val'; // 'val' | 'pcs'
@@ -1305,9 +1304,9 @@ function renderParticipationCharts(summary, isVal) {
     Object.keys(marcaRaw).forEach(clientKey=>{
       const cName = clientKey==='ATT'?'AT&T':clientKey;
       const clientTotal2026 = Object.values(marcaRaw[clientKey]||{}).reduce((s,catData)=>{
-        return s + Object.values(catData).reduce((ss,d)=>ss+(isVal?d.val.reduce((a,b)=>a+b,0):d.pcs.reduce((a,b)=>a+b,0)),0);
+        return s + Object.values(catData).reduce((ss,d)=>ss+(isVal?Object.values(d.val).reduce((a,b)=>a+b,0):Object.values(d.pcs).reduce((a,b)=>a+b,0)),0);
       },0);
-      const marcaClientTotal2026 = Object.values(marcaRaw[clientKey]?.[m]||{}).reduce((s,d)=>s+(isVal?d.val.reduce((a,b)=>a+b,0):d.pcs.reduce((a,b)=>a+b,0)),0);
+      const marcaClientTotal2026 = Object.values(marcaRaw[clientKey]?.[m]||{}).reduce((s,d)=>s+(isVal?Object.values(d.val).reduce((a,b)=>a+b,0):Object.values(d.pcs).reduce((a,b)=>a+b,0)),0);
       const share = clientTotal2026 > 0 ? marcaClientTotal2026/clientTotal2026 : 0;
       total += (client2025Val[cName]||0) * share;
     });
@@ -1347,6 +1346,24 @@ function renderParticipationCharts(summary, isVal) {
     });
   });
 }
+
+function renderMarcaTable(){
+  const rows=getTableRows(); const isVal=marcaState.mode==='val';
+  const tbody=document.getElementById('marcaTableBody'); let html=''; let lastMarca='',lastCliente='';
+  rows.forEach(({marca,cliente,cat,mData,totPcs,totVal})=>{
+    const newMarca=marca!==lastMarca; const newCliente=cliente!==lastCliente||newMarca;
+    lastMarca=marca; lastCliente=cliente;
+    const dotColor=clientColors[cliente]||'#90A4AE';
+    const dot=`<span class="dot" style="background:${dotColor}"></span>`;
+    const mc=newMarca?`<td style="font-weight:700;color:${marcaColors[marca]||'#333'}">${marca}</td>`:`<td style="color:var(--muted);padding-left:16px">↳</td>`;
+    const cc=newCliente?`<td>${dot}${cliente}</td>`:`<td style="color:var(--muted)">↳</td>`;
+    const cells=MONTHS_H2_KEYS.map(m=>`<td class="num">${fmtNum(isVal?(mData.val[m]||0):(mData.pcs[m]||0),marcaState.mode)}</td>`).join('');
+    const tot=isVal?totVal:totPcs;
+    html+=`<tr>${mc}${cc}<td style="font-size:11px;color:var(--muted)">${cat}</td>${cells}<td class="num" style="background:var(--surface2);font-weight:700">${fmtNum(tot,marcaState.mode)}</td></tr>`;
+  });
+  if(tbody) tbody.innerHTML=html;
+}
+
 
 function renderMarca(){
   const s=getMarcaSummary();
