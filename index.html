@@ -150,7 +150,7 @@
   <!-- Charts -->
   <div class="grid-2">
     <div class="card">
-      <div class="card-title" id="avbRetailTitle">2025 vs 2026 — Por Retail</div>
+      <div class="card-title" id="avbRetailTitle">Participación por Retail — 2025 vs 2026</div>
       <canvas id="chartAVBRetail" class="canvas-tall"></canvas>
     </div>
     <div class="card">
@@ -622,18 +622,18 @@ const avbRetailColors = {
 
 /* ══════ QUARTER 2025 DATA (actuals) ══════ */
 const q2025Val = {
-  'AT&T':         [12178941,12044107,13834478,17158571],
-  'iShop':        [5294289, 4957608, 6507450, 7253340],
-  'MacStore':     [7945360, 4069064, 4755720, 8277790],
-  'MercadoLibre': [31957,   64517,   29913,   2016],
+  'AT&T':         [11744962,11588282,12500709,15854802],
+  'iShop':        [4294289, 4957608, 6506916, 6949026],
+  'MacStore':     [6310360, 4070064, 4755720, 6751890],
+  'MercadoLibre': [53676,   63384,   15317,   2016],
   'Coppel':       [0,       0,       0,       0],
   'Liverpool':    [0,       0,       0,       0],
 };
 const q2025Pcs = {
-  'AT&T':         [50051,   44658,   47762,   66517],
-  'iShop':        [9116,    10526,   14949,   15492],
-  'MacStore':     [19163,   9657,    10703,   19351],
-  'MercadoLibre': [2,       78,      30,      3],
+  'AT&T':         [50051,   47511,   47762,   61517],
+  'iShop':        [9116,    11218,   15602,   15517],
+  'MacStore':     [15140,   9658,    10432,   15359],
+  'MercadoLibre': [2,       107,     30,      3],
   'Coppel':       [0,       0,       0,       0],
   'Liverpool':    [0,       0,       0,       0],
 };
@@ -825,11 +825,11 @@ function buildAnualKpis() {
   const totVal = clients.reduce((s,c)=>(valorFull[c]||[]).reduce((a,b)=>a+b,0)+s, 0);
   const totPcs = clients.reduce((s,c)=>(piezasAnual[c]||[]).reduce((a,b)=>a+b,0)+s, 0);
   const h1Val  = clients.reduce((s,c)=>(valorFull[c]||[]).slice(0,7).reduce((a,b)=>a+b,0)+s, 0);
-  const h2Val  = clients.reduce((s,c)=>(valorFull[c]||[]).slice(6).reduce((a,b)=>a+b,0)+s, 0);
+  const h2Val  = clients.reduce((s,c)=>(valorFull[c]||[]).slice(7).reduce((a,b)=>a+b,0)+s, 0);
   document.getElementById('anualKpiRow').innerHTML = [
     {label:'Valor Total Anual', val:'$'+(totVal/1e6).toFixed(1)+' M', sub:'2026 Budget'},
     {label:'Invoice Jan–Jul',    val:'$'+(h1Val/1e6).toFixed(1)+' M', sub:'Ene–Jul'},
-    {label:'H2 Proyección',     val:'$'+(h2Val/1e6).toFixed(1)+' M', sub:'Jul–Dic'},
+    {label:'Proyección Ago–Dic', val:'$'+(h2Val/1e6).toFixed(1)+' M', sub:'Ago–Dic'},
     {label:'Piezas Anuales',    val:totPcs.toLocaleString('es-MX'), sub:'unidades'},
   ].map(k=>`<div class="kpi-card">
     <div class="kpi-label">${k.label}</div>
@@ -1175,7 +1175,7 @@ function renderMarcaCharts(summary){
       labels: MONTHS_H2_KEYS,
       datasets: marcas.map(m=>({
         label:m,
-        data: MONTHS_FULL.map(mes=>isVal?(summary[m].byMes_val[mes]||0):(summary[m].byMes_pcs[mes]||0)),
+        data: MONTHS_H2_KEYS.map(mes=>isVal?(summary[m].byMes_val[mes]||0):(summary[m].byMes_pcs[mes]||0)),
         backgroundColor: (marcaColors[m]||'#90A4AE')+(stacked?'':'99'),
         borderColor: marcaColors[m]||'#90A4AE',
         borderWidth: chartType==='line'?2.5:0,
@@ -1421,52 +1421,30 @@ function renderAVBCharts() {
   const retails = Object.keys(avbRetailColors).filter(r=>avbGet25(r)>0||avbGet26(r,false)>0);
   const fmtTip = v => isVal ? '$'+(v/1e6).toFixed(2)+' M' : v.toLocaleString('es-MX')+' pcs';
 
-  // ── Chart 1: Grouped bars by retail (2025 vs 2026) with % delta labels
-  // Invoice: compare H1 2025 vs H1 2026 (apples-to-apples); Projection: Full Year
-  const d25 = retails.map(r => {
-    if (inv) {
-      const s = isVal ? avb2025Val : avb2025Pcs;
-      return s[r] ? s[r].slice(0,7).reduce((a,b)=>a+b,0) : 0;
-    }
-    return avbGet25(r);
-  });
-  const d26 = retails.map(r=>avbGet26(r,inv));
-  const pctLabelPlugin = {
-    id:'pctLabels',
-    afterDatasetsDraw(chart) {
-      const ctx = chart.ctx;
-      const ds1 = chart.getDatasetMeta(1); // 2026 bars
-      const base = chart.data.datasets[0].data;
-      ds1.data.forEach((bar, j) => {
-        const v25 = base[j]||0, v26 = chart.data.datasets[1].data[j]||0;
-        if (!v25) return;
-        const pct = ((v26/v25 - 1)*100).toFixed(1);
-        const isPos = parseFloat(pct) >= 0;
-        ctx.save();
-        ctx.fillStyle = isPos ? '#16a34a' : '#dc2626';
-        ctx.font = 'bold 11px system-ui,sans-serif';
-        ctx.textAlign = 'center';
-        ctx.fillText((isPos?'+':'')+pct+'%', bar.x, bar.y - 7);
-        ctx.restore();
-      });
-    }
-  };
+  // ── Chart 1: Doughnut – retail share 2025 (inner) vs 2026 (outer)
+  const retailsActive=retails.filter(r=>avbGet25(r)>0||avbGet26(r,inv)>0);
+  const d25a=retailsActive.map(r=>inv?((isVal?avb2025Val:avb2025Pcs)[r]||[]).slice(0,7).reduce((a,b)=>a+b,0):avbGet25(r));
+  const d26a=retailsActive.map(r=>avbGet26(r,inv));
   if (chartAVBRetailInst) chartAVBRetailInst.destroy();
   chartAVBRetailInst = new Chart(document.getElementById('chartAVBRetail'), {
-    type:'bar',
+    type:'doughnut',
     data:{
-      labels:retails,
+      labels:retailsActive,
       datasets:[
-        {label:inv?'2025 Real H1':'2025 Real Full Year', data:d25, backgroundColor:retails.map(r=>avbRetailColors[r]+'55'), borderColor:retails.map(r=>avbRetailColors[r]), borderWidth:2, borderRadius:4},
-        {label:`2026 ${inv?'Invoice Jan–Jul':'Projection'}`, data:d26, backgroundColor:retails.map(r=>avbRetailColors[r]), borderRadius:4}
+        {label:inv?'2025 Ene–Jul':'2025 Full Year', data:d25a, backgroundColor:retailsActive.map(r=>avbRetailColors[r]+'88'), borderColor:'#fff', borderWidth:2},
+        {label:`2026 ${inv?'Invoice':'Proyección'}`, data:d26a, backgroundColor:retailsActive.map(r=>avbRetailColors[r]), borderColor:'#fff', borderWidth:2}
       ]
     },
-    plugins:[pctLabelPlugin],
-    options:{responsive:true,maintainAspectRatio:false,
-      layout:{padding:{top:24}},
-      plugins:{legend:{position:'bottom',labels:{font:{size:11},boxWidth:12,padding:12}},
-        tooltip:{callbacks:{label:c=>` ${c.dataset.label}: ${fmtTip(c.parsed.y)}`}}},
-      scales:{x:{grid:{display:false}},y:{ticks:{callback:v=>isVal?'$'+(v/1e6).toFixed(1)+'M':v>=1000?(v/1000).toFixed(0)+'K':v},grid:{color:'#e2e8f0'}}}
+    options:{responsive:true,maintainAspectRatio:false,cutout:'38%',
+      plugins:{
+        legend:{position:'bottom',labels:{font:{size:11},boxWidth:12,padding:10,
+          generateLabels:c=>c.data.labels.map((l,i)=>({text:l,fillStyle:c.data.datasets[1].backgroundColor[i],strokeStyle:'#fff',lineWidth:1}))}},
+        tooltip:{callbacks:{label:c=>{
+          const tot=c.dataset.data.reduce((a,b)=>a+b,0);
+          const pct=(c.parsed/tot*100).toFixed(1);
+          return ` [${c.dataset.label}] ${c.label}: ${fmtTip(c.parsed)} (${pct}%)`;
+        }}}
+      }
     }
   });
 
@@ -1608,7 +1586,9 @@ function buildClienteTab(){
 
   // KPIs
   const totByCat=cats.map(c=>({cat:c,tot:Object.values(catData[c]).reduce((a,b)=>a+b,0)}));
-  const grand=totByCat.reduce((s,x)=>s+x.tot,0);
+  const catGrand=totByCat.reduce((s,x)=>s+x.tot,0);
+  const h1Total=(typeof h1Total!=='undefined'?h1Total:clientAvbArr.slice(0,5).reduce((a,b)=>a+b,0));
+  const grand=catGrand+h1Total;
   let kpiHtml=`<div class="kpi-card"><div class="kpi-label">${cname} TOTAL</div><div class="kpi-value">${fmtKpi(grand)}</div><div class="kpi-sub">${isVal?'valor MXN':'piezas'} Jun–Dic 2026</div></div>`;
   totByCat.forEach(({cat,tot})=>{
     const share=grand>0?(tot/grand*100).toFixed(1):'0.0';
@@ -1619,12 +1599,13 @@ function buildClienteTab(){
   // Chart: stacked bars, months on x-axis, categories as datasets
   const MONTH_LABELS=['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
   const ALL_MK=['Ene','Feb','Mar','Abr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
-  const datasets=cats.map(cat=>({
-    label:cat,
-    data:['Ene','Feb','Mar','Abr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'].map(m=>catData[cat][m]||0),
-    backgroundColor:catColors[cat]||'#94a3b8',
-    borderRadius:2
-  }));
+  const avbClientKey={'ATT':'AT&T','MacStore':'MacStore','iShop':'iShop','Liverpool':'Liverpool'};
+  const clientAvbArr=(avb2026Val[avbClientKey[client]]||[]);
+  const h1Total=clientAvbArr.slice(0,5).reduce((a,b)=>a+b,0);
+  const h1Dataset={label:'Total (Ene–May)',data:ALL_MK.map((_,i)=>i<5?clientAvbArr[i]||0:0),backgroundColor:'#CBD5E1',borderRadius:2};
+  const datasets=[h1Dataset,...cats.map(cat=>({
+    label:cat,data:ALL_MK.map((m,i)=>i<5?0:catData[cat][m]||0),backgroundColor:catColors[cat]||'#94a3b8',borderRadius:2
+  }))];
 
   if(chartClienteCatInst)chartClienteCatInst.destroy();
   chartClienteCatInst=new Chart(document.getElementById('chartClienteCat'),{
@@ -1654,8 +1635,10 @@ function buildClienteTab(){
   // Table
   const fmtCell=v=>isVal?(v>0?'$'+(v/1000).toFixed(0)+'K':'—'):(v>0?v.toLocaleString('es-MX'):'—');
   let tblHtml='';
+  const h1Cells=ALL_MK.map((_,i)=>`<td class="num" style="color:var(--muted);font-size:11px">${i<5?fmtCell(clientAvbArr[i]||0):'—'}</td>`).join('');
+  tblHtml+=`<tr style="background:#f8fafc"><td style="font-size:11px;color:var(--muted)">Total retail (sin categoría)</td>${h1Cells}<td class="num" style="font-weight:700">${fmtCell(h1Total)}</td></tr>`;
   cats.forEach(cat=>{
-    const cells=ALL_MK.map(m=>`<td class="num">${fmtCell(catData[cat][m]||0)}</td>`).join('');
+    const cells=ALL_MK.map((m,i)=>`<td class="num">${i<5?'—':fmtCell(catData[cat][m]||0)}</td>`).join('');
     const tot=ALL_MK.reduce((s,m)=>s+(catData[cat][m]||0),0);
     tblHtml+=`<tr><td style="font-weight:600">${cat}</td>${cells}<td class="num" style="background:var(--surface2);font-weight:700">${fmtCell(tot)}</td></tr>`;
   });
