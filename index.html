@@ -418,7 +418,7 @@
       <div class="legend" id="partLegend2025" style="margin-top:10px"></div>
     </div>
     <div class="card">
-      <div class="card-title">Participación por Marca — 2026 Budget H2</div>
+      <div class="card-title">Participación por Marca — 2026 FCST</div>
       <canvas id="chartPart2026" style="max-height:220px"></canvas>
       <div class="legend" id="partLegend2026" style="margin-top:10px"></div>
     </div>
@@ -427,9 +427,17 @@
   <!-- Detail table -->
   <div class="card">
     <div class="card-title">
-      Detalle por Marca · Cliente · Categoría — H2 Jun–Dic 2026
+      Detalle por Marca · Cliente · Categoría — 2026
       <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
-        <span class="filter-label" style="margin-bottom:0">Ordenar</span>
+        <span class="filter-label" style="margin-bottom:0">Cliente</span>
+        <div class="chip-row" id="tblClienteFilter">
+          <button class="chip on" data-cliente="all" onclick="filterMarcaTbl(this)">Todos</button>
+          <button class="chip" data-cliente="ATT" onclick="filterMarcaTbl(this)">AT&amp;T</button>
+          <button class="chip" data-cliente="MacStore" onclick="filterMarcaTbl(this)">MacStore</button>
+          <button class="chip" data-cliente="iShop" onclick="filterMarcaTbl(this)">iShop</button>
+          <button class="chip" data-cliente="Liverpool" onclick="filterMarcaTbl(this)">Liverpool</button>
+        </div>
+        <span class="filter-label" style="margin-bottom:0;margin-left:8px">Ordenar</span>
         <div class="metric-toggle" id="tblSortBtns">
           <button data-s="val" class="active" onclick="setTblSort('val')">Mayor Valor</button>
           <button data-s="pcs" onclick="setTblSort('pcs')">Mayor Piezas</button>
@@ -1277,11 +1285,22 @@ function renderMarca(){
 }
 
 const marcaChipClasses={all:'on',ATT:'on-att',MacStore:'on-macstore',iShop:'on-ishop',Liverpool:'on-liverpool'};
+// Table-level client filter (only affects Detalle table, not charts)
+function filterMarcaTbl(btn){
+  const key=btn.dataset.cliente;
+  document.querySelectorAll('#tblClienteFilter .chip').forEach(b=>{Object.values(marcaChipClasses).forEach(c=>b.classList.remove(c));b.classList.remove('on');});
+  btn.classList.add(marcaChipClasses[key]||'on');
+  marcaState.cliente=key;
+  renderMarcaTable();
+}
 function filterMarca(btn,type){
   const key=btn.dataset.cliente;
   document.querySelectorAll('#marcaClienteFilter .chip').forEach(b=>{Object.values(marcaChipClasses).forEach(c=>b.classList.remove(c));b.classList.remove('on');});
   btn.classList.add(marcaChipClasses[key]||'on');
-  marcaState.cliente=key; renderMarca();
+  marcaState.cliente=key;
+  // Also sync table-level client filter
+  document.querySelectorAll('#tblClienteFilter .chip').forEach(b=>{Object.values(marcaChipClasses).forEach(c=>b.classList.remove(c));b.classList.remove('on');if(b.dataset.cliente===key)b.classList.add(marcaChipClasses[key]||'on');});
+  renderMarca();
 }
 
 
@@ -1389,7 +1408,14 @@ function renderAVBCharts() {
   const fmtTip = v => isVal ? '$'+(v/1e6).toFixed(2)+' M' : v.toLocaleString('es-MX')+' pcs';
 
   // ── Chart 1: Grouped bars by retail (2025 vs 2026) with % delta labels
-  const d25 = retails.map(r=>avbGet25(r));
+  // Invoice: compare H1 2025 vs H1 2026 (apples-to-apples); Projection: Full Year
+  const d25 = retails.map(r => {
+    if (inv) {
+      const s = isVal ? avb2025Val : avb2025Pcs;
+      return s[r] ? s[r].slice(0,6).reduce((a,b)=>a+b,0) : 0;
+    }
+    return avbGet25(r);
+  });
   const d26 = retails.map(r=>avbGet26(r,inv));
   const pctLabelPlugin = {
     id:'pctLabels',
@@ -1417,7 +1443,7 @@ function renderAVBCharts() {
     data:{
       labels:retails,
       datasets:[
-        {label:'2025 Real', data:d25, backgroundColor:retails.map(r=>avbRetailColors[r]+'55'), borderColor:retails.map(r=>avbRetailColors[r]), borderWidth:2, borderRadius:4},
+        {label:inv?'2025 Real H1':'2025 Real Full Year', data:d25, backgroundColor:retails.map(r=>avbRetailColors[r]+'55'), borderColor:retails.map(r=>avbRetailColors[r]), borderWidth:2, borderRadius:4},
         {label:`2026 ${inv?'Invoice H1':'Projection'}`, data:d26, backgroundColor:retails.map(r=>avbRetailColors[r]), borderRadius:4}
       ]
     },
