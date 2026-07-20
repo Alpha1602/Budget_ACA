@@ -117,7 +117,8 @@
   <div class="tab active" onclick="switchTab('attainment',this)">📊 Attainment vs Budget</div>
   <div class="tab" onclick="switchTab('anual',this)">📅 Proyección 2026</div>
   <div class="tab" onclick="switchTab('quarter',this)">📊 Dashboard by Quarter</div>
-  <div class="tab" onclick="switchTab('marca',this)">🏷️ Por Marca</div>
+  <div class="tab" onclick="switchTab('marca',this)">🏷️ Brand</div>
+  <div class="tab" onclick="switchTab('cliente',this)">🏪 Por Cliente</div>
 </div>
 
 <!-- ══ CONTENT ══ -->
@@ -412,10 +413,10 @@
 
   <!-- Participation charts: 2025 vs 2026 -->
   <div class="grid-2">
-    <div class="card">
-      <div class="card-title">Participación por Marca — 2025 Real</div>
-      <canvas id="chartPart2025" style="max-height:220px"></canvas>
-      <div class="legend" id="partLegend2025" style="margin-top:10px"></div>
+    <div class="card" style="display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:200px;text-align:center">
+      <div class="card-title" style="margin-bottom:12px">Participación por Marca — 2025</div>
+      <div style="font-size:36px;margin-bottom:8px">📊</div>
+      <div style="color:var(--muted);font-size:13px;max-width:220px;line-height:1.5">Sin datos de participación por marca en 2025.<br>El tracking por marca inició en 2026.</div>
     </div>
     <div class="card">
       <div class="card-title">Participación por Marca — 2026 FCST</div>
@@ -431,11 +432,11 @@
       <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
         <span class="filter-label" style="margin-bottom:0">Cliente</span>
         <div class="chip-row" id="tblClienteFilter">
-          <button class="chip on" data-cliente="all" onclick="filterMarcaTbl(this)">Todos</button>
-          <button class="chip" data-cliente="ATT" onclick="filterMarcaTbl(this)">AT&amp;T</button>
-          <button class="chip" data-cliente="MacStore" onclick="filterMarcaTbl(this)">MacStore</button>
-          <button class="chip" data-cliente="iShop" onclick="filterMarcaTbl(this)">iShop</button>
-          <button class="chip" data-cliente="Liverpool" onclick="filterMarcaTbl(this)">Liverpool</button>
+          <button class="chip on" data-val="all" onclick="setTblFilter('cliente',this)">Todos</button>
+          <button class="chip" data-val="ATT" onclick="setTblFilter('cliente',this)">AT&amp;T</button>
+          <button class="chip" data-val="MacStore" onclick="setTblFilter('cliente',this)">MacStore</button>
+          <button class="chip" data-val="iShop" onclick="setTblFilter('cliente',this)">iShop</button>
+          <button class="chip" data-val="Liverpool" onclick="setTblFilter('cliente',this)">Liverpool</button>
         </div>
         <span class="filter-label" style="margin-bottom:0;margin-left:8px">Ordenar</span>
         <div class="metric-toggle" id="tblSortBtns">
@@ -461,9 +462,10 @@
           <th style="min-width:100px">Marca</th>
           <th style="min-width:80px">Cliente</th>
           <th style="min-width:130px">Categoría</th>
+          <th class="num" style="color:var(--muted)">Ene</th><th class="num" style="color:var(--muted)">Feb</th><th class="num" style="color:var(--muted)">Mar</th><th class="num" style="color:var(--muted)">Abr</th><th class="num" style="color:var(--muted)">May</th>
           <th class="num">Jun</th><th class="num">Jul</th><th class="num">Ago</th>
           <th class="num">Sep</th><th class="num">Oct</th><th class="num">Nov</th><th class="num">Dic</th>
-          <th class="num">TOTAL H2</th>
+          <th class="num">TOTAL 2026</th>
         </tr></thead>
         <tbody id="marcaTableBody"></tbody>
       </table>
@@ -471,6 +473,55 @@
   </div>
 
 </div><!-- /section-marca -->
+<div class="section" id="section-cliente">
+  <!-- Filters bar -->
+  <div class="filter-bar">
+    <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+      <span class="filter-label" style="margin-bottom:0">Cliente</span>
+      <div class="chip-row" id="clteClienteFilter">
+        <button class="chip on-att" data-c="ATT" onclick="setClienteClient(this)">AT&amp;T</button>
+        <button class="chip" data-c="MacStore" onclick="setClienteClient(this)">MacStore</button>
+        <button class="chip" data-c="iShop" onclick="setClienteClient(this)">iShop</button>
+        <button class="chip" data-c="Liverpool" onclick="setClienteClient(this)">Liverpool</button>
+      </div>
+      <div class="metric-toggle" style="margin-left:12px" id="clteMetricBtns">
+        <button class="active" onclick="setClienteMetric('val',this)">Valor</button>
+        <button onclick="setClienteMetric('pcs',this)">Piezas</button>
+      </div>
+      <div class="metric-toggle" style="margin-left:12px" id="clteSortBtns">
+        <button class="active" onclick="setClienteSort('az',this)">A→Z</button>
+        <button onclick="setClienteSort('za',this)">Z→A</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- KPIs -->
+  <div class="kpi-grid" id="clteKpis"></div>
+
+  <!-- Chart -->
+  <div class="card">
+    <div class="card-title" id="clteChartTitle">Categorías por Mes — 2026</div>
+    <div class="legend" id="clteLegend"></div>
+    <canvas id="chartClienteCat" class="canvas-tall"></canvas>
+  </div>
+
+  <!-- Table -->
+  <div class="card">
+    <div class="card-title" id="clteTableTitle">Detalle por Categoría — 2026</div>
+    <div class="table-wrap">
+      <table id="clteTable" style="min-width:700px">
+        <thead><tr>
+          <th style="min-width:160px">Categoría</th>
+          <th class="num">Jun</th><th class="num">Jul</th><th class="num">Ago</th>
+          <th class="num">Sep</th><th class="num">Oct</th><th class="num">Nov</th><th class="num">Dic</th>
+          <th class="num" style="background:var(--surface2)">TOTAL</th>
+        </tr></thead>
+        <tbody id="clteTableBody"></tbody>
+      </table>
+    </div>
+  </div>
+</div><!-- /section-cliente -->
+
 
 
 
@@ -689,6 +740,7 @@ function switchTab(id, el) {
   else if (id === 'quarter') buildQSection();
 
   else if (id === 'marca')   renderMarca();
+  else if (id === 'cliente') buildClienteTab();
 }
 
 /* ══════ ANNUAL TABLE TOGGLE ══════ */
@@ -1112,7 +1164,7 @@ function renderMarcaKpis(summary){
   container.innerHTML=sorted.map(({marca,tot})=>
     `<div class="kpi-card"><div class="kpi-label" style="color:${marcaColors[marca]||'#64748b'}">${marca}</div>
     <div class="kpi-value" style="font-size:20px">${marcaState.mode==='pcs'?tot.toLocaleString('es-MX'):'$'+(tot/1e6).toFixed(1)+' M'}</div>
-    <div class="kpi-sub">${marcaState.mode==='pcs'?'piezas H2':'valor H2 MXN'}</div></div>`
+    <div class="kpi-sub">${marcaState.mode==='pcs'?'piezas 2026':'valor 2026 MXN'}</div></div>`
   ).join('');
 }
 
@@ -1271,9 +1323,10 @@ function renderMarcaTable(){
     const dot=`<span class="dot" style="background:${dotColor}"></span>`;
     const mc=newMarca?`<td style="font-weight:700;color:${marcaColors[marca]||'#333'}">${marca}</td>`:`<td style="color:var(--muted);padding-left:16px">↳</td>`;
     const cc=newCliente?`<td>${dot}${cliente}</td>`:`<td style="color:var(--muted)">↳</td>`;
+    const h1cells='<td class="num" style="color:var(--muted)">—</td>'.repeat(5);
     const cells=MONTHS_H2_KEYS.map(m=>`<td class="num">${fmtNum(isVal?(mData.val[m]||0):(mData.pcs[m]||0),marcaState.mode)}</td>`).join('');
     const tot=isVal?totVal:totPcs;
-    html+=`<tr>${mc}${cc}<td style="font-size:11px;color:var(--muted)">${cat}</td>${cells}<td class="num" style="background:var(--surface2);font-weight:700">${fmtNum(tot,marcaState.mode)}</td></tr>`;
+    html+=`<tr>${mc}${cc}<td style="font-size:11px;color:var(--muted)">${cat}</td>${h1cells}${cells}<td class="num" style="background:var(--surface2);font-weight:700">${fmtNum(tot,marcaState.mode)}</td></tr>`;
   });
   if(tbody) tbody.innerHTML=html;
 }
@@ -1285,21 +1338,13 @@ function renderMarca(){
 }
 
 const marcaChipClasses={all:'on',ATT:'on-att',MacStore:'on-macstore',iShop:'on-ishop',Liverpool:'on-liverpool'};
-// Table-level client filter (only affects Detalle table, not charts)
-function filterMarcaTbl(btn){
-  const key=btn.dataset.cliente;
-  document.querySelectorAll('#tblClienteFilter .chip').forEach(b=>{Object.values(marcaChipClasses).forEach(c=>b.classList.remove(c));b.classList.remove('on');});
-  btn.classList.add(marcaChipClasses[key]||'on');
-  marcaState.cliente=key;
-  renderMarcaTable();
-}
 function filterMarca(btn,type){
   const key=btn.dataset.cliente;
   document.querySelectorAll('#marcaClienteFilter .chip').forEach(b=>{Object.values(marcaChipClasses).forEach(c=>b.classList.remove(c));b.classList.remove('on');});
   btn.classList.add(marcaChipClasses[key]||'on');
   marcaState.cliente=key;
   // Also sync table-level client filter
-  document.querySelectorAll('#tblClienteFilter .chip').forEach(b=>{Object.values(marcaChipClasses).forEach(c=>b.classList.remove(c));b.classList.remove('on');if(b.dataset.cliente===key)b.classList.add(marcaChipClasses[key]||'on');});
+  document.querySelectorAll('#tblClienteFilter .chip').forEach(b=>{Object.values(tblChipClasses.cliente).forEach(c=>b.classList.remove(c));b.classList.remove('on');if(b.dataset.val===key)b.classList.add(tblChipClasses.cliente[key]||'on');});
   renderMarca();
 }
 
@@ -1530,6 +1575,127 @@ function renderAVBTable() {
     <td class="num">100%</td>
     <td class="num">100%</td>
   </tr>`;
+}
+
+
+/* ══════ POR CLIENTE TAB ══════ */
+let clienteTabState={client:'ATT',mode:'val',sort:'az'};
+let chartClienteCatInst=null;
+
+const clteClientDisplay={ATT:'AT&T',MacStore:'MacStore',iShop:'iShop',Liverpool:'Liverpool'};
+const clteClientClass={ATT:'on-att',MacStore:'on-macstore',iShop:'on-ishop',Liverpool:'on-liverpool'};
+
+function setClienteClient(btn){
+  const c=btn.dataset.c;
+  document.querySelectorAll('#clteClienteFilter .chip').forEach(b=>{
+    Object.values(clteClientClass).forEach(cls=>b.classList.remove(cls));b.classList.remove('on');
+  });
+  btn.classList.add(clteClientClass[c]||'on');
+  clienteTabState.client=c; buildClienteTab();
+}
+function setClienteMetric(m,btn){
+  clienteTabState.mode=m;
+  document.querySelectorAll('#clteMetricBtns button').forEach(b=>b.classList.toggle('active',b===btn));
+  buildClienteTab();
+}
+function setClienteSort(s,btn){
+  clienteTabState.sort=s;
+  document.querySelectorAll('#clteSortBtns button').forEach(b=>b.classList.toggle('active',b===btn));
+  buildClienteTab();
+}
+
+function getClienteCatData(){
+  const {client,mode}=clienteTabState;
+  const isVal=mode==='val';
+  const catData={};
+  for(const [brand,clients] of Object.entries(marcaRaw)){
+    const bData=clients[client];
+    if(!bData)continue;
+    for(const [cat,mData] of Object.entries(bData)){
+      if(!catData[cat])catData[cat]={};
+      for(const m of MONTHS_H2_KEYS){
+        catData[cat][m]=(catData[cat][m]||0)+(isVal?(mData.val[m]||0):(mData.pcs[m]||0));
+      }
+    }
+  }
+  return catData;
+}
+
+function buildClienteTab(){
+  const {client,mode,sort}=clienteTabState;
+  const isVal=mode==='val';
+  const catData=getClienteCatData();
+  let cats=Object.keys(catData).filter(c=>Object.values(catData[c]).some(v=>v>0));
+  if(sort==='az') cats.sort((a,b)=>a.localeCompare(b));
+  else cats.sort((a,b)=>b.localeCompare(a));
+
+  const fmtTip=v=>isVal?'$'+(v/1e6).toFixed(2)+' M':v.toLocaleString('es-MX')+' pcs';
+  const fmtKpi=v=>isVal?'$'+(v/1e6).toFixed(1)+' M':v.toLocaleString('es-MX');
+
+  // Update title
+  const cname=clteClientDisplay[client]||client;
+  document.getElementById('clteChartTitle').textContent=`${cname} — Categorías por Mes 2026`;
+  document.getElementById('clteTableTitle').textContent=`${cname} — Detalle por Categoría 2026`;
+
+  // KPIs
+  const totByCat=cats.map(c=>({cat:c,tot:Object.values(catData[c]).reduce((a,b)=>a+b,0)}));
+  const grand=totByCat.reduce((s,x)=>s+x.tot,0);
+  let kpiHtml=`<div class="kpi-card"><div class="kpi-label">${cname} TOTAL</div><div class="kpi-value">${fmtKpi(grand)}</div><div class="kpi-sub">${isVal?'valor MXN':'piezas'} Jun–Dic 2026</div></div>`;
+  totByCat.forEach(({cat,tot})=>{
+    const share=grand>0?(tot/grand*100).toFixed(1):'0.0';
+    kpiHtml+=`<div class="kpi-card"><div class="kpi-label" style="font-size:10px">${cat}</div><div class="kpi-value" style="font-size:20px">${fmtKpi(tot)}</div><div class="kpi-sub">${share}% del total</div></div>`;
+  });
+  document.getElementById('clteKpis').innerHTML=kpiHtml;
+
+  // Chart: stacked bars, months on x-axis, categories as datasets
+  const MONTH_LABELS=['Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
+  const datasets=cats.map(cat=>({
+    label:cat,
+    data:MONTHS_H2_KEYS.map(m=>catData[cat][m]||0),
+    backgroundColor:catColors[cat]||'#94a3b8',
+    borderRadius:2
+  }));
+
+  if(chartClienteCatInst)chartClienteCatInst.destroy();
+  chartClienteCatInst=new Chart(document.getElementById('chartClienteCat'),{
+    type:'bar',
+    data:{labels:MONTH_LABELS,datasets},
+    options:{
+      responsive:true,maintainAspectRatio:false,
+      plugins:{
+        legend:{position:'bottom',labels:{font:{size:11},boxWidth:12,padding:10}},
+        tooltip:{mode:'index',intersect:false,callbacks:{
+          label:c=>` ${c.dataset.label}: ${fmtTip(c.parsed.y)}`
+        }}
+      },
+      scales:{
+        x:{stacked:true,grid:{display:false}},
+        y:{stacked:true,ticks:{callback:v=>isVal?'$'+(v/1e6).toFixed(1)+'M':v>=1000?(v/1000).toFixed(0)+'K':v},grid:{color:'#e2e8f0'}}
+      }
+    }
+  });
+
+  // Legend
+  let leg='<div style="display:flex;flex-wrap:wrap;gap:10px;font-size:11px;margin-top:8px">';
+  cats.forEach(c=>{leg+=`<span><span style="display:inline-block;width:10px;height:10px;border-radius:2px;background:${catColors[c]||'#94a3b8'};margin-right:4px"></span>${c}</span>`;});
+  leg+='</div>';
+  document.getElementById('clteLegend').innerHTML=leg;
+
+  // Table
+  const fmtCell=v=>isVal?(v>0?'$'+(v/1000).toFixed(0)+'K':'—'):(v>0?v.toLocaleString('es-MX'):'—');
+  let tblHtml='';
+  cats.forEach(cat=>{
+    const cells=MONTHS_H2_KEYS.map(m=>`<td class="num">${fmtCell(catData[cat][m]||0)}</td>`).join('');
+    const tot=Object.values(catData[cat]).reduce((a,b)=>a+b,0);
+    tblHtml+=`<tr><td style="font-weight:600">${cat}</td>${cells}<td class="num" style="background:var(--surface2);font-weight:700">${fmtCell(tot)}</td></tr>`;
+  });
+  // Total row
+  const totCells=MONTHS_H2_KEYS.map(m=>{
+    const v=cats.reduce((s,c)=>s+(catData[c][m]||0),0);
+    return `<td class="num" style="font-weight:700">${fmtCell(v)}</td>`;
+  }).join('');
+  tblHtml+=`<tr style="border-top:2px solid var(--accent)"><td style="font-weight:700">TOTAL</td>${totCells}<td class="num" style="background:var(--accent);color:#fff;font-weight:700">${fmtKpi(grand)}</td></tr>`;
+  document.getElementById('clteTableBody').innerHTML=tblHtml;
 }
 
 /* ══════ INIT ══════ */
