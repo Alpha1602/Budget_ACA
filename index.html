@@ -1587,8 +1587,13 @@ function buildClienteTab(){
   // KPIs
   const totByCat=cats.map(c=>({cat:c,tot:Object.values(catData[c]).reduce((a,b)=>a+b,0)}));
   const catGrand=totByCat.reduce((s,x)=>s+x.tot,0);
-  const h1Total=(typeof h1Total!=='undefined'?h1Total:clientAvbArr.slice(0,5).reduce((a,b)=>a+b,0));
+  const MONTH_LABELS=['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
+  const ALL_MK=['Ene','Feb','Mar','Abr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  const avbClientKey={'ATT':'AT&T','MacStore':'MacStore','iShop':'iShop','Liverpool':'Liverpool'};
+  const clientAvbArr=(avb2026Val[avbClientKey[client]]||[]);
+  const h1Total=clientAvbArr.slice(0,5).reduce((a,b)=>a+b,0);
   const grand=catGrand+h1Total;
+
   let kpiHtml=`<div class="kpi-card"><div class="kpi-label">${cname} TOTAL</div><div class="kpi-value">${fmtKpi(grand)}</div><div class="kpi-sub">${isVal?'valor MXN':'piezas'} Jun–Dic 2026</div></div>`;
   totByCat.forEach(({cat,tot})=>{
     const share=grand>0?(tot/grand*100).toFixed(1):'0.0';
@@ -1597,11 +1602,6 @@ function buildClienteTab(){
   document.getElementById('clteKpis').innerHTML=kpiHtml;
 
   // Chart: stacked bars, months on x-axis, categories as datasets
-  const MONTH_LABELS=['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
-  const ALL_MK=['Ene','Feb','Mar','Abr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
-  const avbClientKey={'ATT':'AT&T','MacStore':'MacStore','iShop':'iShop','Liverpool':'Liverpool'};
-  const clientAvbArr=(avb2026Val[avbClientKey[client]]||[]);
-  const h1Total=clientAvbArr.slice(0,5).reduce((a,b)=>a+b,0);
   const h1Dataset={label:'Total (Ene–May)',data:ALL_MK.map((_,i)=>i<5?clientAvbArr[i]||0:0),backgroundColor:'#CBD5E1',borderRadius:2};
   const datasets=[h1Dataset,...cats.map(cat=>({
     label:cat,data:ALL_MK.map((m,i)=>i<5?0:catData[cat][m]||0),backgroundColor:catColors[cat]||'#94a3b8',borderRadius:2
