@@ -410,16 +410,9 @@
   <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px">
     <!-- Category breakdown chart -->
     <div class="card" style="border-left:4px solid var(--accent);margin-bottom:0">
-      <div class="card-title" style="flex-wrap:wrap;gap:8px">
-        <span id="marcaCatTitle">Desglose por Categoría — Ene–Dic 2026 (Todos)</span>
-        <div style="display:flex;gap:4px;margin-left:auto">
-          <button id="catChartGrouped" class="toggle-btn active" onclick="setMarcaChartType('grouped')">Agrupada</button>
-          <button id="catChartStacked" class="toggle-btn" onclick="setMarcaChartType('stacked')">Apilada</button>
-          <button id="catChartLine" class="toggle-btn" onclick="setMarcaChartType('line')">Lineal</button>
-        </div>
-      </div>
-      <canvas id="chartMarcaCat" style="height:250px"></canvas>
-      <div id="marcaCatLegend" style="margin-top:8px;display:flex;flex-wrap:wrap;gap:8px;font-size:11px"></div>
+      <div class="card-title" id="marcaCatTitle">Desglose por Categoría — Ene–Dic 2026 (Todos)</div>
+      <div class="legend" id="marcaCatLegend"></div>
+      <canvas id="chartMarcaCat" style="height:260px"></canvas>
     </div>
     <!-- Main brand chart (grouped/stacked/line) -->
     <div class="card" style="margin-bottom:0">
@@ -1286,11 +1279,6 @@ function setMarcaChartType(type) {
     const el = document.getElementById('mChart'+k);
     if(el) el.classList.toggle('active', type===k.toLowerCase());
   });
-  // Sync category chart buttons
-  ['Grouped','Stacked','Line'].forEach(k=>{
-    const el = document.getElementById('catChart'+k);
-    if(el) el.classList.toggle('active', type===k.toLowerCase());
-  });
   const s = getMarcaSummary();
   renderMarcaCharts(s);
   renderMarcaCatChart(); // keep both charts in sync
@@ -1536,10 +1524,17 @@ function renderMarcaCatChart(){
     }
   });
 
-  // Legend
-  const leg = document.getElementById('marcaCatLegend');
-  if(leg){
-    leg.innerHTML = activeCats.map(c=>`<span style="display:flex;align-items:center;gap:4px"><span style="width:10px;height:10px;border-radius:2px;background:${catColors[c]||'#90A4AE'}"></span>${c}</span>`).join('');
+  // Clickable legend — same style as marcaMainLegend
+  const legEl = document.getElementById('marcaCatLegend');
+  if(legEl){
+    legEl.innerHTML='';
+    activeCats.forEach(cat=>{
+      const pill=document.createElement('div'); pill.className='legend-item';
+      pill.innerHTML=`<span class="legend-dot" style="background:${catColors[cat]||'#90A4AE'}"></span>${cat}`;
+      const ds=chartMarcaCatInst.data.datasets.find(d=>d.label===cat);
+      if(ds) pill.addEventListener('click',()=>{ds.hidden=!ds.hidden;pill.classList.toggle('hidden',ds.hidden);chartMarcaCatInst.update();});
+      legEl.appendChild(pill);
+    });
   }
 }
 
