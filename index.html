@@ -329,6 +329,18 @@
         <button class="chip" data-c="Coppel" onclick="setAnualClient(this)">Coppel</button>
       </div>
     </div>
+    <!-- Brand + Category filters -->
+    <div style="display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin-bottom:10px;padding-bottom:10px;border-bottom:1px solid var(--border)">
+      <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap">
+        <span class="filter-label" style="margin-bottom:0">Marca</span>
+        <div class="chip-row" id="avbMarcaFilter"></div>
+      </div>
+      <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap">
+        <span class="filter-label" style="margin-bottom:0">Categoría</span>
+        <div class="chip-row" id="avbCatFilter"></div>
+      </div>
+      <button id="avbResetBtn" onclick="resetAvbChartFilters()" style="display:none;padding:4px 12px;font-size:12px;font-weight:600;border:1.5px solid var(--accent);border-radius:20px;background:white;color:var(--accent);cursor:pointer;transition:.15s" onmouseover="this.style.background='var(--accent)';this.style.color='white'" onmouseout="this.style.background='white';this.style.color='var(--accent)'">↺ Resetear</button>
+    </div>
     <canvas id="chartAnualDual" style="max-height:380px"></canvas>
   </div>
 
@@ -974,8 +986,93 @@ function setAnualClient(btn) {
   });
   const clsMap = {all:'on','AT&T':'on-att','MacStore':'on-macstore','iShop':'on-ishop','Liverpool':'on-liverpool','MercadoLibre':'on-ml','Coppel':'on-coppel'};
   btn.classList.add(clsMap[key] || 'on');
+  // Reset brand/cat selection that may no longer be valid for new retail
+  avbChartState = {marca:'all', cat:'all'};
+  updateAvbCatChips();
   buildAnualDualChart();
   buildAnualKpis();
+}
+
+const avbRetailKeyMap = {'AT&T':'ATT','MacStore':'MacStore','iShop':'iShop','Liverpool':'Liverpool'};
+let avbChartState = {marca:'all', cat:'all'};
+
+function initAvbChartFilters(){
+  const marcaEl = document.getElementById('avbMarcaFilter');
+  if(!marcaEl || marcaEl.children.length > 0) return; // already initialized
+  const marcas = Object.keys(marcaRaw).sort();
+  marcaEl.innerHTML = `<button class="chip on" data-val="all" onclick="setAvbFilter('marca',this)">Todas</button>`;
+  marcas.forEach(m => {
+    marcaEl.innerHTML += `<button class="chip" data-val="${m}" onclick="setAvbFilter('marca',this)">${m}</button>`;
+  });
+  updateAvbCatChips();
+}
+
+function updateAvbCatChips(){
+  const catEl = document.getElementById('avbCatFilter');
+  if(!catEl) return;
+  const selectedRetailKey = avbRetailKeyMap[anualSelectedClient];
+  // Active cats given current marca + retail selection
+  const activeCats = new Set();
+  const activeMarcas = new Set();
+  for(const [marca, clients] of Object.entries(marcaRaw)){
+    for(const [retail, cats] of Object.entries(clients)){
+      if(anualSelectedClient !== 'all' && retail !== selectedRetailKey) continue;
+      const hasData = Object.values(cats).some(md => ALL_MONTHS.some(m=>(md.val[m]||0)>0));
+      if(hasData) activeMarcas.add(marca);
+      if(avbChartState.marca !== 'all' && marca !== avbChartState.marca) continue;
+      for(const [cat, md] of Object.entries(cats)){
+        if(ALL_MONTHS.some(m=>(md.val[m]||0)>0)) activeCats.add(cat);
+      }
+    }
+  }
+  // Hide marcas with no data for selected retail
+  document.querySelectorAll('#avbMarcaFilter .chip').forEach(b=>{
+    if(b.dataset.val==='all'){b.style.display='';return;}
+    b.style.display = activeMarcas.has(b.dataset.val) ? '' : 'none';
+  });
+  // Rebuild cat chips
+  if(avbChartState.cat !== 'all' && !activeCats.has(avbChartState.cat)) avbChartState.cat='all';
+  catEl.innerHTML = `<button class="chip on" data-val="all" onclick="setAvbFilter('cat',this)">Todas</button>`;
+  [...activeCats].sort().forEach(cat=>{
+    catEl.innerHTML += `<button class="chip ${avbChartState.cat===cat?'on':''}" data-val="${cat}" onclick="setAvbFilter('cat',this)">${catLabel[cat]||cat}</button>`;
+  });
+  // Show/hide marca chips that have no data for selected cat
+  if(avbChartState.cat !== 'all'){
+    const marcasForCat = new Set();
+    for(const [marca, clients] of Object.entries(marcaRaw)){
+      for(const [retail, cats] of Object.entries(clients)){
+        if(anualSelectedClient !== 'all' && retail !== selectedRetailKey) continue;
+        if(cats[avbChartState.cat] && ALL_MONTHS.some(m=>(cats[avbChartState.cat].val[m]||0)>0)) marcasForCat.add(marca);
+      }
+    }
+    document.querySelectorAll('#avbMarcaFilter .chip').forEach(b=>{
+      if(b.dataset.val==='all'){b.style.display='';return;}
+      b.style.display = marcasForCat.has(b.dataset.val) ? '' : 'none';
+    });
+  }
+  // Reset-button visibility
+  const resetBtn = document.getElementById('avbResetBtn');
+  if(resetBtn) resetBtn.style.display = (avbChartState.marca!=='all'||avbChartState.cat!=='all') ? '' : 'none';
+}
+
+function setAvbFilter(type, btn){
+  const key = type==='marca' ? 'avbMarcaFilter' : 'avbCatFilter';
+  document.querySelectorAll(`#${key} .chip`).forEach(b=>b.classList.remove('on'));
+  btn.classList.add('on');
+  avbChartState[type] = btn.dataset.val;
+  updateAvbCatChips();
+  buildAnualDualChart();
+}
+
+function resetAvbChartFilters(){
+  avbChartState = {marca:'all', cat:'all'};
+  document.querySelectorAll('#avbMarcaFilter .chip, #avbCatFilter .chip').forEach(b=>{
+    b.classList.toggle('on', b.dataset.val==='all');
+    b.style.display = '';
+  });
+  const resetBtn = document.getElementById('avbResetBtn');
+  if(resetBtn) resetBtn.style.display = 'none';
+  buildAnualDualChart();
 }
 
 function buildAnualDualChart() {
@@ -984,17 +1081,36 @@ function buildAnualDualChart() {
     ? ['AT&T','MacStore','iShop','Liverpool','MercadoLibre','Coppel']
     : [anualSelectedClient];
 
-  const val2026 = MONTHS_FULL.map((_,mi) =>
-    clients.reduce((s,c) => s + ((valorFull[c]||[])[mi]||0), 0)
-  );
+  const isFiltered = avbChartState.marca !== 'all' || avbChartState.cat !== 'all';
+  const selectedRetailKey = avbRetailKeyMap[anualSelectedClient];
+
+  let val2026, pcs2026;
+  if(isFiltered){
+    val2026 = new Array(12).fill(0);
+    pcs2026 = new Array(12).fill(0);
+    for(const [marca, retails] of Object.entries(marcaRaw)){
+      if(avbChartState.marca !== 'all' && marca !== avbChartState.marca) continue;
+      for(const [retail, cats] of Object.entries(retails)){
+        if(anualSelectedClient !== 'all' && retail !== selectedRetailKey) continue;
+        for(const [cat, md] of Object.entries(cats)){
+          if(avbChartState.cat !== 'all' && cat !== avbChartState.cat) continue;
+          ALL_MONTHS.forEach((m,i)=>{ val2026[i]+=(md.val[m]||0); pcs2026[i]+=(md.pcs[m]||0); });
+        }
+      }
+    }
+  } else {
+    val2026 = MONTHS_FULL.map((_,mi) => clients.reduce((s,c)=>s+((valorFull[c]||[])[mi]||0),0));
+    pcs2026 = MONTHS_FULL.map((_,mi) => clients.reduce((s,c)=>s+((piezasAnual[c]||[])[mi]||0),0));
+  }
+
   const val2025 = MONTHS_FULL.map((_,mi) =>
     clients.reduce((s,c) => s + ((avb2025Val[c]||[])[mi]||0), 0)
   );
-  const pcs2026 = MONTHS_FULL.map((_,mi) =>
-    clients.reduce((s,c) => s + ((piezasAnual[c]||[])[mi]||0), 0)
-  );
 
-  const titleParts = anualSelectedClient === 'all' ? 'Todos los Clientes' : anualSelectedClient;
+  const retailLabel = anualSelectedClient === 'all' ? 'Todos los Clientes' : anualSelectedClient;
+  const marcaLabel2 = avbChartState.marca !== 'all' ? ` · ${avbChartState.marca}` : '';
+  const catLabel2 = avbChartState.cat !== 'all' ? ` · ${catLabel[avbChartState.cat]||avbChartState.cat}` : '';
+  const titleParts = retailLabel + marcaLabel2 + catLabel2;
   document.getElementById('anualDualTitle').textContent = `2025 vs 2026 — ${titleParts}`;
 
   const growthLabelPlugin = {
@@ -1743,6 +1859,7 @@ function buildAVBSection() {
   renderAVBCharts();
   renderAVBTable();
   initAnualFilters();
+  initAvbChartFilters();
   // Proyección charts (merged tab)
   if(document.getElementById('chartAnualDual')){
     try { buildAnualDualChart(); buildAnualKpis(); buildCatCharts(); } catch(e){ console.warn('AVB chart error:',e); }
@@ -2105,7 +2222,8 @@ function buildClienteTab(){
 
 /* ══════ INIT ══════ */
 buildAVBSection();
-initAnualFilters(); // ensure annual table filters always initialize
+initAnualFilters();
+initAvbChartFilters();
 // Other tabs build on first visit via switchTab
 </script>
 </body>
