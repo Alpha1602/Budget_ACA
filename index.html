@@ -500,10 +500,17 @@
     <div id="clteH1Summary" style="display:flex;flex-wrap:wrap;gap:16px;font-size:13px"></div>
   </div>
 
-  <!-- Chart: ONLY Jun-Dec with category breakdown -->
+  <!-- Chart: category breakdown -->
   <div class="card" style="border-left:4px solid var(--accent)">
-    <div class="card-title" id="clteChartTitle">Categorías Jun–Dic 2026 — <span style="font-weight:400;color:var(--muted);font-size:12px">datos: Consenso FCST</span></div>
-    <div id="clteLegend" style="display:flex;flex-wrap:wrap;gap:10px;font-size:11px;margin-bottom:8px"></div>
+    <div class="card-title" style="flex-wrap:wrap;gap:8px">
+      <span id="clteChartTitle">Categorías Ene–Dic 2026 — <span style="font-weight:400;color:var(--muted);font-size:12px">fuente: Consenso FCST</span></span>
+      <div style="display:flex;gap:4px;margin-left:auto">
+        <button id="clteChartGrouped" class="toggle-btn" onclick="setClteChartType('grouped')">Agrupada</button>
+        <button id="clteChartStacked" class="toggle-btn active" onclick="setClteChartType('stacked')">Apilada</button>
+        <button id="clteChartLine" class="toggle-btn" onclick="setClteChartType('line')">Lineal</button>
+      </div>
+    </div>
+    <div id="clteLegend" style="display:flex;flex-wrap:wrap;gap:8px;font-size:11px;margin-bottom:8px"></div>
     <canvas id="chartClienteCat" class="canvas-tall"></canvas>
   </div>
 
@@ -1801,7 +1808,17 @@ function renderAVBTable() {
 
 /* ══════ POR CLIENTE TAB ══════ */
 let clienteTabState={client:'ATT',mode:'val',sort:'az'};
+let clteChartType='stacked'; // 'grouped' | 'stacked' | 'line'
 let chartClienteCatInst=null;
+
+function setClteChartType(type){
+  clteChartType=type;
+  ['Grouped','Stacked','Line'].forEach(k=>{
+    const el=document.getElementById('clteChart'+k);
+    if(el) el.classList.toggle('active', type===k.toLowerCase());
+  });
+  buildClienteTab();
+}
 
 const clteClientDisplay={ATT:'AT&T',MacStore:'MacStore',iShop:'iShop',Liverpool:'Liverpool'};
 const clteClientClass={ATT:'on-att',MacStore:'on-macstore',iShop:'on-ishop',Liverpool:'on-liverpool'};
@@ -1889,37 +1906,53 @@ function buildClienteTab(){
   const h1Card=document.getElementById('clteH1Card');
   if(h1Card) h1Card.style.display='none';
 
-  // Chart: All 12 months with stacked categories (data from Consenso)
+  // Chart type from state
+  const cType = clteChartType==='line' ? 'line' : 'bar';
+  const cStacked = clteChartType==='stacked';
+
+  // Chart: All 12 months with categories
   const datasets=cats.map(cat=>({
     label:cat,
     data:ALL_MONTHS.map(m=>catData[cat][m]||0),
-    backgroundColor:catColors[cat]||'#94a3b8',
-    borderRadius:2
+    backgroundColor:(catColors[cat]||'#94a3b8')+(cStacked?'':'cc'),
+    borderColor:catColors[cat]||'#94a3b8',
+    borderWidth: cType==='line'?2:0,
+    pointRadius: cType==='line'?3:0,
+    tension:.35, fill:false,
+    borderRadius: cStacked?0:3,
   }));
 
   if(chartClienteCatInst)chartClienteCatInst.destroy();
   chartClienteCatInst=new Chart(document.getElementById('chartClienteCat'),{
-    type:'bar',
+    type:cType,
     data:{labels:ALL_MONTHS_ES,datasets},
     options:{
       responsive:true,maintainAspectRatio:false,
       plugins:{
-        legend:{position:'bottom',labels:{font:{size:11},boxWidth:12,padding:10}},
+        legend:{display:false},
         tooltip:{mode:'index',intersect:false,callbacks:{
           label:c=>` ${c.dataset.label}: ${fmtTip(c.parsed.y)}`
         }}
       },
       scales:{
-        x:{stacked:true,grid:{display:false}},
-        y:{stacked:true,ticks:{callback:v=>isVal?'$'+(v/1e6).toFixed(1)+'M':v>=1000?(v/1000).toFixed(0)+'K':v},grid:{color:'#e2e8f0'}}
+        x:{stacked:cStacked,grid:{display:false}},
+        y:{stacked:cStacked,ticks:{callback:v=>isVal?'$'+(v/1e6).toFixed(1)+'M':v>=1000?(v/1000).toFixed(0)+'K':v},grid:{color:'#e2e8f0'}}
       }
     }
   });
 
-  // Legend
-  let leg='';
-  cats.forEach(c=>{leg+=`<span style="display:inline-flex;align-items:center;gap:4px"><span style="display:inline-block;width:10px;height:10px;border-radius:2px;background:${catColors[c]||'#94a3b8'}"></span>${c}</span> `;});
-  document.getElementById('clteLegend').innerHTML=leg;
+  // Clickable legend pills
+  const legEl=document.getElementById('clteLegend');
+  if(legEl){
+    legEl.innerHTML='';
+    cats.forEach(cat=>{
+      const pill=document.createElement('div'); pill.className='legend-item';
+      pill.innerHTML=`<span class="legend-dot" style="background:${catColors[cat]||'#94a3b8'}"></span>${cat}`;
+      const ds=chartClienteCatInst.data.datasets.find(d=>d.label===cat);
+      if(ds) pill.addEventListener('click',()=>{ds.hidden=!ds.hidden;pill.classList.toggle('hidden',ds.hidden);chartClienteCatInst.update();});
+      legEl.appendChild(pill);
+    });
+  }
 
   // Table: 12 months from Consenso by category
   let tblHtml='';
