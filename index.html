@@ -459,7 +459,11 @@
           <th style="min-width:100px;cursor:pointer;user-select:none" onclick="setTblColSort('marca')">Marca<span id="thSort_marca" style="color:var(--accent);font-size:10px"></span></th>
           <th style="min-width:80px;cursor:pointer;user-select:none" onclick="setTblColSort('retail')">Retail<span id="thSort_retail" style="color:var(--accent);font-size:10px"></span></th>
           <th style="min-width:130px;cursor:pointer;user-select:none" onclick="setTblColSort('cat')">Categoría<span id="thSort_cat" style="color:var(--accent);font-size:10px"></span></th>
-          <th class="num" style="color:var(--muted)">Ene</th><th class="num" style="color:var(--muted)">Feb</th><th class="num" style="color:var(--muted)">Mar</th><th class="num" style="color:var(--muted)">Abr</th><th class="num" style="color:var(--muted)">May</th>
+          <th class="num" style="cursor:pointer" onclick="setTblColSort('Jan')">Ene<span id="thSort_Jan" style="color:var(--accent);font-size:10px"></span></th>
+          <th class="num" style="cursor:pointer" onclick="setTblColSort('Feb')">Feb<span id="thSort_Feb" style="color:var(--accent);font-size:10px"></span></th>
+          <th class="num" style="cursor:pointer" onclick="setTblColSort('Mar')">Mar<span id="thSort_Mar" style="color:var(--accent);font-size:10px"></span></th>
+          <th class="num" style="cursor:pointer" onclick="setTblColSort('Apr')">Abr<span id="thSort_Apr" style="color:var(--accent);font-size:10px"></span></th>
+          <th class="num" style="cursor:pointer" onclick="setTblColSort('May')">May<span id="thSort_May" style="color:var(--accent);font-size:10px"></span></th>
           <th class="num" style="cursor:pointer" onclick="setTblColSort('Jun')">Jun<span id="thSort_Jun" style="color:var(--accent);font-size:10px"></span></th>
           <th class="num" style="cursor:pointer" onclick="setTblColSort('Jul')">Jul<span id="thSort_Jul" style="color:var(--accent);font-size:10px"></span></th>
           <th class="num" style="cursor:pointer" onclick="setTblColSort('Aug')">Ago<span id="thSort_Aug" style="color:var(--accent);font-size:10px"></span></th>
@@ -665,135 +669,137 @@ const qPiezas = {
 const marcaRaw = {
   'Cubitt':{
     'MacStore':{
-      'Others':{pcs:{Jun:0,Jul:0,Aug:0,Sep:0,Oct:0,Nov:0,Dec:0},val:{Jun:0,Jul:0,Aug:0,Sep:0,Oct:0,Nov:0,Dec:0}},
+      'Others':{pcs:{Jan:0,Feb:0,Mar:0,Apr:0,May:1,Jun:0,Jul:0,Aug:0,Sep:0,Oct:0,Nov:0,Dec:0},val:{Jan:0,Feb:0,Mar:0,Apr:0,May:560,Jun:0,Jul:0,Aug:0,Sep:0,Oct:0,Nov:0,Dec:0}},
     },
   },
   'Hypergear':{
     'MacStore':{
-      'Others':{pcs:{Jun:0,Jul:0,Aug:0,Sep:0,Oct:0,Nov:0,Dec:0},val:{Jun:0,Jul:0,Aug:0,Sep:0,Oct:0,Nov:0,Dec:0}},
+      'Others':{pcs:{Jan:0,Feb:0,Mar:0,Apr:0,May:0,Jun:0,Jul:0,Aug:0,Sep:0,Oct:0,Nov:0,Dec:0},val:{Jan:0,Feb:0,Mar:0,Apr:0,May:0,Jun:0,Jul:0,Aug:0,Sep:0,Oct:0,Nov:0,Dec:0}},
     },
   },
   'Moment':{
     'MacStore':{
-      'Cases iPhone':{pcs:{Jun:0,Jul:0,Aug:0,Sep:0,Oct:0,Nov:0,Dec:0},val:{Jun:0,Jul:0,Aug:0,Sep:0,Oct:0,Nov:0,Dec:0}},
+      'Cases iPhone':{pcs:{Jan:0,Feb:0,Mar:0,Apr:0,May:0,Jun:0,Jul:0,Aug:0,Sep:0,Oct:0,Nov:0,Dec:0},val:{Jan:0,Feb:0,Mar:0,Apr:0,May:0,Jun:0,Jul:0,Aug:0,Sep:0,Oct:0,Nov:0,Dec:0}},
     },
   },
   'Mophie':{
     'MacStore':{
-      'Others':{pcs:{Jun:0,Jul:0,Aug:0,Sep:0,Oct:0,Nov:0,Dec:0},val:{Jun:0,Jul:0,Aug:0,Sep:0,Oct:0,Nov:0,Dec:0}},
+      'Others':{pcs:{Jan:0,Feb:0,Mar:0,Apr:0,May:0,Jun:0,Jul:0,Aug:0,Sep:0,Oct:0,Nov:0,Dec:0},val:{Jan:0,Feb:0,Mar:0,Apr:0,May:0,Jun:0,Jul:0,Aug:0,Sep:0,Oct:0,Nov:0,Dec:0}},
     },
   },
   'Nomad':{
     'ATT':{
-      'Cases iPhone':{pcs:{Jun:0,Jul:0,Aug:0,Sep:0,Oct:0,Nov:0,Dec:0},val:{Jun:0,Jul:0,Aug:0,Sep:0,Oct:0,Nov:0,Dec:0}},
+      'Cases iPhone':{pcs:{Jan:4,Feb:1,Mar:1,Apr:3,May:1,Jun:1,Jul:0,Aug:0,Sep:0,Oct:0,Nov:0,Dec:0},val:{Jan:2067,Feb:517,Mar:517,Apr:1551,May:517,Jun:517,Jul:0,Aug:0,Sep:0,Oct:0,Nov:0,Dec:0}},
     },
     'Liverpool':{
-      'Cases Airpods':{pcs:{Jun:0,Jul:220,Aug:300,Sep:354,Oct:418,Nov:494,Dec:582},val:{Jun:0,Jul:79541,Aug:108464,Sep:127988,Oct:151128,Nov:178606,Dec:210422}},
-      'Cases iPhone':{pcs:{Jun:0,Jul:0,Aug:140,Sep:300,Oct:300,Nov:300,Dec:300},val:{Jun:0,Jul:0,Aug:72340,Sep:138224,Oct:138224,Nov:138224,Dec:138224}},
-      'Others':{pcs:{Jun:0,Jul:0,Aug:190,Sep:220,Oct:255,Nov:295,Dec:341},val:{Jun:0,Jul:0,Aug:98177,Sep:113678,Oct:131764,Nov:152433,Dec:176202}},
+      'Cases Airpods':{pcs:{Jan:0,Feb:0,Mar:0,Apr:0,May:0,Jun:0,Jul:0,Aug:300,Sep:354,Oct:418,Nov:494,Dec:582},val:{Jan:0,Feb:0,Mar:0,Apr:0,May:0,Jun:0,Jul:0,Aug:108464,Sep:127988,Oct:151128,Nov:178606,Dec:210422}},
+      'Cases iPhone':{pcs:{Jan:0,Feb:0,Mar:0,Apr:0,May:0,Jun:0,Jul:0,Aug:140,Sep:300,Oct:300,Nov:300,Dec:300},val:{Jan:0,Feb:0,Mar:0,Apr:0,May:0,Jun:0,Jul:0,Aug:72340,Sep:138224,Oct:138224,Nov:138224,Dec:138224}},
+      'Others':{pcs:{Jan:0,Feb:0,Mar:0,Apr:0,May:0,Jun:0,Jul:0,Aug:190,Sep:220,Oct:255,Nov:295,Dec:341},val:{Jan:0,Feb:0,Mar:0,Apr:0,May:0,Jun:0,Jul:0,Aug:98177,Sep:113678,Oct:131764,Nov:152433,Dec:176202}},
     },
     'MacStore':{
-      'Cases Airpods':{pcs:{Jun:172,Jul:167,Aug:182,Sep:170,Oct:176,Nov:211,Dec:232},val:{Jun:82932,Jul:80521,Aug:87754,Sep:81967,Oct:84861,Nov:101736,Dec:111861}},
-      'Cases iPhone':{pcs:{Jun:281,Jul:256,Aug:255,Sep:260,Oct:313,Nov:313,Dec:313},val:{Jun:169398,Jul:154327,Aug:153724,Sep:121926,Oct:146061,Nov:146061,Dec:146061}},
-      'Others':{pcs:{Jun:448,Jul:422,Aug:425,Sep:414,Oct:434,Nov:470,Dec:506},val:{Jun:425718,Jul:409481,Aug:413034,Sep:402970,Oct:417710,Nov:463901,Dec:500218}},
-      'Straps':{pcs:{Jun:0,Jul:0,Aug:0,Sep:0,Oct:0,Nov:0,Dec:0},val:{Jun:0,Jul:0,Aug:0,Sep:0,Oct:0,Nov:0,Dec:0}},
+      'Cases Airpods':{pcs:{Jan:0,Feb:23,Mar:159,Apr:182,May:154,Jun:169,Jul:167,Aug:182,Sep:170,Oct:176,Nov:211,Dec:232},val:{Jan:0,Feb:11090,Mar:76663,Apr:87753,May:74253,Jun:81485,Jul:80521,Aug:87754,Sep:81967,Oct:84861,Nov:101736,Dec:111861}},
+      'Cases iPhone':{pcs:{Jan:508,Feb:283,Mar:199,Apr:232,May:234,Jun:277,Jul:256,Aug:255,Sep:260,Oct:313,Nov:313,Dec:313},val:{Jan:306244,Feb:170605,Mar:119967,Apr:139860,May:141065,Jun:166986,Jul:154327,Aug:153724,Sep:121926,Oct:146061,Nov:146061,Dec:146061}},
+      'Others':{pcs:{Jan:767,Feb:629,Mar:441,Apr:412,May:386,Jun:430,Jul:422,Aug:425,Sep:414,Oct:434,Nov:470,Dec:506},val:{Jan:581333,Feb:499337,Mar:393738,Apr:371587,May:363062,Jun:371343,Jul:409481,Aug:413034,Sep:402970,Oct:417710,Nov:463901,Dec:500218}},
+      'Straps':{pcs:{Jan:0,Feb:0,Mar:0,Apr:0,May:0,Jun:0,Jul:0,Aug:0,Sep:0,Oct:0,Nov:0,Dec:0},val:{Jan:0,Feb:0,Mar:0,Apr:0,May:0,Jun:0,Jul:0,Aug:0,Sep:0,Oct:0,Nov:0,Dec:0}},
     },
     'iShop':{
-      'Cases Airpods':{pcs:{Jun:280,Jul:220,Aug:160,Sep:160,Oct:114,Nov:60,Dec:60},val:{Jun:96432,Jul:75768,Aug:55104,Sep:55104,Oct:39262,Nov:20664,Dec:20664}},
-      'Cases iPhone':{pcs:{Jun:245,Jul:383,Aug:228,Sep:1170,Oct:670,Nov:710,Dec:570},val:{Jun:127664,Jul:199573,Aug:118805,Sep:586565,Oct:330314,Nov:349263,Dec:282944}},
-      'Others':{pcs:{Jun:670,Jul:555,Aug:448,Sep:389,Oct:696,Nov:942,Dec:582},val:{Jun:390100,Jul:294590,Aug:234549,Sep:205092,Oct:400607,Nov:512613,Dec:333630}},
+      'Cases Airpods':{pcs:{Jan:447,Feb:240,Mar:319,Apr:113,May:275,Jun:157,Jul:81,Aug:160,Sep:160,Oct:114,Nov:60,Dec:60},val:{Jan:153947,Feb:82656,Mar:109864,Apr:38917,May:94710,Jun:54071,Jul:27897,Aug:55104,Sep:55104,Oct:39262,Nov:20664,Dec:20664}},
+      'Cases iPhone':{pcs:{Jan:388,Feb:343,Mar:452,Apr:145,May:344,Jun:154,Jul:246,Aug:228,Sep:1170,Oct:670,Nov:710,Dec:570},val:{Jan:202179,Feb:178730,Mar:235529,Apr:75557,May:179251,Jun:80247,Jul:128186,Aug:118805,Sep:586565,Oct:330314,Nov:349263,Dec:282944}},
+      'Others':{pcs:{Jan:331,Feb:684,Mar:859,Apr:485,May:711,Jun:399,Jul:378,Aug:448,Sep:389,Oct:696,Nov:942,Dec:582},val:{Jan:188780,Feb:431732,Mar:479934,Apr:278024,May:413144,Jun:222803,Jul:216778,Aug:234549,Sep:205092,Oct:400607,Nov:512613,Dec:333630}},
     },
   },
   'PanzerGlass':{
     'MacStore':{
-      'Micas':{pcs:{Jun:0,Jul:0,Aug:0,Sep:0,Oct:0,Nov:0,Dec:0},val:{Jun:0,Jul:0,Aug:0,Sep:0,Oct:0,Nov:0,Dec:0}},
+      'Micas':{pcs:{Jan:0,Feb:0,Mar:0,Apr:0,May:0,Jun:0,Jul:0,Aug:0,Sep:0,Oct:0,Nov:0,Dec:0},val:{Jan:0,Feb:0,Mar:0,Apr:0,May:0,Jun:0,Jul:0,Aug:0,Sep:0,Oct:0,Nov:0,Dec:0}},
     },
   },
   'Pitaka':{
     'MacStore':{
-      'Cases iPhone':{pcs:{Jun:0,Jul:0,Aug:0,Sep:0,Oct:0,Nov:0,Dec:0},val:{Jun:0,Jul:0,Aug:0,Sep:0,Oct:0,Nov:0,Dec:0}},
-      'Others':{pcs:{Jun:0,Jul:0,Aug:0,Sep:0,Oct:0,Nov:0,Dec:0},val:{Jun:0,Jul:0,Aug:0,Sep:0,Oct:0,Nov:0,Dec:0}},
+      'Cases iPhone':{pcs:{Jan:339,Feb:201,Mar:96,Apr:188,May:150,Jun:177,Jul:0,Aug:0,Sep:0,Oct:0,Nov:0,Dec:0},val:{Jan:206053,Feb:122137,Mar:58355,Apr:114300,May:91391,Jun:107185,Jul:0,Aug:0,Sep:0,Oct:0,Nov:0,Dec:0}},
+      'Others':{pcs:{Jan:12,Feb:12,Mar:1,Apr:0,May:0,Jun:1,Jul:0,Aug:0,Sep:0,Oct:0,Nov:0,Dec:0},val:{Jan:8078,Feb:6390,Mar:603,Apr:0,May:0,Jun:482,Jul:0,Aug:0,Sep:0,Oct:0,Nov:0,Dec:0}},
     },
   },
   'Quikcell':{
     'ATT':{
-      'Cases iPhone':{pcs:{Jun:0,Jul:0,Aug:0,Sep:0,Oct:0,Nov:0,Dec:0},val:{Jun:0,Jul:0,Aug:0,Sep:0,Oct:0,Nov:0,Dec:0}},
-      'Micas':{pcs:{Jun:1506,Jul:3508,Aug:3504,Sep:3514,Oct:5005,Nov:7503,Dec:7505},val:{Jun:466449,Jul:1086677,Aug:1085541,Sep:1088381,Oct:1550570,Nov:2324577,Dec:2325145}},
-      'Others':{pcs:{Jun:18580,Jul:17122,Aug:18102,Sep:19149,Oct:21139,Nov:23629,Dec:23626},val:{Jun:3703893,Jul:3426368,Aug:3621562,Sep:3832653,Oct:4229542,Nov:4726959,Dec:4726262}},
+      'Cases iPhone':{pcs:{Jan:45,Feb:74,Mar:0,Apr:0,May:0,Jun:0,Jul:0,Aug:0,Sep:0,Oct:0,Nov:0,Dec:0},val:{Jan:9287,Feb:15273,Mar:0,Apr:0,May:0,Jun:0,Jul:0,Aug:0,Sep:0,Oct:0,Nov:0,Dec:0}},
+      'Micas':{pcs:{Jan:1878,Feb:1266,Mar:853,Apr:1013,May:788,Jun:827,Jul:3508,Aug:3504,Sep:3514,Oct:5005,Nov:7503,Dec:7505},val:{Jan:580723,Feb:391883,Mar:263691,Apr:313289,May:243888,Jun:255868,Jul:1086677,Aug:1085541,Sep:1088381,Oct:1550570,Nov:2324577,Dec:2325145}},
+      'Others':{pcs:{Jan:25621,Feb:18081,Mar:16306,Apr:17524,May:16755,Jun:17594,Jul:17122,Aug:18102,Sep:19149,Oct:21139,Nov:23629,Dec:23626},val:{Jan:5385168,Feb:3828747,Mar:3390190,Apr:3538352,May:3363325,Jun:3594279,Jul:3426368,Aug:3621562,Sep:3832653,Oct:4229542,Nov:4726959,Dec:4726262}},
     },
     'MacStore':{
-      'Cases iPhone':{pcs:{Jun:0,Jul:0,Aug:0,Sep:0,Oct:0,Nov:0,Dec:0},val:{Jun:0,Jul:0,Aug:0,Sep:0,Oct:0,Nov:0,Dec:0}},
-      'Micas':{pcs:{Jun:348,Jul:383,Aug:340,Sep:444,Oct:149,Nov:170,Dec:182},val:{Jun:52395,Jul:57665,Aug:51190,Sep:66849,Oct:22433,Nov:25596,Dec:27403}},
-      'Others':{pcs:{Jun:46,Jul:50,Aug:43,Sep:46,Oct:49,Nov:58,Dec:64},val:{Jun:9793,Jul:10644,Aug:9154,Sep:9793,Oct:10432,Nov:12348,Dec:13625}},
+      'Cases iPhone':{pcs:{Jan:0,Feb:0,Mar:0,Apr:0,May:0,Jun:0,Jul:0,Aug:0,Sep:0,Oct:0,Nov:0,Dec:0},val:{Jan:0,Feb:0,Mar:0,Apr:0,May:0,Jun:0,Jul:0,Aug:0,Sep:0,Oct:0,Nov:0,Dec:0}},
+      'Micas':{pcs:{Jan:2016,Feb:788,Mar:723,Apr:387,May:238,Jun:302,Jul:383,Aug:340,Sep:444,Oct:149,Nov:170,Dec:182},val:{Jan:305352,Feb:120632,Mar:109808,Apr:59065,May:36639,Jun:45628,Jul:57665,Aug:51190,Sep:66849,Oct:22433,Nov:25596,Dec:27403}},
+      'Others':{pcs:{Jan:62,Feb:78,Mar:54,Apr:57,May:50,Jun:49,Jul:50,Aug:43,Sep:46,Oct:49,Nov:58,Dec:64},val:{Jan:13199,Feb:16605,Mar:11496,Apr:12135,May:10644,Jun:10432,Jul:10644,Aug:9154,Sep:9793,Oct:10432,Nov:12348,Dec:13625}},
     },
   },
   'Raptic':{
     'MacStore':{
-      'Others':{pcs:{Jun:0,Jul:0,Aug:0,Sep:0,Oct:0,Nov:0,Dec:0},val:{Jun:0,Jul:0,Aug:0,Sep:0,Oct:0,Nov:0,Dec:0}},
+      'Others':{pcs:{Jan:124,Feb:54,Mar:20,Apr:6,May:7,Jun:8,Jul:0,Aug:0,Sep:0,Oct:0,Nov:0,Dec:0},val:{Jan:49802,Feb:17602,Mar:6603,Apr:1565,May:1928,Jun:3471,Jul:0,Aug:0,Sep:0,Oct:0,Nov:0,Dec:0}},
     },
   },
   'Speck':{
     'ATT':{
-      'Cases iPhone':{pcs:{Jun:1618,Jul:3541,Aug:3557,Sep:2479,Oct:2724,Nov:2388,Dec:2373},val:{Jun:835846,Jul:1829498,Aug:1836110,Sep:1157532,Oct:1256265,Nov:996856,Dec:986281}},
-      'Micas':{pcs:{Jun:16,Jul:16,Aug:16,Sep:11,Oct:15,Nov:15,Dec:15},val:{Jun:5784,Jul:5784,Aug:5784,Sep:3977,Oct:5423,Nov:5423,Dec:5423}},
-      'Others':{pcs:{Jun:10,Jul:7,Aug:9,Sep:14,Oct:11,Nov:13,Dec:16},val:{Jun:3098,Jul:2169,Aug:2788,Sep:6431,Oct:3872,Nov:4725,Dec:5888}},
+      'Cases iPhone':{pcs:{Jan:3093,Feb:1489,Mar:966,Apr:819,May:844,Jun:889,Jul:3541,Aug:3557,Sep:2479,Oct:2724,Nov:2388,Dec:2373},val:{Jan:1595319,Feb:766500,Mar:497083,Apr:421125,May:435492,Jun:456260,Jul:1829498,Aug:1836110,Sep:1157532,Oct:1256265,Nov:996856,Dec:986281}},
+      'Micas':{pcs:{Jan:14,Feb:26,Mar:12,Apr:15,May:8,Jun:8,Jul:16,Aug:16,Sep:11,Oct:15,Nov:15,Dec:15},val:{Jan:5061,Feb:9400,Mar:4338,Apr:5423,May:2892,Jun:2892,Jul:5784,Aug:5784,Sep:3977,Oct:5423,Nov:5423,Dec:5423}},
+      'Others':{pcs:{Jan:28,Feb:29,Mar:25,Apr:12,May:7,Jun:18,Jul:7,Aug:9,Sep:14,Oct:11,Nov:13,Dec:16},val:{Jan:9606,Feb:9449,Mar:10305,Apr:3718,May:2169,Jun:5577,Jul:2169,Aug:2788,Sep:6431,Oct:3872,Nov:4725,Dec:5888}},
     },
     'Coppel':{
-      'Cases iPhone':{pcs:{Jun:0,Jul:0,Aug:0,Sep:0,Oct:0,Nov:0,Dec:0},val:{Jun:0,Jul:0,Aug:0,Sep:0,Oct:0,Nov:0,Dec:0}},
+      'Cases iPhone':{pcs:{Jan:0,Feb:0,Mar:0,Apr:1470,May:0,Jun:0,Jul:0,Aug:0,Sep:0,Oct:0,Nov:0,Dec:0},val:{Jan:0,Feb:0,Mar:0,Apr:445377,May:0,Jun:0,Jul:0,Aug:0,Sep:0,Oct:0,Nov:0,Dec:0}},
     },
     'Liverpool':{
-      'Cases iPhone':{pcs:{Jun:0,Jul:0,Aug:0,Sep:0,Oct:0,Nov:0,Dec:0},val:{Jun:0,Jul:0,Aug:0,Sep:0,Oct:0,Nov:0,Dec:0}},
+      'Cases iPhone':{pcs:{Jan:0,Feb:0,Mar:0,Apr:0,May:0,Jun:0,Jul:0,Aug:0,Sep:0,Oct:0,Nov:0,Dec:0},val:{Jan:0,Feb:0,Mar:0,Apr:0,May:0,Jun:0,Jul:0,Aug:0,Sep:0,Oct:0,Nov:0,Dec:0}},
     },
     'MacStore':{
-      'Cases Macbook':{pcs:{Jun:230,Jul:237,Aug:285,Sep:218,Oct:238,Nov:286,Dec:313},val:{Jun:115876,Jul:119403,Aug:143585,Sep:109831,Oct:119907,Nov:144090,Dec:157693}},
-      'Cases Sleeves':{pcs:{Jun:5,Jul:12,Aug:20,Sep:12,Oct:11,Nov:13,Dec:18},val:{Jun:2519,Jul:6046,Aug:10076,Sep:6046,Oct:5542,Nov:6550,Dec:9069}},
-      'Cases iPad':{pcs:{Jun:421,Jul:422,Aug:510,Sep:363,Oct:397,Nov:477,Dec:519},val:{Jun:211145,Jul:211700,Aug:255833,Sep:181873,Oct:198852,Nov:238905,Dec:259914}},
-      'Cases iPhone':{pcs:{Jun:412,Jul:395,Aug:423,Sep:829,Oct:784,Nov:997,Dec:953},val:{Jun:186136,Jul:177935,Aug:190654,Sep:376242,Oct:356800,Nov:454939,Dec:434480}},
-      'Others':{pcs:{Jun:69,Jul:80,Aug:76,Sep:62,Oct:74,Nov:86,Dec:93},val:{Jun:30949,Jul:31614,Aug:35307,Sep:24271,Oct:32326,Nov:36073,Dec:38178}},
+      'Cases Macbook':{pcs:{Jan:274,Feb:254,Mar:152,Apr:213,May:141,Jun:182,Jul:237,Aug:285,Sep:218,Oct:238,Nov:286,Dec:313},val:{Jan:138044,Feb:127968,Mar:76579,Apr:107312,May:71037,Jun:91693,Jul:119403,Aug:143585,Sep:109831,Oct:119907,Nov:144090,Dec:157693}},
+      'Cases Sleeves':{pcs:{Jan:0,Feb:0,Mar:0,Apr:0,May:3,Jun:6,Jul:12,Aug:20,Sep:12,Oct:11,Nov:13,Dec:18},val:{Jan:0,Feb:0,Mar:0,Apr:0,May:1511,Jun:3023,Jul:6046,Aug:10076,Sep:6046,Oct:5542,Nov:6550,Dec:9069}},
+      'Cases iPad':{pcs:{Jan:1538,Feb:865,Mar:352,Apr:394,May:374,Jun:393,Jul:422,Aug:510,Sep:363,Oct:397,Nov:477,Dec:519},val:{Jan:768759,Feb:435595,Mar:178955,Apr:197492,May:187821,Jun:199861,Jul:211700,Aug:255833,Sep:181873,Oct:198852,Nov:238905,Dec:259914}},
+      'Cases iPhone':{pcs:{Jan:1521,Feb:859,Mar:460,Apr:425,May:364,Jun:403,Jul:395,Aug:423,Sep:829,Oct:784,Nov:997,Dec:953},val:{Jan:690476,Feb:390068,Mar:207704,Apr:191392,May:162179,Jun:182363,Jul:177935,Aug:190654,Sep:376242,Oct:356800,Nov:454939,Dec:434480}},
+      'Others':{pcs:{Jan:123,Feb:75,Mar:72,Apr:71,May:69,Jun:89,Jul:80,Aug:76,Sep:62,Oct:74,Nov:86,Dec:93},val:{Jan:47271,Feb:28809,Mar:24204,Apr:24162,May:23167,Jun:33773,Jul:31614,Aug:35307,Sep:24271,Oct:32326,Nov:36073,Dec:38178}},
     },
     'iShop':{
-      'Cases Macbook':{pcs:{Jun:908,Jul:318,Aug:1200,Sep:707,Oct:677,Nov:1282,Dec:1037},val:{Jun:402084,Jul:148461,Aug:531699,Sep:312731,Oct:306819,Nov:572612,Dec:466683}},
-      'Cases Sleeves':{pcs:{Jun:17,Jul:13,Aug:21,Sep:12,Oct:33,Nov:12,Dec:12},val:{Jun:7320,Jul:5598,Aug:9043,Sep:5167,Oct:14210,Nov:5167,Dec:5167}},
-      'Cases iPad':{pcs:{Jun:864,Jul:683,Aug:1625,Sep:699,Oct:644,Nov:1411,Dec:601},val:{Jun:372300,Jul:294792,Aug:726279,Sep:312197,Oct:288083,Nov:631113,Dec:267844}},
-      'Cases iPhone':{pcs:{Jun:538,Jul:452,Aug:230,Sep:2324,Oct:899,Nov:929,Dec:744},val:{Jun:198526,Jul:170279,Aug:78427,Sep:922914,Oct:345062,Nov:346990,Dec:284993}},
-      'Others':{pcs:{Jun:100,Jul:92,Aug:107,Sep:74,Oct:94,Nov:140,Dec:89},val:{Jun:23237,Jul:21378,Aug:24864,Sep:17195,Oct:21843,Nov:32532,Dec:20681}},
+      'Cases Macbook':{pcs:{Jan:229,Feb:561,Mar:800,Apr:267,May:565,Jun:254,Jul:260,Aug:1200,Sep:707,Oct:677,Nov:1282,Dec:1037},val:{Jan:103457,Feb:258377,Mar:370234,Apr:125963,May:264516,Jun:117346,Jul:120684,Aug:531699,Sep:312731,Oct:306819,Nov:572612,Dec:466683}},
+      'Cases Sleeves':{pcs:{Jan:0,Feb:0,Mar:35,Apr:9,May:0,Jun:8,Jul:17,Aug:21,Sep:12,Oct:33,Nov:12,Dec:12},val:{Jan:0,Feb:0,Mar:15071,Apr:3875,May:0,Jun:3445,Jul:7320,Aug:9043,Sep:5167,Oct:14210,Nov:5167,Dec:5167}},
+      'Cases iPad':{pcs:{Jan:1038,Feb:1133,Mar:1389,Apr:548,May:1058,Jun:659,Jul:547,Aug:1625,Sep:699,Oct:644,Nov:1411,Dec:601},val:{Jan:449595,Feb:488992,Mar:598451,Apr:237521,May:447559,Jun:285061,Jul:236530,Aug:726279,Sep:312197,Oct:288083,Nov:631113,Dec:267844}},
+      'Cases iPhone':{pcs:{Jan:617,Feb:912,Mar:478,Apr:512,May:481,Jun:316,Jul:632,Aug:230,Sep:2324,Oct:899,Nov:929,Dec:744},val:{Jan:238802,Feb:353435,Mar:185245,Apr:197955,May:185631,Jun:122463,Jul:244538,Aug:78427,Sep:922914,Oct:345062,Nov:346990,Dec:284993}},
+      'Others':{pcs:{Jan:67,Feb:57,Mar:163,Apr:66,May:149,Jun:37,Jul:89,Aug:107,Sep:74,Oct:94,Nov:140,Dec:89},val:{Jan:15568,Feb:13245,Mar:37876,Apr:15336,May:34623,Jun:8598,Jul:20681,Aug:24864,Sep:17195,Oct:21843,Nov:32532,Dec:20681}},
     },
   },
   'Tech21':{
     'ATT':{
-      'Cases iPhone':{pcs:{Jun:0,Jul:0,Aug:0,Sep:1087,Oct:1331,Nov:1673,Dec:1693},val:{Jun:0,Jul:0,Aug:0,Sep:439706,Oct:536890,Nov:674695,Dec:682867}},
+      'Cases iPhone':{pcs:{Jan:27,Feb:19,Mar:13,Apr:11,May:6,Jun:8,Jul:0,Aug:0,Sep:1087,Oct:1331,Nov:1673,Dec:1693},val:{Jan:13951,Feb:9818,Mar:6717,Apr:5684,May:3100,Jun:4133,Jul:0,Aug:0,Sep:439706,Oct:536890,Nov:674695,Dec:682867}},
     },
     'MacStore':{
-      'Cases Macbook':{pcs:{Jun:117,Jul:120,Aug:145,Sep:84,Oct:90,Nov:106,Dec:116},val:{Jun:76794,Jul:78763,Aug:95171,Sep:55134,Oct:59072,Nov:69574,Dec:76138}},
-      'Cases iPad':{pcs:{Jun:90,Jul:81,Aug:98,Sep:102,Oct:93,Nov:112,Dec:123},val:{Jun:63998,Jul:57598,Aug:69687,Sep:72531,Oct:66131,Nov:79642,Dec:87464}},
-      'Cases iPhone':{pcs:{Jun:205,Jul:204,Aug:208,Sep:924,Oct:627,Nov:679,Dec:647},val:{Jun:94658,Jul:94205,Aug:95966,Sep:426400,Oct:289558,Nov:313400,Dec:298508}},
-      'Micas':{pcs:{Jun:0,Jul:0,Aug:0,Sep:983,Oct:1826,Nov:1757,Dec:667},val:{Jun:0,Jul:0,Aug:0,Sep:452913,Oct:841321,Nov:809531,Dec:307317}},
-      'Others':{pcs:{Jun:20,Jul:22,Aug:24,Sep:23,Oct:21,Nov:23,Dec:23},val:{Jun:4529,Jul:4981,Aug:5434,Sep:5208,Oct:4755,Nov:5208,Dec:5208}},
+      'Cases Macbook':{pcs:{Jan:84,Feb:107,Mar:79,Apr:111,May:139,Jun:121,Jul:120,Aug:145,Sep:84,Oct:90,Nov:106,Dec:116},val:{Jan:55134,Feb:70229,Mar:51851,Apr:72855,May:91233,Jun:79420,Jul:78763,Aug:95171,Sep:55134,Oct:59072,Nov:69574,Dec:76138}},
+      'Cases iPad':{pcs:{Jan:0,Feb:0,Mar:12,Apr:63,May:64,Jun:67,Jul:81,Aug:98,Sep:102,Oct:93,Nov:112,Dec:123},val:{Jan:0,Feb:0,Mar:8533,Apr:44799,May:45510,Jun:47643,Jul:57598,Aug:69687,Sep:72531,Oct:66131,Nov:79642,Dec:87464}},
+      'Cases iPhone':{pcs:{Jan:522,Feb:360,Mar:165,Apr:193,May:142,Jun:215,Jul:204,Aug:208,Sep:924,Oct:627,Nov:679,Dec:647},val:{Jan:241305,Feb:166444,Mar:75915,Apr:88915,May:65489,Jun:99898,Jul:94205,Aug:95966,Sep:426400,Oct:289558,Nov:313400,Dec:298508}},
+      'Micas':{pcs:{Jan:0,Feb:0,Mar:0,Apr:0,May:0,Jun:0,Jul:0,Aug:0,Sep:983,Oct:1826,Nov:1757,Dec:667},val:{Jan:0,Feb:0,Mar:0,Apr:0,May:0,Jun:0,Jul:0,Aug:0,Sep:452913,Oct:841321,Nov:809531,Dec:307317}},
+      'Others':{pcs:{Jan:71,Feb:45,Mar:26,Apr:13,May:5,Jun:19,Jul:22,Aug:24,Sep:23,Oct:21,Nov:23,Dec:23},val:{Jan:16077,Feb:10189,Mar:5887,Apr:2944,May:1132,Jun:4302,Jul:4981,Aug:5434,Sep:5208,Oct:4755,Nov:5208,Dec:5208}},
     },
     'iShop':{
-      'Cases Macbook':{pcs:{Jun:120,Jul:120,Aug:200,Sep:70,Oct:120,Nov:200,Dec:40},val:{Jun:69776,Jul:69776,Aug:116294,Sep:40703,Oct:69776,Nov:116294,Dec:23259}},
-      'Cases iPad':{pcs:{Jun:110,Jul:160,Aug:150,Sep:107,Oct:107,Nov:145,Dec:220},val:{Jun:66333,Jul:96484,Aug:90453,Sep:64524,Oct:64524,Nov:87438,Dec:132664}},
-      'Cases iPhone':{pcs:{Jun:483,Jul:404,Aug:192,Sep:3205,Oct:1075,Nov:1205,Dec:875},val:{Jun:178542,Jul:152455,Aug:62762,Sep:1424265,Oct:431648,Nov:472539,Dec:371389}},
-      'Others':{pcs:{Jun:30,Jul:30,Aug:13,Sep:30,Oct:30,Nov:30,Dec:30},val:{Jun:5225,Jul:5225,Aug:2264,Sep:5225,Oct:5225,Nov:5225,Dec:5225}},
+      'Cases Macbook':{pcs:{Jan:0,Feb:0,Mar:302,Apr:112,May:0,Jun:163,Jul:118,Aug:200,Sep:70,Oct:120,Nov:200,Dec:40},val:{Jan:0,Feb:0,Mar:175604,Apr:65125,May:0,Jun:94780,Jul:68613,Aug:116294,Sep:40703,Oct:69776,Nov:116294,Dec:23259}},
+      'Cases iPad':{pcs:{Jan:0,Feb:0,Mar:449,Apr:139,May:74,Jun:142,Jul:143,Aug:150,Sep:107,Oct:107,Nov:145,Dec:220},val:{Jan:0,Feb:0,Mar:270756,Apr:83820,May:44623,Jun:85629,Jul:86232,Aug:90453,Sep:64524,Oct:64524,Nov:87438,Dec:132664}},
+      'Cases iPhone':{pcs:{Jan:852,Feb:998,Mar:877,Apr:655,May:399,Jun:211,Jul:497,Aug:192,Sep:3205,Oct:1075,Nov:1205,Dec:875},val:{Jan:332909,Feb:388363,Mar:390570,Apr:235793,May:163275,Jun:74520,Jul:197328,Aug:62762,Sep:1424265,Oct:431648,Nov:472539,Dec:371389}},
+      'Others':{pcs:{Jan:0,Feb:0,Mar:0,Apr:81,May:39,Jun:8,Jul:23,Aug:13,Sep:30,Oct:30,Nov:30,Dec:30},val:{Jan:0,Feb:0,Mar:0,Apr:14109,May:6793,Jun:1393,Jul:4006,Aug:2264,Sep:5225,Oct:5225,Nov:5225,Dec:5225}},
     },
   },
   'Uniq':{
     'MacStore':{
-      'Cases Airpods':{pcs:{Jun:0,Jul:435,Aug:464,Sep:436,Oct:445,Nov:445,Dec:449},val:{Jun:0,Jul:80049,Aug:85386,Sep:80233,Oct:81888,Nov:81888,Dec:82624}},
-      'Cases Apple Watch':{pcs:{Jun:0,Jul:0,Aug:0,Sep:0,Oct:0,Nov:0,Dec:0},val:{Jun:0,Jul:0,Aug:0,Sep:0,Oct:0,Nov:0,Dec:0}},
-      'Cases iPhone':{pcs:{Jun:188,Jul:769,Aug:797,Sep:675,Oct:1090,Nov:1310,Dec:1150},val:{Jun:84075,Jul:342088,Aug:352765,Sep:309560,Oct:502214,Nov:603578,Dec:529860}},
-      'Others':{pcs:{Jun:243,Jul:977,Aug:995,Sep:1106,Oct:1102,Nov:1124,Dec:1145},val:{Jun:119780,Jul:479323,Aug:484133,Sep:553471,Oct:543071,Nov:550948,Dec:558020}},
-      'Straps':{pcs:{Jun:0,Jul:0,Aug:0,Sep:0,Oct:0,Nov:0,Dec:0},val:{Jun:0,Jul:0,Aug:0,Sep:0,Oct:0,Nov:0,Dec:0}},
+      'Cases Airpods':{pcs:{Jan:0,Feb:0,Mar:0,Apr:0,May:0,Jun:0,Jul:435,Aug:464,Sep:436,Oct:445,Nov:445,Dec:449},val:{Jan:0,Feb:0,Mar:0,Apr:0,May:0,Jun:0,Jul:80049,Aug:85386,Sep:80233,Oct:81888,Nov:81888,Dec:82624}},
+      'Cases Apple Watch':{pcs:{Jan:0,Feb:0,Mar:0,Apr:0,May:0,Jun:0,Jul:0,Aug:0,Sep:0,Oct:0,Nov:0,Dec:0},val:{Jan:0,Feb:0,Mar:0,Apr:0,May:0,Jun:0,Jul:0,Aug:0,Sep:0,Oct:0,Nov:0,Dec:0}},
+      'Cases iPhone':{pcs:{Jan:0,Feb:0,Mar:0,Apr:0,May:0,Jun:0,Jul:769,Aug:797,Sep:675,Oct:1090,Nov:1310,Dec:1150},val:{Jan:0,Feb:0,Mar:0,Apr:0,May:0,Jun:0,Jul:342088,Aug:352765,Sep:309560,Oct:502214,Nov:603578,Dec:529860}},
+      'Others':{pcs:{Jan:0,Feb:0,Mar:0,Apr:0,May:0,Jun:0,Jul:977,Aug:995,Sep:1106,Oct:1102,Nov:1124,Dec:1145},val:{Jan:0,Feb:0,Mar:0,Apr:0,May:0,Jun:0,Jul:479323,Aug:484133,Sep:553471,Oct:543071,Nov:550948,Dec:558020}},
+      'Straps':{pcs:{Jan:0,Feb:0,Mar:0,Apr:0,May:0,Jun:0,Jul:0,Aug:0,Sep:0,Oct:0,Nov:0,Dec:0},val:{Jan:0,Feb:0,Mar:0,Apr:0,May:0,Jun:0,Jul:0,Aug:0,Sep:0,Oct:0,Nov:0,Dec:0}},
     },
   },
   'Vivitar':{
     'MacStore':{
-      'Others':{pcs:{Jun:0,Jul:0,Aug:0,Sep:0,Oct:0,Nov:0,Dec:0},val:{Jun:0,Jul:0,Aug:0,Sep:0,Oct:0,Nov:0,Dec:0}},
+      'Others':{pcs:{Jan:0,Feb:1,Mar:0,Apr:0,May:0,Jun:0,Jul:0,Aug:0,Sep:0,Oct:0,Nov:0,Dec:0},val:{Jan:0,Feb:123,Mar:0,Apr:0,May:0,Jun:0,Jul:0,Aug:0,Sep:0,Oct:0,Nov:0,Dec:0}},
     },
   },
-};;
+};;;
 const marcaColors = {'Quikcell':'#2563eb','Speck':'#00BFA5','Nomad':'#FF6D00','Tech21':'#C62828','Tech21_2':'#C62828','Uniq':'#7B1FA2'};
-const MONTHS_H2_KEYS = ['Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+const MONTHS_H2_KEYS = ['Jun','Jul','Aug','Sep','Oct','Nov','Dec']; // kept for Tab1/Tab2
+const ALL_MONTHS     = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+const ALL_MONTHS_ES  = ['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
 
 /* ══════ GLOBAL METRIC STATE ══════ */
 let gMetric = 'valor'; // 'valor' | 'piezas'
@@ -1199,7 +1205,7 @@ function getMarcaSummary(){
       if(marcaState.cliente!=='all'&&cliente!==marcaState.cliente)continue;
       if(!r[marca])r[marca]={pcs:{},val:{},byMes_pcs:{},byMes_val:{}};
       for(const [cat,mData] of Object.entries(cats)){
-        for(const m of MONTHS_H2_KEYS){
+        for(const m of ALL_MONTHS){
           r[marca].pcs[cat]=(r[marca].pcs[cat]||0)+(mData.pcs[m]||0);
           r[marca].val[cat]=(r[marca].val[cat]||0)+(mData.val[m]||0);
           r[marca].byMes_pcs[m]=(r[marca].byMes_pcs[m]||0)+(mData.pcs[m]||0);
@@ -1219,8 +1225,8 @@ function getTableRows(){
       if(tblState.cliente!=='all'&&cliente!==tblState.cliente)continue;
       for(const [cat,mData] of Object.entries(cats)){
         if(tblState.cat!=='all'&&cat!==tblState.cat)continue;
-        const totPcs=MONTHS_H2_KEYS.reduce((s,m)=>s+(mData.pcs[m]||0),0);
-        const totVal=MONTHS_H2_KEYS.reduce((s,m)=>s+(mData.val[m]||0),0);
+        const totPcs=ALL_MONTHS.reduce((s,m)=>s+(mData.pcs[m]||0),0);
+        const totVal=ALL_MONTHS.reduce((s,m)=>s+(mData.val[m]||0),0);
         if(totPcs===0&&totVal===0)continue;
         rows.push({marca,cliente,cat,mData,totPcs,totVal});
       }
@@ -1299,7 +1305,7 @@ function renderMarcaCharts(summary){
   const stacked = marcaChartType==='stacked';
 
   document.getElementById('marcaMainTitle').textContent =
-    `${isVal?'Monto MXN':'Piezas'} por Marca — H2 2026 (${marcaChartType==='grouped'?'Agrupada':marcaChartType==='stacked'?'Apilada':'Lineal'})`;
+    `${isVal?'Monto MXN':'Piezas'} por Marca — Ene–Dic 2026 (${marcaChartType==='grouped'?'Agrupada':marcaChartType==='stacked'?'Apilada':'Lineal'})`;
 
   if(chartMarcaMainInst) chartMarcaMainInst.destroy();
   const legendEl = document.getElementById('marcaMainLegend'); legendEl.innerHTML='';
@@ -1307,10 +1313,10 @@ function renderMarcaCharts(summary){
   chartMarcaMainInst = new Chart(document.getElementById('chartMarcaMain'),{
     type: chartType,
     data:{
-      labels: MONTHS_H2_KEYS,
+      labels: ALL_MONTHS_ES,
       datasets: marcas.map(m=>({
         label:m,
-        data: MONTHS_H2_KEYS.map(mes=>isVal?(summary[m].byMes_val[mes]||0):(summary[m].byMes_pcs[mes]||0)),
+        data: ALL_MONTHS.map(mes=>isVal?(summary[m].byMes_val[mes]||0):(summary[m].byMes_pcs[mes]||0)),
         backgroundColor: (marcaColors[m]||'#90A4AE')+(stacked?'':'99'),
         borderColor: marcaColors[m]||'#90A4AE',
         borderWidth: chartType==='line'?2.5:0,
@@ -1427,7 +1433,7 @@ function renderMarcaTable(){
   const sign = dir==='asc'?1:-1;
   const arrow = dir==='asc'?' ↑':' ↓';
   // Update header icons
-  ['marca','retail','cat','Jun','Jul','Aug','Sep','Oct','Nov','Dec','total'].forEach(c=>{
+  ['marca','retail','cat','Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec','total'].forEach(c=>{
     const el=document.getElementById('thSort_'+c);
     if(el) el.textContent = c===col ? arrow : '';
   });
@@ -1441,9 +1447,8 @@ function renderMarcaTable(){
 
   // TOTAL row at top
   const grandTot = rows.reduce((s,r)=>s+(isVal?r.totVal:r.totPcs),0);
-  const monthTots = MONTHS_H2_KEYS.map(m=>rows.reduce((s,r)=>s+(isVal?(r.mData.val[m]||0):(r.mData.pcs[m]||0)),0));
-  const h1Empty = '<td class="num" style="color:var(--muted)">—</td>'.repeat(5);
-  const totCells = h1Empty + monthTots.map(v=>`<td class="num" style="font-weight:700">${fmtNum(v,marcaState.mode)}</td>`).join('');
+  const monthTots = ALL_MONTHS.map(m=>rows.reduce((s,r)=>s+(isVal?(r.mData.val[m]||0):(r.mData.pcs[m]||0)),0));
+  const totCells = monthTots.map(v=>`<td class="num" style="font-weight:700">${fmtNum(v,marcaState.mode)}</td>`).join('');
   html += `<tr style="background:var(--surface2);border-bottom:2px solid var(--accent)"><td style="font-weight:700;font-size:12px">TOTAL</td><td></td><td></td>${totCells}<td class="num" style="background:var(--accent);color:#fff;font-weight:700">${fmtNum(grandTot,marcaState.mode)}</td></tr>`;
 
   rows.forEach(({marca,cliente,cat,mData,totPcs,totVal})=>{
@@ -1453,8 +1458,7 @@ function renderMarcaTable(){
     const dot=`<span class="dot" style="background:${dotColor}"></span>`;
     const mc=newMarca?`<td style="font-weight:700;color:${marcaColors[marca]||'#333'}">${marca}</td>`:`<td style="color:var(--muted);padding-left:16px">↳</td>`;
     const cc=newCliente?`<td>${dot}${cliente}</td>`:`<td style="color:var(--muted)">↳</td>`;
-    const h1Dash='<td class="num" style="color:var(--muted)">—</td>'.repeat(5);
-    const cells=h1Dash+MONTHS_H2_KEYS.map(m=>`<td class="num">${fmtNum(isVal?(mData.val[m]||0):(mData.pcs[m]||0),marcaState.mode)}</td>`).join('');
+    const cells=ALL_MONTHS.map(m=>`<td class="num">${fmtNum(isVal?(mData.val[m]||0):(mData.pcs[m]||0),marcaState.mode)}</td>`).join('');
     const tot=isVal?totVal:totPcs;
     html+=`<tr>${mc}${cc}<td style="font-size:11px;color:var(--muted)">${cat}</td>${cells}<td class="num" style="background:var(--surface2);font-weight:700">${fmtNum(tot,marcaState.mode)}</td></tr>`;
   });
@@ -1472,25 +1476,25 @@ function renderMarcaCatChart(){
       if(marcaState.cliente!=='all' && retail!==marcaState.cliente) continue;
       for(const [cat, mData] of Object.entries(cats)){
         if(!catTotals[cat]) catTotals[cat]={};
-        for(const m of MONTHS_H2_KEYS){
+        for(const m of ALL_MONTHS){
           catTotals[cat][m]=(catTotals[cat][m]||0)+(isVal?(mData.val[m]||0):(mData.pcs[m]||0));
         }
       }
     }
   }
-  const activeCats = Object.keys(catTotals).filter(c=>MONTHS_H2_KEYS.some(m=>catTotals[c][m]>0));
+  const activeCats = Object.keys(catTotals).filter(c=>ALL_MONTHS.some(m=>catTotals[c][m]>0));
   activeCats.sort((a,b)=>{
-    const ta=MONTHS_H2_KEYS.reduce((s,m)=>s+(catTotals[a][m]||0),0);
-    const tb=MONTHS_H2_KEYS.reduce((s,m)=>s+(catTotals[b][m]||0),0);
+    const ta=ALL_MONTHS.reduce((s,m)=>s+(catTotals[a][m]||0),0);
+    const tb=ALL_MONTHS.reduce((s,m)=>s+(catTotals[b][m]||0),0);
     return tb-ta;
   });
 
   const retailLabel = marcaState.cliente==='all'?'Todos':marcaState.cliente;
-  document.getElementById('marcaCatTitle').textContent=`Desglose por Categoría — H2 2026 (${retailLabel})`;
+  document.getElementById('marcaCatTitle').textContent=`Desglose por Categoría — Ene–Dic 2026 (${retailLabel})`;
 
   const datasets = activeCats.map(cat=>({
     label:cat,
-    data:MONTHS_H2_KEYS.map(m=>catTotals[cat][m]||0),
+    data:ALL_MONTHS.map(m=>catTotals[cat][m]||0),
     backgroundColor:catColors[cat]||'#90A4AE',
     borderWidth:0, borderRadius:2
   }));
@@ -1498,7 +1502,7 @@ function renderMarcaCatChart(){
   if(chartMarcaCatInst) chartMarcaCatInst.destroy();
   chartMarcaCatInst = new Chart(document.getElementById('chartMarcaCat'),{
     type:'bar',
-    data:{labels:MONTHS_H2,datasets},
+    data:{labels:ALL_MONTHS_ES,datasets},
     options:{responsive:true,maintainAspectRatio:false,
       plugins:{
         legend:{display:false},
@@ -1783,7 +1787,7 @@ function getClienteCatData(){
     if(!bData)continue;
     for(const [cat,mData] of Object.entries(bData)){
       if(!catData[cat])catData[cat]={};
-      for(const m of MONTHS_H2_KEYS){
+      for(const m of ALL_MONTHS){
         catData[cat][m]=(catData[cat][m]||0)+(isVal?(mData.val[m]||0):(mData.pcs[m]||0));
       }
     }
@@ -1809,42 +1813,29 @@ function buildClienteTab(){
 
   // Update title
   const cname=clteClientDisplay[client]||client;
-  document.getElementById('clteChartTitle').innerHTML=`${cname} — Categorías Jun–Dic 2026 &nbsp;<span style="font-weight:400;color:var(--muted);font-size:12px">fuente: Consenso FCST</span>`;
+  document.getElementById('clteChartTitle').innerHTML=`${cname} — Categorías Ene–Dic 2026 &nbsp;<span style="font-weight:400;color:var(--muted);font-size:12px">fuente: Consenso FCST</span>`;
   document.getElementById('clteTableTitle').textContent=`${cname} — Detalle por Categoría 2026`;
 
-  // Budget 2026 arrays
-  const avbClientKey={'ATT':'AT&T','MacStore':'MacStore','iShop':'iShop','Liverpool':'Liverpool'};
-  const avbPcsKey={'ATT':'AT&T','MacStore':'MacStore','iShop':'iShop','Liverpool':'Liverpool'};
-  const clientAvbVal=(avb2026Val[avbClientKey[client]]||[]);
-  const clientAvbPcs=(avb2026Pcs[avbPcsKey[client]]||[]);
-  const clientAvbArr=isVal?clientAvbVal:clientAvbPcs;
-  const h1Total=clientAvbArr.slice(0,5).reduce((a,b)=>a+b,0);
-  const grand=clientAvbArr.reduce((a,b)=>a+b,0);
+  // KPIs — all from Consenso marcaRaw (12 months)
+  const totByCat=cats.map(c=>({cat:c,tot:ALL_MONTHS.reduce((s,m)=>s+(catData[c][m]||0),0)}));
+  const catGrand=totByCat.reduce((s,x)=>s+x.tot,0);
 
-  // KPIs
-  const totByCat=cats.map(c=>({cat:c,tot:Object.values(catData[c]).reduce((a,b)=>a+b,0)}));
-  const catH2Grand=totByCat.reduce((s,x)=>s+x.tot,0);
-
-  let kpiHtml=`<div class="kpi-card"><div class="kpi-label">${cname} TOTAL AÑO</div><div class="kpi-value">${fmtKpi(grand)}</div><div class="kpi-sub">${isVal?'valor MXN':'piezas'} Ene–Dic 2026</div></div>`;
-  kpiHtml+=`<div class="kpi-card"><div class="kpi-label">H2 Jun–Dic (Consenso)</div><div class="kpi-value">${fmtKpi(catH2Grand)}</div><div class="kpi-sub">${totByCat.length} categorías activas</div></div>`;
+  let kpiHtml=`<div class="kpi-card"><div class="kpi-label">${cname} TOTAL AÑO</div><div class="kpi-value">${fmtKpi(catGrand)}</div><div class="kpi-sub">${isVal?'valor MXN':'piezas'} Ene–Dic 2026</div></div>`;
+  kpiHtml+=`<div class="kpi-card"><div class="kpi-label">Categorías Activas</div><div class="kpi-value">${totByCat.length}</div><div class="kpi-sub">fuente Consenso FCST</div></div>`;
   totByCat.forEach(({cat,tot})=>{
-    const share=catH2Grand>0?(tot/catH2Grand*100).toFixed(1):'0.0';
-    kpiHtml+=`<div class="kpi-card"><div class="kpi-label" style="font-size:10px">${cat}</div><div class="kpi-value" style="font-size:20px">${fmtKpi(tot)}</div><div class="kpi-sub">${share}% del H2</div></div>`;
+    const share=catGrand>0?(tot/catGrand*100).toFixed(1):'0.0';
+    kpiHtml+=`<div class="kpi-card"><div class="kpi-label" style="font-size:10px">${cat}</div><div class="kpi-value" style="font-size:20px">${fmtKpi(tot)}</div><div class="kpi-sub">${share}% del año</div></div>`;
   });
   document.getElementById('clteKpis').innerHTML=kpiHtml;
 
-  // H1 summary (Ene-May budget only — no category breakdown available)
-  const H1_LABELS=['Ene','Feb','Mar','Abr','May'];
-  let h1Html=H1_LABELS.map((l,i)=>`<span style="padding:4px 10px;background:white;border-radius:6px;border:1px solid var(--border)"><b>${l}</b>: ${fmtCell(clientAvbArr[i]||0)}</span>`).join('');
-  h1Html+=`<span style="padding:4px 10px;background:white;border-radius:6px;border:1px solid var(--border);font-weight:700">Total H1: ${fmtKpi(h1Total)}</span>`;
-  document.getElementById('clteH1Summary').innerHTML=h1Html;
+  // Hide H1 card if present
+  const h1Card=document.getElementById('clteH1Card');
+  if(h1Card) h1Card.style.display='none';
 
-  // Chart: ONLY Jun-Dec with stacked categories (data from Consenso)
-  const H2_CHART_LABELS=['Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
-  const H2_KEYS=['Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  // Chart: All 12 months with stacked categories (data from Consenso)
   const datasets=cats.map(cat=>({
     label:cat,
-    data:H2_KEYS.map(m=>catData[cat][m]||0),
+    data:ALL_MONTHS.map(m=>catData[cat][m]||0),
     backgroundColor:catColors[cat]||'#94a3b8',
     borderRadius:2
   }));
@@ -1852,7 +1843,7 @@ function buildClienteTab(){
   if(chartClienteCatInst)chartClienteCatInst.destroy();
   chartClienteCatInst=new Chart(document.getElementById('chartClienteCat'),{
     type:'bar',
-    data:{labels:H2_CHART_LABELS,datasets},
+    data:{labels:ALL_MONTHS_ES,datasets},
     options:{
       responsive:true,maintainAspectRatio:false,
       plugins:{
@@ -1873,25 +1864,20 @@ function buildClienteTab(){
   cats.forEach(c=>{leg+=`<span style="display:inline-flex;align-items:center;gap:4px"><span style="display:inline-block;width:10px;height:10px;border-radius:2px;background:${catColors[c]||'#94a3b8'}"></span>${c}</span> `;});
   document.getElementById('clteLegend').innerHTML=leg;
 
-  // Table: 12 months — Ene-May from Budget, Jun-Dec from Consenso by category
-  const TBL_MK=['Ene','Feb','Mar','Abr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
-  const TBL_LABELS=['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
+  // Table: 12 months from Consenso by category
   let tblHtml='';
-  // Row 1: H1 budget totals (no category breakdown)
-  const h1Cells=TBL_MK.map((m,i)=>`<td class="num" style="color:var(--muted);font-size:11px">${i<5?fmtCell(clientAvbArr[i]||0):'—'}</td>`).join('');
-  tblHtml+=`<tr style="background:#f8fafc"><td style="font-size:11px;color:var(--muted)">Presupuesto H1 (sin desglose)</td>${h1Cells}<td class="num" style="font-weight:700">${fmtCell(h1Total)}</td></tr>`;
-  // Category rows: Ene-May = '—', Jun-Dec from marcaRaw
+  // Category rows: all 12 months from marcaRaw
   cats.forEach(cat=>{
-    const cells=TBL_MK.map((m,i)=>`<td class="num">${i<5?'—':fmtCell(catData[cat][m]||0)}</td>`).join('');
-    const tot=H2_KEYS.reduce((s,m)=>s+(catData[cat][m]||0),0);
+    const cells=ALL_MONTHS.map(m=>`<td class="num">${fmtCell(catData[cat][m]||0)}</td>`).join('');
+    const tot=ALL_MONTHS.reduce((s,m)=>s+(catData[cat][m]||0),0);
     tblHtml+=`<tr><td style="font-weight:600;display:flex;align-items:center;gap:6px"><span style="display:inline-block;width:8px;height:8px;border-radius:2px;background:${catColors[cat]||'#94a3b8'};flex-shrink:0"></span>${cat}</td>${cells}<td class="num" style="background:var(--surface2);font-weight:700">${fmtCell(tot)}</td></tr>`;
   });
-  // Total row: Budget 2026 all 12 months
-  const totCells=TBL_MK.map((_,i)=>{
-    const v=clientAvbArr[i]||0;
+  // Total row from Consenso
+  const totCells=ALL_MONTHS.map(m=>{
+    const v=cats.reduce((s,c)=>s+(catData[c][m]||0),0);
     return `<td class="num" style="font-weight:700">${fmtCell(v)}</td>`;
   }).join('');
-  tblHtml+=`<tr style="border-top:2px solid var(--accent)"><td style="font-weight:700">TOTAL</td>${totCells}<td class="num" style="background:var(--accent);color:#fff;font-weight:700">${fmtKpi(grand)}</td></tr>`;
+  tblHtml+=`<tr style="border-top:2px solid var(--accent)"><td style="font-weight:700">TOTAL</td>${totCells}<td class="num" style="background:var(--accent);color:#fff;font-weight:700">${fmtKpi(catGrand)}</td></tr>`;
   document.getElementById('clteTableBody').innerHTML=tblHtml;
 }
 
