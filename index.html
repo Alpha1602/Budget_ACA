@@ -135,18 +135,23 @@
   <!-- Invoice / Projection toggle -->
   <div class="filter-bar">
     <div style="display:flex;align-items:center;gap:16px;flex-wrap:wrap">
-      <span class="metric-bar-label">2026 View:</span>
+      <span class="metric-bar-label">Métrica:</span>
+      <div class="metric-toggle">
+        <button id="avbValBtn" class="active" onclick="setAVBMetric('valor')">Monto MXN</button>
+        <button id="avbPcsBtn" onclick="setAVBMetric('piezas')">Piezas</button>
+      </div>
+      <span class="metric-bar-label" style="margin-left:8px">2026 View:</span>
       <div style="display:flex;gap:0">
         <button id="avbInvoiceBtn" onclick="setAVBMode('invoice',this)"
           style="padding:7px 18px;font-size:12px;font-weight:700;border:1.5px solid #cbd5e1;border-radius:6px 0 0 6px;cursor:pointer;background:#fff;color:#374151;transition:.15s">
-          ⬜ Invoice &nbsp;·&nbsp; Jan–Jul
+          ⬜ Invoice &nbsp;·&nbsp; Ene–Jun
         </button>
         <button id="avbProjBtn" onclick="setAVBMode('projection',this)"
           style="padding:7px 18px;font-size:12px;font-weight:700;border:1.5px solid #9ca3af;border-left:none;border-radius:0 6px 6px 0;cursor:pointer;background:#9ca3af;color:#fff;transition:.15s">
           ◼ Projection &nbsp;·&nbsp; Full Year
         </button>
       </div>
-      <span id="avbModeNote" style="font-size:11px;color:var(--muted)">Mostrando facturas emitidas Jan–Jul 2026</span>
+      <span id="avbModeNote" style="font-size:11px;color:var(--muted)">Mostrando facturas emitidas Ene–Jun 2026</span>
     </div>
   </div>
 
@@ -415,6 +420,18 @@
           <button id="mChartLine" onclick="setMarcaChartType('line')">Lineal</button>
         </div>
       </div>
+      <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+        <span class="filter-label" style="margin-bottom:0">Marca</span>
+        <div class="chip-row" id="marcaBrandFilter">
+          <button class="chip on" data-brand="all" onclick="filterMarcaBrand(this)">Todas</button>
+          <button class="chip" data-brand="Nomad" onclick="filterMarcaBrand(this)">Nomad</button>
+          <button class="chip" data-brand="Speck" onclick="filterMarcaBrand(this)">Speck</button>
+          <button class="chip" data-brand="Quikcell" onclick="filterMarcaBrand(this)">Quikcell</button>
+          <button class="chip" data-brand="Tech21" onclick="filterMarcaBrand(this)">Tech21</button>
+          <button class="chip" data-brand="Pitaka" onclick="filterMarcaBrand(this)">Pitaka</button>
+          <button class="chip" data-brand="Raptic" onclick="filterMarcaBrand(this)">Raptic</button>
+        </div>
+      </div>
       <div style="display:flex;align-items:center;gap:8px">
         <span class="filter-label" style="margin-bottom:0">Retail</span>
         <div class="chip-row" id="marcaClienteFilter">
@@ -425,6 +442,7 @@
           <button class="chip" data-cliente="Liverpool" onclick="filterMarca(this,'cliente')">Liverpool</button>
         </div>
       </div>
+      <button id="marcaResetBtn" onclick="resetMarcaFilters()" style="display:none;padding:4px 12px;font-size:12px;font-weight:600;border:1.5px solid var(--accent);border-radius:20px;background:white;color:var(--accent);cursor:pointer;transition:.15s" onmouseover="this.style.background='var(--accent)';this.style.color='white'" onmouseout="this.style.background='white';this.style.color='var(--accent)'">↺ Resetear</button>
     </div>
   </div>
 
@@ -455,6 +473,7 @@
       <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
         <span class="filter-label" style="margin-bottom:0">Categoría</span>
         <div class="chip-row" id="tblCatFilter"></div>
+        <button id="tblCatResetBtn" onclick="resetTblCatFilter()" style="display:none;padding:3px 10px;font-size:11px;font-weight:600;border:1.5px solid var(--accent);border-radius:20px;background:white;color:var(--accent);cursor:pointer;transition:.15s" onmouseover="this.style.background='var(--accent)';this.style.color='white'" onmouseout="this.style.background='white';this.style.color='var(--accent)'">↺ Resetear</button>
       </div>
     </div>
     <div class="table-wrap">
@@ -625,18 +644,18 @@ const clientColors = {
 /* ══════ AVB DATA ══════ */
 const MONTHS_AVB = ['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
 const avb2025Val = {
-  'AT&T':         [3399383,3956583,3612164,3419782,4863453,4088204,4246650,4426318,5259168,4733823,6139439,7601182],
+  'AT&T':         [3399383,3956583,3612164,3419782,4863453,4088204,4246650,4426318,5259168,4733823,6139439,4678900],
   'iShop':        [2027050,1090937,964569,1542529,1405688,1849607,1301211,699206,4374318,1986553,3502650,1391418],
-  'MacStore':     [1806376,1371058,1306512,1344189,1406709,1531091,1508253,1657354,1877661,2391458,2315591,3434551],
-  'MercadoLibre': [0,0,26393,20616,17245,8029,6078,3524,2014,0,0,0],
+  'MacStore':     [1806376,1371058,1306512,1344189,1406709,1531091,1508253,1657354,1877661,2391458,2315591,3104913],
+  'MercadoLibre': [0,0,0,26393,20616,17245,8029,6078,3524,2014,0,0],
   'Coppel':       [0,0,0,0,0,0,0,0,0,0,0,0],
   'Liverpool':    [0,0,0,0,0,0,0,0,0,0,0,0],
 };
 const avb2025Pcs = {
-  'AT&T':         [14310,16708,15231,14173,18107,15518,16042,16202,18647,18135,24735,30710],
+  'AT&T':         [14310,16708,15231,14173,18107,15518,16042,16202,18647,18135,24735,19033],
   'iShop':        [4689,2418,2011,3503,3542,4199,3210,1660,10810,4398,8114,3203],
-  'MacStore':     [4359,3344,3029,3211,3375,3378,3385,3648,4004,5459,5882,8009],
-  'MercadoLibre': [0,0,42,35,30,14,10,5,3,0,0,0],
+  'MacStore':     [4359,3344,3029,3211,3375,3378,3385,3648,4004,5459,5882,7335],
+  'MercadoLibre': [0,0,0,42,35,30,14,10,5,3,0,0],
   'Coppel':       [0,0,0,0,0,0,0,0,0,0,0,0],
   'Liverpool':    [0,0,0,0,0,0,0,0,0,0,0,0],
 };
@@ -664,18 +683,18 @@ const avbRetailColors = {
 
 /* ══════ QUARTER 2025 DATA (actuals) ══════ */
 const q2025Val = {
-  'AT&T':         [10968130,12371439,13932136,18474444],
+  'AT&T':         [10968130,12371439,13932136,15552162],
   'iShop':        [4082556,4797824,6374735,6880621],
-  'MacStore':     [4483946,4281989,5043268,8141600],
-  'MercadoLibre': [26393,45890,11616,0],
+  'MacStore':     [4483946,4281989,5043268,7811962],
+  'MercadoLibre': [0,64254,17631,2014],
   'Coppel':       [0,0,0,0],
   'Liverpool':    [0,0,0,0],
 };
 const q2025Pcs = {
-  'AT&T':         [46249,47798,50891,73580],
+  'AT&T':         [46249,47798,50891,61903],
   'iShop':        [9118,11244,15680,15715],
-  'MacStore':     [10732,9964,11037,19350],
-  'MercadoLibre': [42,79,18,0],
+  'MacStore':     [10732,9964,11037,18676],
+  'MercadoLibre': [0,107,29,3],
   'Coppel':       [0,0,0,0],
   'Liverpool':    [0,0,0,0],
 };
@@ -700,20 +719,20 @@ const qPiezas = {
 const sales2025Raw = {
   'Nomad':{
     'ATT':{
-      'Cases iPhone':{Jan:19636,Feb:21702,Mar:17051,Apr:6201,May:6200,Jun:4651,Jul:6200,Aug:7233,Sep:4133,Oct:5683,Nov:4650,Dec:2067},
+      'Cases iPhone':{Jan:19636,Feb:21702,Mar:17051,Apr:6201,May:6200,Jun:4651,Jul:6200,Aug:7233,Sep:4133,Oct:5683,Nov:4650,Dec:29454},
     },
     'MacStore':{
-      'Cables':{Jan:602,Feb:301,Mar:0,Apr:301,May:0,Jun:1204,Jul:301,Aug:0,Sep:0,Oct:0,Nov:0,Dec:0},
-      'Cases AirTag':{Jan:5786,Feb:4339,Mar:4339,Apr:1929,May:964,Jun:482,Jul:482,Aug:0,Sep:0,Oct:964,Nov:0,Dec:482},
-      'Cases Airpods':{Jan:77598,Feb:55908,Mar:48740,Apr:48618,May:50245,Jun:54464,Jul:49642,Aug:49883,Sep:28195,Oct:13796,Nov:27593,Dec:20905},
-      'Cases iPhone':{Jan:244752,Feb:177237,Mar:185677,Apr:161562,May:172413,Jun:208584,Jul:146491,Aug:116288,Sep:320712,Oct:431634,Nov:341810,Dec:306244},
-      'Straps':{Jan:455021,Feb:349783,Mar:366236,Apr:378492,May:396275,Jun:411106,Jul:369931,Aug:348830,Sep:333810,Oct:392611,Nov:400058,Dec:552350},
-      'Wall Charger':{Jan:16700,Feb:20982,Mar:15614,Apr:23332,May:23150,Jun:19112,Jul:25863,Aug:13143,Sep:11938,Oct:21523,Nov:13143,Dec:7596},
+      'Cables':{Jan:602,Feb:301,Mar:0,Apr:301,May:0,Jun:1204,Jul:301,Aug:0,Sep:0,Oct:0,Nov:0,Dec:301},
+      'Cases AirTag':{Jan:5786,Feb:4339,Mar:4339,Apr:1929,May:964,Jun:482,Jul:482,Aug:0,Sep:0,Oct:964,Nov:0,Dec:10607},
+      'Cases Airpods':{Jan:77598,Feb:55908,Mar:48740,Apr:48618,May:50245,Jun:54464,Jul:49642,Aug:49883,Sep:28195,Oct:13796,Nov:27593,Dec:112543},
+      'Cases iPhone':{Jan:244752,Feb:177237,Mar:185677,Apr:161562,May:172413,Jun:208584,Jul:146491,Aug:116288,Sep:320712,Oct:431634,Nov:341810,Dec:438266},
+      'Straps':{Jan:455021,Feb:349783,Mar:366236,Apr:378492,May:396275,Jun:411106,Jul:369931,Aug:348830,Sep:333810,Oct:392611,Nov:400058,Dec:715737},
+      'Wall Charger':{Jan:16700,Feb:20982,Mar:15614,Apr:23332,May:23150,Jun:19112,Jul:25863,Aug:13143,Sep:11938,Oct:21523,Nov:13143,Dec:33218},
     },
     'MercadoLibre':{
-      'Cables':{Jan:0,Feb:0,Mar:1006,Apr:0,May:0,Jun:0,Jul:0,Aug:503,Sep:503,Oct:0,Nov:0,Dec:0},
-      'Cases iPhone':{Jan:0,Feb:0,Mar:10230,Apr:12959,May:13394,Jun:5708,Jul:5449,Aug:3021,Sep:1511,Oct:0,Nov:0,Dec:0},
-      'Straps':{Jan:0,Feb:0,Mar:12939,Apr:6537,May:1406,Jun:0,Jul:0,Aug:0,Sep:0,Oct:0,Nov:0,Dec:0},
+      'Cables':{Jan:0,Feb:0,Mar:0,Apr:1006,May:0,Jun:0,Jul:0,Aug:0,Sep:503,Oct:503,Nov:0,Dec:0},
+      'Cases iPhone':{Jan:0,Feb:0,Mar:0,Apr:10230,May:12959,Jun:13394,Jul:5708,Aug:5449,Sep:3021,Oct:1511,Nov:0,Dec:0},
+      'Straps':{Jan:0,Feb:0,Mar:0,Apr:12939,May:6537,Jun:1406,Jul:0,Aug:0,Sep:0,Oct:0,Nov:0,Dec:0},
     },
     'iShop':{
       'Cases Airpods':{Jan:126513,Feb:85461,Mar:49572,Apr:125481,May:40536,Jun:104826,Jul:81071,Aug:16782,Sep:29692,Oct:14201,Nov:0,Dec:0},
@@ -723,52 +742,50 @@ const sales2025Raw = {
   },
   'Pitaka':{
     'MacStore':{
-      'Cases iPhone':{Jan:93708,Feb:92863,Mar:59939,Apr:66693,May:72602,Jun:80201,Jul:53185,Aug:38834,Sep:20261,Oct:22794,Nov:66314,Dec:206053},
-      'Others':{Jan:843,Feb:4583,Mar:12303,Apr:2411,May:964,Jun:3014,Jul:1446,Aug:1446,Sep:3857,Oct:964,Nov:964,Dec:3014},
-      'Straps':{Jan:11575,Feb:8681,Mar:3135,Apr:4823,May:603,Jun:1206,Jul:2533,Aug:1809,Sep:3135,Oct:0,Nov:1809,Dec:5064},
-    },
-    'MercadoLibre':{
+      'Cases iPhone':{Jan:93708,Feb:92863,Mar:59939,Apr:66693,May:72602,Jun:80201,Jul:53185,Aug:38834,Sep:20261,Oct:22794,Nov:66314,Dec:180664},
+      'Others':{Jan:843,Feb:4583,Mar:12303,Apr:2411,May:964,Jun:3014,Jul:1446,Aug:1446,Sep:3857,Oct:964,Nov:964,Dec:6030},
+      'Straps':{Jan:11575,Feb:8681,Mar:3135,Apr:4823,May:603,Jun:1206,Jul:2533,Aug:1809,Sep:3135,Oct:0,Nov:1809,Dec:12901},
     },
   },
   'Quikcell':{
     'ATT':{
-      'Cables':{Jan:764352,Feb:737991,Mar:896890,Apr:790901,May:926734,Jun:863378,Jul:965687,Aug:932103,Sep:962310,Oct:1094470,Nov:1585971,Dec:1836215},
-      'Cases iPhone':{Jan:45610,Feb:50357,Mar:30544,Apr:35910,May:51595,Jun:28481,Jul:24147,Aug:24765,Sep:20431,Oct:21463,Nov:9080,Dec:9287},
-      'Liquid':{Jan:519585,Feb:470322,Mar:527331,Apr:519895,May:792235,Jun:582171,Jul:506882,Aug:470942,Sep:558933,Oct:539414,Nov:564510,Dec:568228},
-      'Micas':{Jan:55859,Feb:645758,Mar:38928,Apr:26900,May:25274,Jun:13631,Jul:13063,Aug:21734,Sep:17812,Oct:15619,Nov:8235,Dec:12495},
-      'Others':{Jan:69440,Feb:63866,Mar:80355,Apr:81052,May:120300,Jun:76871,Jul:66885,Aug:69440,Sep:61311,Oct:65027,Nov:59221,Dec:74085},
-      'Wall Charger':{Jan:1675041,Feb:1570003,Mar:1775183,Apr:1746474,May:1950363,Jun:1612638,Jul:1564592,Aug:1493203,Sep:1824036,Oct:1776639,Nov:2487303,Dec:3474868},
+      'Cables':{Jan:764352,Feb:737991,Mar:896890,Apr:790901,May:926734,Jun:863378,Jul:965687,Aug:932103,Sep:962310,Oct:1094470,Nov:1585971,Dec:766614},
+      'Cases iPhone':{Jan:45610,Feb:50357,Mar:30544,Apr:35910,May:51595,Jun:28481,Jul:24147,Aug:24765,Sep:20431,Oct:21463,Nov:9080,Dec:83791},
+      'Liquid':{Jan:519585,Feb:470322,Mar:527331,Apr:519895,May:792235,Jun:582171,Jul:506882,Aug:470942,Sep:558933,Oct:539414,Nov:564510,Dec:746380},
+      'Micas':{Jan:55859,Feb:645758,Mar:38928,Apr:26900,May:25274,Jun:13631,Jul:13063,Aug:21734,Sep:17812,Oct:15619,Nov:8235,Dec:59034},
+      'Others':{Jan:69440,Feb:63866,Mar:80355,Apr:81052,May:120300,Jun:76871,Jul:66885,Aug:69440,Sep:61311,Oct:65027,Nov:59221,Dec:91270},
+      'Wall Charger':{Jan:1675041,Feb:1570003,Mar:1775183,Apr:1746474,May:1950363,Jun:1612638,Jul:1564592,Aug:1493203,Sep:1824036,Oct:1776639,Nov:2487303,Dec:2509542},
     },
     'MacStore':{
-      'Micas':{Jan:209934,Feb:170316,Mar:127604,Apr:151731,May:160758,Jun:110362,Jul:113460,Aug:105211,Sep:92803,Oct:202619,Nov:327828,Dec:305352},
-      'Others':{Jan:213,Feb:0,Mar:0,Apr:0,May:213,Jun:1277,Jul:426,Aug:426,Sep:0,Oct:213,Nov:9154,Dec:13199},
+      'Micas':{Jan:209934,Feb:170316,Mar:127604,Apr:151731,May:160758,Jun:110362,Jul:113460,Aug:105211,Sep:92803,Oct:202619,Nov:327828,Dec:302390},
+      'Others':{Jan:213,Feb:0,Mar:0,Apr:0,May:213,Jun:1277,Jul:426,Aug:426,Sep:0,Oct:213,Nov:9154,Dec:213},
     },
     'MercadoLibre':{
-      'Others':{Jan:0,Feb:0,Mar:755,Apr:0,May:629,Jun:1649,Jul:629,Aug:0,Sep:0,Oct:0,Nov:0,Dec:0},
+      'Others':{Jan:0,Feb:0,Mar:0,Apr:755,May:0,Jun:629,Jul:1649,Aug:629,Sep:0,Oct:0,Nov:0,Dec:0},
     },
   },
   'Raptic':{
     'MacStore':{
-      'Cases Apple Watch':{Jan:81304,Feb:94130,Mar:53375,Apr:42057,May:78289,Jun:82548,Jul:61917,Aug:57104,Sep:38527,Oct:45620,Nov:28564,Dec:57226},
+      'Cases Apple Watch':{Jan:81304,Feb:94130,Mar:53375,Apr:42057,May:78289,Jun:82548,Jul:61917,Aug:57104,Sep:38527,Oct:45620,Nov:28564,Dec:203754},
     },
   },
   'Speck':{
     'ATT':{
-      'Cases iPhone':{Jan:175986,Feb:343118,Mar:198515,Apr:160796,May:190764,Jun:135170,Jul:479718,Aug:1240226,Sep:1727389,Oct:1153518,Nov:1377363,Dec:1595319},
-      'Micas':{Jan:16631,Feb:14101,Mar:13377,Apr:17354,May:19885,Jun:15908,Jul:11570,Aug:7231,Sep:11931,Oct:12654,Nov:10123,Dec:5061},
-      'Others':{Jan:14872,Feb:14562,Mar:16421,Apr:16731,May:769251,Jun:747555,Jul:587753,Aug:111903,Sep:44013,Oct:25567,Nov:18516,Dec:9606},
+      'Cases iPhone':{Jan:175986,Feb:343118,Mar:198515,Apr:160796,May:190764,Jun:135170,Jul:479718,Aug:1240226,Sep:1727389,Oct:1153518,Nov:1377363,Dec:269401},
+      'Micas':{Jan:16631,Feb:14101,Mar:13377,Apr:17354,May:19885,Jun:15908,Jul:11570,Aug:7231,Sep:11931,Oct:12654,Nov:10123,Dec:32902},
+      'Others':{Jan:14872,Feb:14562,Mar:16421,Apr:16731,May:769251,Jun:747555,Jul:587753,Aug:111903,Sep:44013,Oct:25567,Nov:18516,Dec:25406},
     },
     'MacStore':{
-      'Cases AirTag':{Jan:8760,Feb:10875,Mar:14198,Apr:18125,May:16614,Jun:17521,Jul:20541,Aug:16312,Sep:12083,Oct:10271,Nov:11177,Dec:14500},
-      'Cases Macbook':{Jan:0,Feb:0,Mar:33251,Apr:44839,May:52396,Jun:45847,Jul:76076,Aug:97740,Sep:25190,Oct:52396,Nov:110334,Dec:138044},
-      'Cases iPad':{Jan:84140,Feb:39300,Mar:32044,Apr:54316,May:23982,Jun:26906,Jul:95325,Aug:313019,Sep:263492,Oct:223290,Nov:278912,Dec:768759},
-      'Cases iPhone':{Jan:365442,Feb:226118,Mar:253577,Apr:256523,May:260211,Jun:346000,Jul:381574,Aug:283158,Sep:413923,Oct:576390,Nov:415043,Dec:690476},
-      'Others':{Jan:18466,Feb:15151,Mar:18652,Apr:13907,May:13815,Jun:18604,Jul:15288,Aug:23989,Sep:11742,Oct:11743,Nov:11881,Dec:19019},
-      'Speakers':{Jan:4344,Feb:8686,Mar:3257,Apr:2171,May:9048,Jun:10856,Jul:16287,Aug:3619,Sep:6152,Oct:3981,Nov:19905,Dec:13752},
+      'Cases AirTag':{Jan:8760,Feb:10875,Mar:14198,Apr:18125,May:16614,Jun:17521,Jul:20541,Aug:16312,Sep:12083,Oct:10271,Nov:11177,Dec:16312},
+      'Cases Macbook':{Jan:0,Feb:0,Mar:33251,Apr:44839,May:52396,Jun:45847,Jul:76076,Aug:97740,Sep:25190,Oct:52396,Nov:110334,Dec:0},
+      'Cases iPad':{Jan:84140,Feb:39300,Mar:32044,Apr:54316,May:23982,Jun:26906,Jul:95325,Aug:313019,Sep:263492,Oct:223290,Nov:278912,Dec:100763},
+      'Cases iPhone':{Jan:365442,Feb:226118,Mar:253577,Apr:256523,May:260211,Jun:346000,Jul:381574,Aug:283158,Sep:413923,Oct:576390,Nov:415043,Dec:694119},
+      'Others':{Jan:18466,Feb:15151,Mar:18652,Apr:13907,May:13815,Jun:18604,Jul:15288,Aug:23989,Sep:11742,Oct:11743,Nov:11881,Dec:29194},
+      'Speakers':{Jan:4344,Feb:8686,Mar:3257,Apr:2171,May:9048,Jun:10856,Jul:16287,Aug:3619,Sep:6152,Oct:3981,Nov:19905,Dec:25694},
     },
     'MercadoLibre':{
-      'Cases Macbook':{Jan:0,Feb:0,Mar:791,Apr:0,May:0,Jun:0,Jul:0,Aug:0,Sep:0,Oct:0,Nov:0,Dec:0},
-      'Cases iPhone':{Jan:0,Feb:0,Mar:0,Apr:0,May:136,Jun:0,Jul:0,Aug:0,Sep:0,Oct:0,Nov:0,Dec:0},
+      'Cases Macbook':{Jan:0,Feb:0,Mar:0,Apr:791,May:0,Jun:0,Jul:0,Aug:0,Sep:0,Oct:0,Nov:0,Dec:0},
+      'Cases iPhone':{Jan:0,Feb:0,Mar:0,Apr:0,May:0,Jun:136,Jul:0,Aug:0,Sep:0,Oct:0,Nov:0,Dec:0},
     },
     'iShop':{
       'Cases AirTag':{Jan:19751,Feb:11154,Mar:19519,Apr:27187,May:24631,Jun:14175,Jul:24399,Aug:15104,Sep:4880,Oct:13477,Nov:26723,Dec:11851},
@@ -782,15 +799,15 @@ const sales2025Raw = {
   },
   'Tech21':{
     'ATT':{
-      'Cases iPhone':{Jan:42371,Feb:24803,Mar:17569,Apr:17568,May:10852,Jun:7750,Jul:20153,Aug:47538,Sep:26869,Oct:23769,Nov:14467,Dec:13951},
+      'Cases iPhone':{Jan:42371,Feb:24803,Mar:17569,Apr:17568,May:10852,Jun:7750,Jul:20153,Aug:47538,Sep:26869,Oct:23769,Nov:14467,Dec:65106},
     },
     'MacStore':{
-      'Cases Airpods':{Jan:0,Feb:0,Mar:0,Apr:0,May:906,Jun:6340,Jul:5434,Aug:7472,Sep:3849,Oct:5661,Nov:7925,Dec:16077},
-      'Cases Macbook':{Jan:0,Feb:0,Mar:0,Apr:0,May:0,Jun:0,Jul:0,Aug:77449,Sep:58416,Oct:59728,Nov:48570,Dec:55134},
-      'Cases iPhone':{Jan:127188,Feb:91805,Mar:74571,Apr:72359,May:73261,Jun:85457,Jul:72051,Aug:101622,Sep:229576,Oct:315260,Nov:194607,Dec:241305},
+      'Cases Airpods':{Jan:0,Feb:0,Mar:0,Apr:0,May:906,Jun:6340,Jul:5434,Aug:7472,Sep:3849,Oct:5661,Nov:7925,Dec:0},
+      'Cases Macbook':{Jan:0,Feb:0,Mar:0,Apr:0,May:0,Jun:0,Jul:0,Aug:77449,Sep:58416,Oct:59728,Nov:48570,Dec:0},
+      'Cases iPhone':{Jan:127188,Feb:91805,Mar:74571,Apr:72359,May:73261,Jun:85457,Jul:72051,Aug:101622,Sep:229576,Oct:315260,Nov:194607,Dec:222207},
     },
     'MercadoLibre':{
-      'Cases iPhone':{Jan:0,Feb:0,Mar:672,Apr:1120,May:1680,Jun:672,Jul:0,Aug:0,Sep:0,Oct:0,Nov:0,Dec:0},
+      'Cases iPhone':{Jan:0,Feb:0,Mar:0,Apr:672,May:1120,Jun:1680,Jul:672,Aug:0,Sep:0,Oct:0,Nov:0,Dec:0},
     },
     'iShop':{
       'Cases Airpods':{Jan:0,Feb:0,Mar:0,Apr:0,May:25082,Jun:871,Jul:2613,Aug:0,Sep:0,Oct:0,Nov:0,Dec:0},
@@ -1299,12 +1316,12 @@ function buildAnualKpis() {
     : [anualSelectedClient];
   const totVal = clients.reduce((s,c)=>(valorFull[c]||[]).reduce((a,b)=>a+b,0)+s, 0);
   const totPcs = clients.reduce((s,c)=>(piezasAnual[c]||[]).reduce((a,b)=>a+b,0)+s, 0);
-  const h1Val  = clients.reduce((s,c)=>(valorFull[c]||[]).slice(0,7).reduce((a,b)=>a+b,0)+s, 0);
-  const h2Val  = clients.reduce((s,c)=>(valorFull[c]||[]).slice(7).reduce((a,b)=>a+b,0)+s, 0);
+  const h1Val  = clients.reduce((s,c)=>(valorFull[c]||[]).slice(0,6).reduce((a,b)=>a+b,0)+s, 0);
+  const h2Val  = clients.reduce((s,c)=>(valorFull[c]||[]).slice(6).reduce((a,b)=>a+b,0)+s, 0);
   document.getElementById('anualKpiRow').innerHTML = [
     {label:'Valor Total Anual', val:'$'+(totVal/1e6).toFixed(1)+' M', sub:'2026 Budget'},
-    {label:'Invoice Jan–Jul',    val:'$'+(h1Val/1e6).toFixed(1)+' M', sub:'Ene–Jul'},
-    {label:'Proyección Ago–Dic', val:'$'+(h2Val/1e6).toFixed(1)+' M', sub:'Ago–Dic'},
+    {label:'Invoice Ene–Jun',    val:'$'+(h1Val/1e6).toFixed(1)+' M', sub:'Ene–Jun'},
+    {label:'Proyección Jul–Dic', val:'$'+(h2Val/1e6).toFixed(1)+' M', sub:'Jul–Dic'},
     {label:'Piezas Anuales',    val:totPcs.toLocaleString('es-MX'), sub:'unidades'},
   ].map(k=>`<div class="kpi-card">
     <div class="kpi-label">${k.label}</div>
@@ -1618,6 +1635,9 @@ function updateTblCatChips(){
     const tv = c => ALL_MONTHS.reduce((s,m)=>{ for(const [,clients] of Object.entries(marcaRaw)) for(const [,cats] of Object.entries(clients)) if(cats[c]) s+=(cats[c].val[m]||0); return s; },0);
     return tv(b)-tv(a);
   }).forEach(cat => makeChip(cat, catLabel[cat]||cat));
+  // show/hide reset button
+  const rb=document.getElementById('tblCatResetBtn');
+  if(rb) rb.style.display=tblState.cat!=='all'?'inline-block':'none';
 }
 
 function setTblFilter(type,btn){
@@ -1940,7 +1960,57 @@ function filterMarca(btn,type){
   btn.classList.add(marcaChipClasses[key]||'on');
   marcaState.cliente=key;
   tblState.cliente=key; // sync table filter with main retail filter
+  updateMarcaResetBtn();
   renderMarca();
+}
+
+// Brand (Marca) chip filter in Brand tab
+function filterMarcaBrand(btn){
+  const brand=btn.dataset.brand;
+  document.querySelectorAll('#marcaBrandFilter .chip').forEach(b=>{b.classList.remove('on');});
+  btn.classList.add('on');
+  marcaState.brand=brand;
+  updateMarcaResetBtn();
+  renderMarca();
+}
+
+function updateMarcaResetBtn(){
+  const btn=document.getElementById('marcaResetBtn');
+  if(btn) btn.style.display=(marcaState.cliente!=='all'||marcaState.brand!=='all')?'inline-block':'none';
+}
+
+function resetMarcaFilters(){
+  marcaState.cliente='all'; marcaState.brand='all';
+  document.querySelectorAll('#marcaClienteFilter .chip').forEach(b=>{
+    Object.values(marcaChipClasses).forEach(c=>b.classList.remove(c));b.classList.remove('on');
+  });
+  const allBtn=document.querySelector('#marcaClienteFilter [data-cliente="all"]');
+  if(allBtn) allBtn.classList.add('on');
+  document.querySelectorAll('#marcaBrandFilter .chip').forEach(b=>b.classList.remove('on'));
+  const allBrand=document.querySelector('#marcaBrandFilter [data-brand="all"]');
+  if(allBrand) allBrand.classList.add('on');
+  tblState.cliente='all';
+  updateMarcaResetBtn();
+  updateTblCatChips();
+  renderMarcaTable();
+}
+
+function resetTblCatFilter(){
+  tblState.cat='all';
+  updateTblCatChips();
+  renderMarcaTable();
+  const btn=document.getElementById('tblCatResetBtn');
+  if(btn) btn.style.display='none';
+}
+
+// AVB metric toggle
+function setAVBMetric(m){
+  gMetric=m;
+  const vBtn=document.getElementById('avbValBtn');
+  const pBtn=document.getElementById('avbPcsBtn');
+  if(vBtn){vBtn.classList.toggle('active',m==='valor');}
+  if(pBtn){pBtn.classList.toggle('active',m==='piezas');}
+  buildAVBSection();
 }
 
 
@@ -1955,7 +2025,7 @@ function setAVBMode(mode) {
   if (mode === 'invoice') {
     iBtn.style.background='#fff'; iBtn.style.color='#374151'; iBtn.style.borderColor='#cbd5e1';
     pBtn.style.background='#e5e7eb'; pBtn.style.color='#6b7280'; pBtn.style.borderColor='#9ca3af';
-    document.getElementById('avbModeNote').textContent = 'Mostrando facturas emitidas Jan–Jul 2026 — celdas sin sombrear';
+    document.getElementById('avbModeNote').textContent = 'Mostrando facturas emitidas Ene–Jun 2026 — celdas sin sombrear';
   } else {
     iBtn.style.background='#e5e7eb'; iBtn.style.color='#6b7280'; iBtn.style.borderColor='#cbd5e1';
     pBtn.style.background='#6b7280'; pBtn.style.color='#fff'; pBtn.style.borderColor='#6b7280';
@@ -1968,7 +2038,7 @@ function avbGet26(retail, useInvoice) {
   const isVal = gMetric === 'valor';
   const src = isVal ? avb2026Val : avb2026Pcs;
   if (!src[retail]) return 0;
-  const months = useInvoice ? src[retail].slice(0,7) : src[retail];
+  const months = useInvoice ? src[retail].slice(0,6) : src[retail];
   return months.reduce((s,v)=>s+v,0);
 }
 function avbGet25(retail) {
@@ -2013,7 +2083,7 @@ function renderAVBKpis() {
       <div class="kpi-sub">SI/ST ${isVal?'valor MXN':'piezas'}</div>
     </div>
     <div class="kpi-card">
-      <div class="kpi-label">2026 ${inv?'Invoice · Jan–Jul':'Projection · Full Year'}</div>
+      <div class="kpi-label">2026 ${inv?'Invoice · Ene–Jun':'Projection · Full Year'}</div>
       <div class="kpi-value">${fmt(total26shown)}</div>
       <div class="kpi-sub">${inv?'Ene–Jun 2026 · facturado':'Ene–Dic 2026 · budget total'}</div>
     </div>
@@ -2046,7 +2116,7 @@ function renderAVBKpis() {
 function renderAVBCharts() {
   const isVal = gMetric === 'valor';
   const inv = avbMode === 'invoice';
-  const nMonths = inv ? 7 : 12;
+  const nMonths = inv ? 6 : 12;
   const labels = MONTHS_AVB.slice(0,nMonths);
   const src25 = isVal ? avb2025Val : avb2025Pcs;
   const src26 = isVal ? avb2026Val : avb2026Pcs;
@@ -2055,7 +2125,7 @@ function renderAVBCharts() {
 
   // ── Chart 1: Doughnut – retail share 2025 (inner) vs 2026 (outer)
   const retailsActive=retails.filter(r=>avbGet25(r)>0||avbGet26(r,inv)>0);
-  const d25a=retailsActive.map(r=>inv?((isVal?avb2025Val:avb2025Pcs)[r]||[]).slice(0,7).reduce((a,b)=>a+b,0):avbGet25(r));
+  const d25a=retailsActive.map(r=>inv?((isVal?avb2025Val:avb2025Pcs)[r]||[]).slice(0,6).reduce((a,b)=>a+b,0):avbGet25(r));
   const d26a=retailsActive.map(r=>avbGet26(r,inv));
   if (chartAVBRetailInst) chartAVBRetailInst.destroy();
   chartAVBRetailInst = new Chart(document.getElementById('chartAVBRetail'), {
@@ -2063,7 +2133,7 @@ function renderAVBCharts() {
     data:{
       labels:retailsActive,
       datasets:[
-        {label:inv?'2025 Ene–Jul':'2025 Full Year', data:d25a, backgroundColor:retailsActive.map(r=>avbRetailColors[r]+'88'), borderColor:'#fff', borderWidth:2},
+        {label:inv?'2025 Ene–Jun':'2025 Full Year', data:d25a, backgroundColor:retailsActive.map(r=>avbRetailColors[r]+'88'), borderColor:'#fff', borderWidth:2},
         {label:`2026 ${inv?'Invoice':'Proyección'}`, data:d26a, backgroundColor:retailsActive.map(r=>avbRetailColors[r]), borderColor:'#fff', borderWidth:2}
       ]
     },
@@ -2119,7 +2189,7 @@ function renderAVBTable() {
   const allRetails = Object.keys(avbRetailColors);
 
   // Helper: get H1 2025 for a retail
-  const get25H1 = r => src25[r] ? src25[r].slice(0,7).reduce((s,v)=>s+v,0) : 0;
+  const get25H1 = r => src25[r] ? src25[r].slice(0,6).reduce((s,v)=>s+v,0) : 0;
 
   const s25all = allRetails.reduce((s,r)=>s+(inv?get25H1(r):avbGet25(r)),0);
   const s26all = allRetails.reduce((s,r)=>s+avbGet26(r,inv),0);
@@ -2147,7 +2217,7 @@ function renderAVBTable() {
   const thead = document.querySelector('#avbTable thead tr');
   if (thead) thead.innerHTML = `
     <th style="cursor:pointer" onclick="setAvbTblSort('retail')">Retail${arrow('retail')}</th>
-    <th class="num" style="cursor:pointer" onclick="setAvbTblSort('v25')">2025 ${inv?'Ene–Jul':'Full Year'}${arrow('v25')}</th>
+    <th class="num" style="cursor:pointer" onclick="setAvbTblSort('v25')">2025 ${inv?'Ene–Jun':'Full Year'}${arrow('v25')}</th>
     <th class="num" style="cursor:pointer" onclick="setAvbTblSort('v26')">2026 ${inv?'Invoice H1':'Projection'}${arrow('v26')}</th>
     <th class="num" style="cursor:pointer" onclick="setAvbTblSort('yoy')">YoY %${arrow('yoy')}</th>
     <th class="num" style="cursor:pointer" onclick="setAvbTblSort('sh25')">Share 2025${arrow('sh25')}</th>
