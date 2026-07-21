@@ -18,7 +18,8 @@
   .header-logo{font-size:26px;font-weight:800;color:#fff;letter-spacing:-1px}
   .header-sub{color:rgba(255,255,255,0.7);font-size:13px;margin-top:2px}
   .header-badge{margin-left:auto;background:#f59e0b;color:white;padding:4px 12px;border-radius:20px;font-size:11px;font-weight:700;white-space:nowrap}
-  .tabs{display:flex;gap:2px;padding:12px 24px 0;background:white;border-bottom:2px solid var(--border)}
+  .tabs{display:flex;gap:2px;padding:12px 24px 0;background:white;border-bottom:2px solid var(--border);position:sticky;top:0;z-index:50;box-shadow:0 2px 4px rgba(0,0,0,.07)}
+  .filter-bar{position:sticky;top:50px;z-index:40;background:white;border-bottom:1px solid var(--border);padding:10px 24px;box-shadow:0 2px 6px rgba(0,0,0,.06);margin:-16px -24px 14px -24px}
   .tab{padding:10px 20px;border-radius:6px 6px 0 0;cursor:pointer;font-size:13px;font-weight:600;color:var(--muted);border-bottom:2px solid transparent;margin-bottom:-2px;transition:all .2s;user-select:none}
   .tab:hover{color:var(--accent);background:var(--bg)}
   .tab.active{color:var(--accent);border-bottom-color:var(--accent);background:white}
@@ -132,7 +133,7 @@
   <div id="avbKpis" class="kpi-grid" style="padding:16px 0 8px"></div>
 
   <!-- Invoice / Projection toggle -->
-  <div class="card" style="padding:10px 18px;margin-bottom:14px">
+  <div class="filter-bar">
     <div style="display:flex;align-items:center;gap:16px;flex-wrap:wrap">
       <span class="metric-bar-label">2026 View:</span>
       <div style="display:flex;gap:0">
@@ -192,9 +193,20 @@
         <button class="toggle-btn" onclick="switchAnualTable('pcs')">Piezas</button>
       </div>
     </div>
-
-    <!-- VALOR TABLE -->
-    <div id="anualTableVal">
+    <!-- Dynamic filters -->
+    <div style="display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin-bottom:12px;border-bottom:1px solid var(--border);padding-bottom:12px">
+      <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap">
+        <span class="filter-label" style="margin-bottom:0">Marca</span>
+        <div class="chip-row" id="anualMarcaFilter"></div>
+      </div>
+      <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap">
+        <span class="filter-label" style="margin-bottom:0">Categoría</span>
+        <div class="chip-row" id="anualCatFilter"></div>
+      </div>
+    </div>
+    <div id="anualTableContainer"></div>
+    <!-- REMOVE OLD STATIC TABLES - replaced by dynamic container -->
+    <div id="anualTableVal" style="display:none">
       <div class="table-wrap"><table>
         <thead><tr>
           <th>Retail</th>
@@ -330,7 +342,7 @@
 <div class="section" id="section-quarter">
 
   <!-- Filter bar -->
-  <div class="card" style="padding:10px 18px;margin-bottom:14px">
+  <div class="filter-bar">
     <div style="display:flex;align-items:center;gap:16px;flex-wrap:wrap">
       <span class="filter-label" style="margin-bottom:0">Métrica</span>
       <div class="metric-toggle">
@@ -373,7 +385,7 @@
 <div class="section" id="section-marca">
 
   <!-- Filter bar -->
-  <div class="card" style="padding:12px 18px;margin-bottom:14px">
+  <div class="filter-bar">
     <div style="display:flex;flex-wrap:wrap;gap:16px;align-items:center">
       <div style="display:flex;align-items:center;gap:8px">
         <span class="filter-label" style="margin-bottom:0">Métrica</span>
@@ -429,22 +441,7 @@
       Detalle por Marca · Retail · Categoría — 2026
       <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
         <span class="filter-label" style="margin-bottom:0">Categoría</span>
-        <div class="chip-row" id="tblCatFilter">
-          <button class="chip on" data-val="all" onclick="setTblFilter('cat',this)">Todas</button>
-          <button class="chip" data-val="Cases iPhone" onclick="setTblFilter('cat',this)">iPhone</button>
-          <button class="chip" data-val="Cases iPad" onclick="setTblFilter('cat',this)">iPad</button>
-          <button class="chip" data-val="Cases Macbook" onclick="setTblFilter('cat',this)">MacBook</button>
-          <button class="chip" data-val="Cases Airpods" onclick="setTblFilter('cat',this)">AirPods</button>
-          <button class="chip" data-val="Cases Apple Watch" onclick="setTblFilter('cat',this)">Apple Watch</button>
-          <button class="chip" data-val="Cases AirTag" onclick="setTblFilter('cat',this)">AirTag</button>
-          <button class="chip" data-val="Micas" onclick="setTblFilter('cat',this)">Micas</button>
-          <button class="chip" data-val="Straps" onclick="setTblFilter('cat',this)">Straps</button>
-          <button class="chip" data-val="Cables" onclick="setTblFilter('cat',this)">Cables</button>
-          <button class="chip" data-val="Sleeves" onclick="setTblFilter('cat',this)">Sleeves</button>
-          <button class="chip" data-val="Speakers" onclick="setTblFilter('cat',this)">Speakers</button>
-          <button class="chip" data-val="Wall Charger" onclick="setTblFilter('cat',this)">Wall Charger</button>
-          <button class="chip" data-val="Others" onclick="setTblFilter('cat',this)">Others</button>
-        </div>
+        <div class="chip-row" id="tblCatFilter"></div>
       </div>
     </div>
     <div class="table-wrap">
@@ -863,12 +860,96 @@ function switchTab(id, el) {
   else if (id === 'cliente') buildClienteTab();
 }
 
-/* ══════ ANNUAL TABLE TOGGLE ══════ */
+/* ══════ ANNUAL TABLE — DYNAMIC ══════ */
+let anualTableMode = 'val';
+let anualState = {marca:'all', cat:'all'};
+
+const anualRetails = ['ATT','MacStore','iShop','Liverpool'];
+const anualRetailDisplay = {ATT:'AT&T',MacStore:'MacStore',iShop:'iShop',Liverpool:'Liverpool'};
+const anualRetailColorVar = {ATT:'var(--att)',MacStore:'var(--macstore)',iShop:'var(--ishop)',Liverpool:'var(--liverpool)'};
+const anualH2 = new Set(['Jul','Aug','Sep','Oct','Nov','Dec']);
+
 function switchAnualTable(mode) {
-  document.getElementById('anualTableVal').style.display = mode==='val'?'':'none';
-  document.getElementById('anualTablePcs').style.display = mode==='pcs'?'':'none';
+  anualTableMode = mode;
   document.querySelectorAll('#anualToggle .toggle-btn').forEach((b,i)=>
     b.classList.toggle('active',(i===0&&mode==='val')||(i===1&&mode==='pcs')));
+  renderAnualTable();
+}
+
+function initAnualFilters(){
+  const marcaEl = document.getElementById('anualMarcaFilter');
+  if(!marcaEl) return;
+  const marcas = Object.keys(marcaRaw).sort();
+  marcaEl.innerHTML = `<button class="chip on" data-val="all" onclick="setAnualFilter('marca',this)">Todas</button>`;
+  marcas.forEach(m => {
+    const color = marcaColors[m]||'#64748b';
+    marcaEl.innerHTML += `<button class="chip" data-val="${m}" onclick="setAnualFilter('marca',this)">${m}</button>`;
+  });
+  updateAnualCatChips();
+  renderAnualTable();
+}
+
+function updateAnualCatChips(){
+  const el = document.getElementById('anualCatFilter');
+  if(!el) return;
+  const activeCats = new Set();
+  for(const [marca, clients] of Object.entries(marcaRaw)){
+    if(anualState.marca!=='all' && marca!==anualState.marca) continue;
+    for(const [, cats] of Object.entries(clients)){
+      for(const [cat, md] of Object.entries(cats)){
+        if(ALL_MONTHS.some(m=>(md.pcs[m]||0)+(md.val[m]||0)>0)) activeCats.add(cat);
+      }
+    }
+  }
+  if(anualState.cat!=='all' && !activeCats.has(anualState.cat)) anualState.cat='all';
+  el.innerHTML = `<button class="chip on" data-val="all" onclick="setAnualFilter('cat',this)">Todas</button>`;
+  [...activeCats].sort().forEach(cat => {
+    el.innerHTML += `<button class="chip ${anualState.cat===cat?'on':''}" data-val="${cat}" onclick="setAnualFilter('cat',this)">${catLabel[cat]||cat}</button>`;
+  });
+}
+
+function setAnualFilter(type, btn){
+  const key = type==='marca' ? 'anualMarcaFilter' : 'anualCatFilter';
+  document.querySelectorAll(`#${key} .chip`).forEach(b=>b.classList.remove('on'));
+  btn.classList.add('on');
+  anualState[type] = btn.dataset.val;
+  if(type==='marca') updateAnualCatChips();
+  renderAnualTable();
+}
+
+function renderAnualTable(){
+  const isVal = anualTableMode==='val';
+  const fmt = v => isVal ? '$'+(v/1e6).toFixed(1)+'M' : v.toLocaleString('es-MX');
+  // Aggregate from marcaRaw
+  const data = {};
+  for(const r of anualRetails){
+    data[r]={};
+    for(const m of ALL_MONTHS) data[r][m]=0;
+  }
+  for(const [marca, clients] of Object.entries(marcaRaw)){
+    if(anualState.marca!=='all' && marca!==anualState.marca) continue;
+    for(const [retail, cats] of Object.entries(clients)){
+      if(!data[retail]) continue;
+      for(const [cat, md] of Object.entries(cats)){
+        if(anualState.cat!=='all' && cat!==anualState.cat) continue;
+        for(const m of ALL_MONTHS){
+          data[retail][m] += isVal ? (md.val[m]||0) : (md.pcs[m]||0);
+        }
+      }
+    }
+  }
+  const monthCols = ALL_MONTHS.map((m,i)=>`<th class="num${anualH2.has(m)?' h2-col':''}">${ALL_MONTHS_ES[i]}</th>`).join('');
+  const bodyRows = anualRetails.map(r=>{
+    const rowTotal = ALL_MONTHS.reduce((s,m)=>s+(data[r][m]||0),0);
+    const cells = ALL_MONTHS.map(m=>`<td class="num${anualH2.has(m)?' h2-col':''}">${fmt(data[r][m]||0)}</td>`).join('');
+    return `<tr><td><span class="dot" style="background:${anualRetailColorVar[r]}"></span>${anualRetailDisplay[r]}</td>${cells}<td class="num"><strong>${fmt(rowTotal)}</strong></td></tr>`;
+  }).join('');
+  const monthTotals = ALL_MONTHS.map(m=>anualRetails.reduce((s,r)=>s+(data[r][m]||0),0));
+  const grand = monthTotals.reduce((s,v)=>s+v,0);
+  const footCells = monthTotals.map((v,i)=>`<td class="num${anualH2.has(ALL_MONTHS[i])?' h2-col':''}">${fmt(v)}</td>`).join('');
+  const foot = `<tr><td>TOTAL</td>${footCells}<td class="num"><strong>${fmt(grand)}</strong></td></tr>`;
+  const container = document.getElementById('anualTableContainer');
+  if(container) container.innerHTML = `<div class="table-wrap"><table><thead><tr><th>Retail</th>${monthCols}<th class="num">TOTAL</th></tr></thead><tbody>${bodyRows}</tbody><tfoot>${foot}</tfoot></table></div>`;
 }
 
 /* ══════ H2 TABLE TOGGLE ══════ */
@@ -1258,14 +1339,62 @@ function setTblSort(s){
   renderMarcaTable();
 }
 
+// Cat label map for display
+const catLabel = {
+  'Cases iPhone':'iPhone','Cases iPad':'iPad','Cases Macbook':'MacBook',
+  'Cases Airpods':'AirPods','Cases Apple Watch':'Apple Watch','Cases AirTag':'AirTag',
+  'Micas':'Micas','Straps':'Straps','Cables':'Cables','Sleeves':'Sleeves',
+  'Cases Sleeves':'Cases Sleeves','Speakers':'Speakers','Wall Charger':'Wall Charger','Others':'Others'
+};
+
+function updateTblCatChips(){
+  // Find categories with data given current retail/marca filters
+  const activeCats = new Set();
+  for(const [marca, clients] of Object.entries(marcaRaw)){
+    if(tblState.marca!=='all' && marca!==tblState.marca) continue;
+    for(const [retail, cats] of Object.entries(clients)){
+      if(tblState.cliente!=='all' && retail!==tblState.cliente) continue;
+      for(const [cat, md] of Object.entries(cats)){
+        if(ALL_MONTHS.some(m=>(md.pcs[m]||0)+(md.val[m]||0)>0)) activeCats.add(cat);
+      }
+    }
+  }
+  // If current cat selection no longer valid, reset
+  if(tblState.cat!=='all' && !activeCats.has(tblState.cat)) tblState.cat='all';
+
+  const el = document.getElementById('tblCatFilter');
+  if(!el) return;
+  el.innerHTML='';
+  const makeChip = (val, label) => {
+    const b = document.createElement('button');
+    b.className = 'chip' + (tblState.cat===val?' on':'');
+    b.dataset.val = val;
+    b.textContent = label;
+    b.onclick = () => setTblFilter('cat', b);
+    el.appendChild(b);
+  };
+  makeChip('all','Todas');
+  // Sort cats by total value desc
+  [...activeCats].sort((a,b)=>{
+    const tv = c => ALL_MONTHS.reduce((s,m)=>{ for(const [,clients] of Object.entries(marcaRaw)) for(const [,cats] of Object.entries(clients)) if(cats[c]) s+=(cats[c].val[m]||0); return s; },0);
+    return tv(b)-tv(a);
+  }).forEach(cat => makeChip(cat, catLabel[cat]||cat));
+}
+
 function setTblFilter(type,btn){
   const val=btn.dataset.val;
-  const barId=type==='cliente'?'tblClienteFilter':type==='marca'?'tblMarcaFilter':'tblCatFilter';
-  document.querySelectorAll(`#${barId} .chip`).forEach(b=>{
-    Object.values(tblChipClasses[type]).forEach(c=>b.classList.remove(c));b.classList.remove('on');
-  });
-  btn.classList.add(tblChipClasses[type][val]||'on');
+  if(type==='cat'){
+    document.querySelectorAll('#tblCatFilter .chip').forEach(b=>b.classList.remove('on'));
+    btn.classList.add('on');
+  } else {
+    const barId=type==='cliente'?'tblClienteFilter':'tblMarcaFilter';
+    document.querySelectorAll(`#${barId} .chip`).forEach(b=>{
+      Object.values(tblChipClasses[type]).forEach(c=>b.classList.remove(c));b.classList.remove('on');
+    });
+    btn.classList.add(tblChipClasses[type][val]||'on');
+  }
   tblState[type]=val;
+  if(type!=='cat') updateTblCatChips();
   renderMarcaTable();
   const ms=getMarcaSummary(); renderMarcaCharts(ms); renderMarcaCatChart();
 }
@@ -1560,7 +1689,9 @@ function renderMarcaCatChart(){
 
 function renderMarca(){
   const s=getMarcaSummary();
-  renderMarcaKpis(s); renderMarcaCharts(s); renderMarcaCatChart(); renderMarcaTable();
+  renderMarcaKpis(s); renderMarcaCharts(s); renderMarcaCatChart();
+  updateTblCatChips();
+  renderMarcaTable();
 }
 
 const marcaChipClasses={all:'on',ATT:'on-att',MacStore:'on-macstore',iShop:'on-ishop',Liverpool:'on-liverpool'};
@@ -1615,6 +1746,7 @@ function buildAVBSection() {
   if(document.getElementById('chartAnualDual')){
     buildAnualDualChart(); buildAnualKpis(); buildCatCharts();
   }
+  initAnualFilters();
 }
 
 function renderAVBKpis() {
