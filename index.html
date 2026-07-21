@@ -119,7 +119,7 @@
   <div class="tab active" onclick="switchTab('attainment',this)">📊 Attainment vs Budget</div>
   <div class="tab" onclick="switchTab('quarter',this)">📊 Dashboard by Quarter</div>
   <div class="tab" onclick="switchTab('marca',this)">🏷️ Brand</div>
-  <div class="tab" onclick="switchTab('cliente',this)">🏪 Por Retail</div>
+  <div class="tab" onclick="switchTab('cliente',this)">🏪 Retail</div>
 </div>
 
 <!-- ══ CONTENT ══ -->
@@ -422,17 +422,6 @@
     </div>
   </div>
 
-  <!-- Participation chart -->
-  <div class="card">
-    <div class="card-title">Participación por Marca — 2026 FCST</div>
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;align-items:center">
-      <div>
-        <canvas id="chartPart2026" style="max-height:200px"></canvas>
-        <div class="legend" id="partLegend2026" style="margin-top:8px"></div>
-      </div>
-      <div id="marcaPartStats" style="font-size:13px;color:var(--muted)"></div>
-    </div>
-  </div>
 
   <!-- Detail table -->
   <div class="card">
@@ -1300,6 +1289,7 @@ function setMarcaChartType(type) {
   });
   const s = getMarcaSummary();
   renderMarcaCharts(s);
+  renderMarcaCatChart(); // keep both charts in sync
 }
 
 function renderMarcaCharts(summary){
@@ -1356,8 +1346,6 @@ function renderMarcaCharts(summary){
     legendEl.appendChild(pill);
   });
 
-  // Participation donuts
-  renderParticipationCharts(summary, isVal);
 }
 
 function renderParticipationCharts(summary, isVal) {
@@ -1723,6 +1711,13 @@ function renderAVBCharts() {
   });
 }
 
+let avbTblSort = {col:'v26', dir:'desc'};
+function setAvbTblSort(col){
+  if(avbTblSort.col===col) avbTblSort.dir = avbTblSort.dir==='desc'?'asc':'desc';
+  else avbTblSort = {col, dir: col==='retail'?'asc':'desc'};
+  renderAVBTable();
+}
+
 function renderAVBTable() {
   const isVal = gMetric === 'valor';
   const inv = avbMode === 'invoice';
@@ -1731,40 +1726,54 @@ function renderAVBTable() {
   const fmt = v => isVal ? '$'+(v/1e6).toFixed(2)+' M' : v.toLocaleString('es-MX');
   const fmtPct = (v,b) => b>0 ? (v>=b?'+':'')+((v/b-1)*100).toFixed(1)+'%' : '—';
   const cls = (v,b) => b>0 ? (v>=b?'pos':'neg') : '';
-  const retails = Object.keys(avbRetailColors);
+  const allRetails = Object.keys(avbRetailColors);
 
   // Helper: get H1 2025 for a retail
   const get25H1 = r => src25[r] ? src25[r].slice(0,7).reduce((s,v)=>s+v,0) : 0;
 
+  const s25all = allRetails.reduce((s,r)=>s+(inv?get25H1(r):avbGet25(r)),0);
+  const s26all = allRetails.reduce((s,r)=>s+avbGet26(r,inv),0);
+
+  // Build rows data for sorting
+  let rows = allRetails.map(r => {
+    const v25 = inv ? get25H1(r) : avbGet25(r);
+    const v26 = avbGet26(r, inv);
+    const yoy = v25>0 ? (v26/v25-1)*100 : 0;
+    const sh25 = s25all>0 ? v25/s25all*100 : 0;
+    const sh26 = s26all>0 ? v26/s26all*100 : 0;
+    return {r, v25, v26, yoy, sh25, sh26};
+  }).filter(x=>x.v25!==0||x.v26!==0);
+
+  // Sort
+  const {col:sc, dir:sd} = avbTblSort;
+  const sign = sd==='asc'?1:-1;
+  if(sc==='retail') rows.sort((a,b)=>sign*a.r.localeCompare(b.r));
+  else rows.sort((a,b)=>sign*(b[sc]-a[sc]));
+
+  // Arrow indicators
+  const arrow = col => col===sc?(sd==='asc'?' ↑':' ↓'):'';
+
   // Update table header dynamically
   const thead = document.querySelector('#avbTable thead tr');
   if (thead) thead.innerHTML = `
-    <th>Retail</th>
-    <th class="num">2025 ${inv?'Ene–Jul':'Full Year'}</th>
-    <th class="num">2026 ${inv?'Invoice H1':'Projection'}</th>
-    <th class="num">YoY %</th>
-    <th class="num">Share 2025</th>
-    <th class="num">Share 2026</th>`;
+    <th style="cursor:pointer" onclick="setAvbTblSort('retail')">Retail${arrow('retail')}</th>
+    <th class="num" style="cursor:pointer" onclick="setAvbTblSort('v25')">2025 ${inv?'Ene–Jul':'Full Year'}${arrow('v25')}</th>
+    <th class="num" style="cursor:pointer" onclick="setAvbTblSort('v26')">2026 ${inv?'Invoice H1':'Projection'}${arrow('v26')}</th>
+    <th class="num" style="cursor:pointer" onclick="setAvbTblSort('yoy')">YoY %${arrow('yoy')}</th>
+    <th class="num" style="cursor:pointer" onclick="setAvbTblSort('sh25')">Share 2025${arrow('sh25')}</th>
+    <th class="num" style="cursor:pointer" onclick="setAvbTblSort('sh26')">Share 2026${arrow('sh26')}</th>`;
 
   let tot25=0, tot26=0;
   let html = '';
-  const s25all = retails.reduce((s,r)=>s+(inv?get25H1(r):avbGet25(r)),0);
-  const s26all = retails.reduce((s,r)=>s+avbGet26(r,inv),0);
-
-  retails.forEach(r => {
-    const v25 = inv ? get25H1(r) : avbGet25(r);
-    const v26 = avbGet26(r, inv);
-    if (v25===0 && v26===0) return;
+  rows.forEach(({r, v25, v26, sh25, sh26}) => {
     tot25+=v25; tot26+=v26;
-    const sh25 = s25all>0 ? (v25/s25all*100).toFixed(1)+'%' : '—';
-    const sh26 = s26all>0 ? (v26/s26all*100).toFixed(1)+'%' : '—';
     html += `<tr>
       <td><span class="dot" style="background:${avbRetailColors[r]}"></span>${r}</td>
       <td class="num">${fmt(v25)}</td>
       <td class="num">${fmt(v26)}</td>
       <td class="num delta ${cls(v26,v25)}">${fmtPct(v26,v25)}</td>
-      <td class="num" style="color:var(--muted)">${sh25}</td>
-      <td class="num" style="color:var(--muted)">${sh26}</td>
+      <td class="num" style="color:var(--muted)">${sh25.toFixed(1)}%</td>
+      <td class="num" style="color:var(--muted)">${sh26.toFixed(1)}%</td>
     </tr>`;
   });
   document.getElementById('avbTableBody').innerHTML = html;
