@@ -410,8 +410,15 @@
   <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px">
     <!-- Category breakdown chart -->
     <div class="card" style="border-left:4px solid var(--accent);margin-bottom:0">
-      <div class="card-title" id="marcaCatTitle">Desglose por Categoría — Ene–Dic 2026 (Todos)</div>
-      <canvas id="chartMarcaCat" style="height:260px"></canvas>
+      <div class="card-title" style="flex-wrap:wrap;gap:8px">
+        <span id="marcaCatTitle">Desglose por Categoría — Ene–Dic 2026 (Todos)</span>
+        <div style="display:flex;gap:4px;margin-left:auto">
+          <button id="catChartGrouped" class="toggle-btn active" onclick="setMarcaChartType('grouped')">Agrupada</button>
+          <button id="catChartStacked" class="toggle-btn" onclick="setMarcaChartType('stacked')">Apilada</button>
+          <button id="catChartLine" class="toggle-btn" onclick="setMarcaChartType('line')">Lineal</button>
+        </div>
+      </div>
+      <canvas id="chartMarcaCat" style="height:250px"></canvas>
       <div id="marcaCatLegend" style="margin-top:8px;display:flex;flex-wrap:wrap;gap:8px;font-size:11px"></div>
     </div>
     <!-- Main brand chart (grouped/stacked/line) -->
@@ -428,16 +435,7 @@
     <div class="card-title">
       Detalle por Marca · Retail · Categoría — 2026
       <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
-        <span class="filter-label" style="margin-bottom:0">Retail</span>
-        <div class="chip-row" id="tblClienteFilter">
-          <button class="chip on" data-val="all" onclick="setTblFilter('cliente',this)">Todos</button>
-          <button class="chip" data-val="ATT" onclick="setTblFilter('cliente',this)">AT&amp;T</button>
-          <button class="chip" data-val="MacStore" onclick="setTblFilter('cliente',this)">MacStore</button>
-          <button class="chip" data-val="iShop" onclick="setTblFilter('cliente',this)">iShop</button>
-          <button class="chip" data-val="Liverpool" onclick="setTblFilter('cliente',this)">Liverpool</button>
-        </div>
-
-        <span class="filter-label" style="margin-bottom:0;margin-left:8px">Categoría</span>
+        <span class="filter-label" style="margin-bottom:0">Categoría</span>
         <div class="chip-row" id="tblCatFilter">
           <button class="chip on" data-val="all" onclick="setTblFilter('cat',this)">Todas</button>
           <button class="chip" data-val="Cases iPhone" onclick="setTblFilter('cat',this)">iPhone</button>
@@ -1283,8 +1281,14 @@ let chartPart2025Inst = null, chartPart2026Inst = null;
 
 function setMarcaChartType(type) {
   marcaChartType = type;
+  // Sync filter bar buttons (mChartGrouped etc.)
   ['Grouped','Stacked','Line'].forEach(k=>{
     const el = document.getElementById('mChart'+k);
+    if(el) el.classList.toggle('active', type===k.toLowerCase());
+  });
+  // Sync category chart buttons
+  ['Grouped','Stacked','Line'].forEach(k=>{
+    const el = document.getElementById('catChart'+k);
     if(el) el.classList.toggle('active', type===k.toLowerCase());
   });
   const s = getMarcaSummary();
