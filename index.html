@@ -1742,11 +1742,11 @@ function buildAVBSection() {
   renderAVBKpis();
   renderAVBCharts();
   renderAVBTable();
+  initAnualFilters();
   // Proyección charts (merged tab)
   if(document.getElementById('chartAnualDual')){
-    buildAnualDualChart(); buildAnualKpis(); buildCatCharts();
+    try { buildAnualDualChart(); buildAnualKpis(); buildCatCharts(); } catch(e){ console.warn('AVB chart error:',e); }
   }
-  initAnualFilters();
 }
 
 function renderAVBKpis() {
@@ -2105,6 +2105,7 @@ function buildClienteTab(){
 
 /* ══════ INIT ══════ */
 buildAVBSection();
+initAnualFilters(); // ensure annual table filters always initialize
 // Other tabs build on first visit via switchTab
 </script>
 </body>
