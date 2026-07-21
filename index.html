@@ -2268,7 +2268,7 @@ function buildClienteTab(){
 
   let kpiHtml=`<div class="kpi-card"><div class="kpi-label">${cname} TOTAL AÑO</div><div class="kpi-value">${fmtKpi(catGrand)}</div><div class="kpi-sub">${isVal?'valor MXN':'piezas'} Ene–Dic 2026</div></div>`;
   kpiHtml+=`<div class="kpi-card"><div class="kpi-label">Categorías Activas</div><div class="kpi-value">${totByCat.length}</div><div class="kpi-sub">fuente Consenso FCST</div></div>`;
-  totByCat.forEach(({cat,tot})=>{
+  [...totByCat].sort((a,b)=>b.tot-a.tot).forEach(({cat,tot})=>{
     const share=catGrand>0?(tot/catGrand*100).toFixed(1):'0.0';
     kpiHtml+=`<div class="kpi-card"><div class="kpi-label" style="font-size:10px">${cat}</div><div class="kpi-value" style="font-size:20px">${fmtKpi(tot)}</div><div class="kpi-sub">${share}% del año</div></div>`;
   });
