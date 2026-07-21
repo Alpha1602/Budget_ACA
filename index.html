@@ -402,7 +402,7 @@
 <!-- ─── TAB 4: POR MARCA ─── -->
 <div class="section" id="section-marca">
 
-  <!-- Filter bar -->
+  <!-- Filter bar: only metric + chart type -->
   <div class="filter-bar">
     <div style="display:flex;flex-wrap:wrap;gap:16px;align-items:center">
       <div style="display:flex;align-items:center;gap:8px">
@@ -420,29 +420,6 @@
           <button id="mChartLine" onclick="setMarcaChartType('line')">Lineal</button>
         </div>
       </div>
-      <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
-        <span class="filter-label" style="margin-bottom:0">Marca</span>
-        <div class="chip-row" id="marcaBrandFilter">
-          <button class="chip on" data-brand="all" onclick="filterMarcaBrand(this)">Todas</button>
-          <button class="chip" data-brand="Nomad" onclick="filterMarcaBrand(this)">Nomad</button>
-          <button class="chip" data-brand="Speck" onclick="filterMarcaBrand(this)">Speck</button>
-          <button class="chip" data-brand="Quikcell" onclick="filterMarcaBrand(this)">Quikcell</button>
-          <button class="chip" data-brand="Tech21" onclick="filterMarcaBrand(this)">Tech21</button>
-          <button class="chip" data-brand="Pitaka" onclick="filterMarcaBrand(this)">Pitaka</button>
-          <button class="chip" data-brand="Raptic" onclick="filterMarcaBrand(this)">Raptic</button>
-        </div>
-      </div>
-      <div style="display:flex;align-items:center;gap:8px">
-        <span class="filter-label" style="margin-bottom:0">Retail</span>
-        <div class="chip-row" id="marcaClienteFilter">
-          <button class="chip on" data-cliente="all" onclick="filterMarca(this,'cliente')">Todos</button>
-          <button class="chip" data-cliente="ATT" onclick="filterMarca(this,'cliente')">AT&amp;T</button>
-          <button class="chip" data-cliente="MacStore" onclick="filterMarca(this,'cliente')">MacStore</button>
-          <button class="chip" data-cliente="iShop" onclick="filterMarca(this,'cliente')">iShop</button>
-          <button class="chip" data-cliente="Liverpool" onclick="filterMarca(this,'cliente')">Liverpool</button>
-        </div>
-      </div>
-      <button id="marcaResetBtn" onclick="resetMarcaFilters()" style="display:none;padding:4px 12px;font-size:12px;font-weight:600;border:1.5px solid var(--accent);border-radius:20px;background:white;color:var(--accent);cursor:pointer;transition:.15s" onmouseover="this.style.background='var(--accent)';this.style.color='white'" onmouseout="this.style.background='white';this.style.color='var(--accent)'">↺ Resetear</button>
     </div>
   </div>
 
@@ -465,15 +442,41 @@
     </div>
   </div>
 
-
-  <!-- Detail table -->
+  <!-- Detail table — chips here control BOTH table AND charts above -->
   <div class="card">
-    <div class="card-title">
-      Detalle por Marca · Retail · Categoría — 2026
-      <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
-        <span class="filter-label" style="margin-bottom:0">Categoría</span>
-        <div class="chip-row" id="tblCatFilter"></div>
-        <button id="tblCatResetBtn" onclick="resetTblCatFilter()" style="display:none;padding:3px 10px;font-size:11px;font-weight:600;border:1.5px solid var(--accent);border-radius:20px;background:white;color:var(--accent);cursor:pointer;transition:.15s" onmouseover="this.style.background='var(--accent)';this.style.color='white'" onmouseout="this.style.background='white';this.style.color='var(--accent)'">↺ Resetear</button>
+    <div class="card-title" style="flex-direction:column;align-items:flex-start;gap:10px">
+      <div style="display:flex;align-items:center;justify-content:space-between;width:100%">
+        <span>Detalle por Marca · Retail · Categoría — 2026</span>
+        <button id="marcaResetBtn" onclick="resetMarcaFilters()" style="display:none;padding:4px 12px;font-size:12px;font-weight:600;border:1.5px solid var(--accent);border-radius:20px;background:white;color:var(--accent);cursor:pointer;transition:.15s" onmouseover="this.style.background='var(--accent)';this.style.color='white'" onmouseout="this.style.background='white';this.style.color='var(--accent)'">↺ Resetear</button>
+      </div>
+      <!-- Filters inside table card — control charts + table -->
+      <div style="display:flex;flex-wrap:wrap;gap:10px;width:100%;padding-top:6px;border-top:1px solid var(--border)">
+        <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap">
+          <span class="filter-label" style="margin-bottom:0">Marca</span>
+          <div class="chip-row" id="marcaBrandFilter">
+            <button class="chip on" data-brand="all" onclick="filterMarcaBrand(this)">Todas</button>
+            <button class="chip" data-brand="Nomad" onclick="filterMarcaBrand(this)">Nomad</button>
+            <button class="chip" data-brand="Speck" onclick="filterMarcaBrand(this)">Speck</button>
+            <button class="chip" data-brand="Quikcell" onclick="filterMarcaBrand(this)">Quikcell</button>
+            <button class="chip" data-brand="Tech21" onclick="filterMarcaBrand(this)">Tech21</button>
+            <button class="chip" data-brand="Pitaka" onclick="filterMarcaBrand(this)">Pitaka</button>
+            <button class="chip" data-brand="Raptic" onclick="filterMarcaBrand(this)">Raptic</button>
+          </div>
+        </div>
+        <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap">
+          <span class="filter-label" style="margin-bottom:0">Retail</span>
+          <div class="chip-row" id="marcaClienteFilter">
+            <button class="chip on" data-cliente="all" onclick="filterMarca(this,'cliente')">Todos</button>
+            <button class="chip" data-cliente="ATT" onclick="filterMarca(this,'cliente')">AT&amp;T</button>
+            <button class="chip" data-cliente="MacStore" onclick="filterMarca(this,'cliente')">MacStore</button>
+            <button class="chip" data-cliente="iShop" onclick="filterMarca(this,'cliente')">iShop</button>
+            <button class="chip" data-cliente="Liverpool" onclick="filterMarca(this,'cliente')">Liverpool</button>
+          </div>
+        </div>
+        <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap">
+          <span class="filter-label" style="margin-bottom:0">Categoría</span>
+          <div class="chip-row" id="tblCatFilter"></div>
+        </div>
       </div>
     </div>
     <div class="table-wrap">
@@ -1637,9 +1640,7 @@ function updateTblCatChips(){
     const tv = c => ALL_MONTHS.reduce((s,m)=>{ for(const [,clients] of Object.entries(marcaRaw)) for(const [,cats] of Object.entries(clients)) if(cats[c]) s+=(cats[c].val[m]||0); return s; },0);
     return tv(b)-tv(a);
   }).forEach(cat => makeChip(cat, catLabel[cat]||cat));
-  // show/hide reset button
-  const rb=document.getElementById('tblCatResetBtn');
-  if(rb) rb.style.display=tblState.cat!=='all'?'inline-block':'none';
+  updateMarcaResetBtn();
 }
 
 function setTblFilter(type,btn){
@@ -1872,9 +1873,10 @@ function renderMarcaTable(){
 let chartMarcaCatInst = null;
 function renderMarcaCatChart(){
   const isVal = marcaState.mode==='val';
-  // Build category totals from marcaRaw filtered by current retail
+  // Build category totals from marcaRaw filtered by current brand + retail
   const catTotals = {};
   for(const [marca, clients] of Object.entries(marcaRaw)){
+    if(marcaState.brand!=='all' && marca!==marcaState.brand) continue;
     for(const [retail, cats] of Object.entries(clients)){
       if(marcaState.cliente!=='all' && retail!==marcaState.cliente) continue;
       for(const [cat, mData] of Object.entries(cats)){
@@ -1980,7 +1982,8 @@ function filterMarcaBrand(btn){
 
 function updateMarcaResetBtn(){
   const btn=document.getElementById('marcaResetBtn');
-  if(btn) btn.style.display=(marcaState.cliente!=='all'||marcaState.brand!=='all')?'inline-block':'none';
+  const hasFilter = marcaState.cliente!=='all' || marcaState.brand!=='all' || tblState.cat!=='all';
+  if(btn) btn.style.display=hasFilter?'inline-block':'none';
 }
 
 function resetMarcaFilters(){
@@ -2003,8 +2006,6 @@ function resetTblCatFilter(){
   tblState.cat='all';
   updateTblCatChips();
   renderMarcaTable();
-  const btn=document.getElementById('tblCatResetBtn');
-  if(btn) btn.style.display='none';
 }
 
 // AVB metric toggle
