@@ -1550,6 +1550,7 @@ function getMarcaSummary(){
   const r={};
   for(const [marcaRaw_,clientes] of Object.entries(marcaRaw)){
     const marca = marcaRaw_;
+    if(marcaState.brand!=='all'&&marca!==marcaState.brand)continue;
     for(const [cliente,cats] of Object.entries(clientes)){
       if(marcaState.cliente!=='all'&&cliente!==marcaState.cliente)continue;
       if(!r[marca])r[marca]={pcs:{},val:{},byMes_pcs:{},byMes_val:{}};
@@ -1607,6 +1608,7 @@ function updateTblCatChips(){
   const activeCats = new Set();
   for(const [marca, clients] of Object.entries(marcaRaw)){
     if(tblState.marca!=='all' && marca!==tblState.marca) continue;
+    if(marcaState.brand!=='all' && marca!==marcaState.brand) continue;
     for(const [retail, cats] of Object.entries(clients)){
       if(tblState.cliente!=='all' && retail!==tblState.cliente) continue;
       for(const [cat, md] of Object.entries(cats)){
@@ -1970,7 +1972,9 @@ function filterMarcaBrand(btn){
   document.querySelectorAll('#marcaBrandFilter .chip').forEach(b=>{b.classList.remove('on');});
   btn.classList.add('on');
   marcaState.brand=brand;
+  tblState.marca=brand; // sync to detail table
   updateMarcaResetBtn();
+  updateTblCatChips();
   renderMarca();
 }
 
@@ -1981,6 +1985,7 @@ function updateMarcaResetBtn(){
 
 function resetMarcaFilters(){
   marcaState.cliente='all'; marcaState.brand='all';
+  tblState.cliente='all'; tblState.marca='all'; tblState.cat='all';
   document.querySelectorAll('#marcaClienteFilter .chip').forEach(b=>{
     Object.values(marcaChipClasses).forEach(c=>b.classList.remove(c));b.classList.remove('on');
   });
@@ -1989,10 +1994,9 @@ function resetMarcaFilters(){
   document.querySelectorAll('#marcaBrandFilter .chip').forEach(b=>b.classList.remove('on'));
   const allBrand=document.querySelector('#marcaBrandFilter [data-brand="all"]');
   if(allBrand) allBrand.classList.add('on');
-  tblState.cliente='all';
   updateMarcaResetBtn();
   updateTblCatChips();
-  renderMarcaTable();
+  renderMarca();
 }
 
 function resetTblCatFilter(){
