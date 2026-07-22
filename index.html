@@ -978,7 +978,7 @@ function switchTab(id, el) {
   if (id === 'attainment') buildAVBSection();
   else if (id === 'quarter') buildQSection();
 
-  else if (id === 'marca')   renderMarca();
+  else if (id === 'marca')   { resetMarcaFilters(); }
   else if (id === 'cliente') buildClienteTab();
 }
 
@@ -2020,6 +2020,12 @@ function updateMarcaResetBtn(){
 function resetMarcaFilters(){
   marcaState.cliente='all'; marcaState.brand='all';
   tblState.cliente='all'; tblState.marca='all'; tblState.cat='all';
+  // Reset chart type to line
+  marcaChartType='line';
+  ['Grouped','Stacked','Line'].forEach(k=>{
+    const el=document.getElementById('mChart'+k);
+    if(el) el.classList.toggle('active',k==='Line');
+  });
   document.querySelectorAll('#marcaClienteFilter .chip').forEach(b=>{
     Object.values(marcaChipClasses).forEach(c=>b.classList.remove(c));b.classList.remove('on');
   });
