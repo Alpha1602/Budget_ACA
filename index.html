@@ -144,14 +144,14 @@
       <div style="display:flex;gap:0">
         <button id="avbInvoiceBtn" onclick="setAVBMode('invoice',this)"
           style="padding:7px 18px;font-size:12px;font-weight:700;border:1.5px solid #cbd5e1;border-radius:6px 0 0 6px;cursor:pointer;background:#fff;color:#374151;transition:.15s">
-          ⬜ Invoice &nbsp;·&nbsp; Ene–Jun
+          ⬜ Invoice &nbsp;·&nbsp; Ene–Jul
         </button>
         <button id="avbProjBtn" onclick="setAVBMode('projection',this)"
           style="padding:7px 18px;font-size:12px;font-weight:700;border:1.5px solid #9ca3af;border-left:none;border-radius:0 6px 6px 0;cursor:pointer;background:#9ca3af;color:#fff;transition:.15s">
           ◼ Projection &nbsp;·&nbsp; Full Year
         </button>
       </div>
-      <span id="avbModeNote" style="font-size:11px;color:var(--muted)">Mostrando facturas emitidas Ene–Jun 2026</span>
+      <span id="avbModeNote" style="font-size:11px;color:var(--muted)">Mostrando facturas emitidas Ene–Jul 2026</span>
     </div>
   </div>
 
@@ -583,7 +583,7 @@ const MONTHS_FULL = ['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct'
 
 // Full year valor: H1 = Budget 2026, H2 = FCST Consenso
 const valorFull = {
-  'AT&T':         [7601182,5031587,4172841,4289142,4051383,4319526,6350496,6551785,6528680,7582562,8733235,8731866],
+  'AT&T':         [7601182,5031587,4172841,4289142,4051383,4319526,6350496,6552120,6529015,7582743,8733570,8732201],
   'MacStore':     [3427127,2193700,1406861,1516136,1368061,1528988,1529528,2616023,3422183,3870140,4240131,3725012],
   'iShop':        [1685237,2195530,2869134,1371995,1834125,1150356,1358793,2050543,3951682,2317373,3152450,2215143],
   'Liverpool':    [0,0,0,0,0,0,0,278981,379890,421116,469263,524848],
@@ -663,7 +663,7 @@ const avb2025Pcs = {
   'Liverpool':    [0,0,0,0,0,0,0,0,0,0,0,0],
 };
 const avb2026Val = {
-  'AT&T':         [7601182,5031587,4172841,4289142,4051383,4319526,6350496,6551785,6528680,7582562,8733235,8731866],
+  'AT&T':         [7601182,5031587,4172841,4289142,4051383,4319526,6350496,6552120,6529015,7582743,8733570,8732201],
   'iShop':        [1685237,2195530,2869134,1371995,1834125,1150356,1358793,2050543,3951682,2317373,3152450,2215143],
   'MacStore':     [3427127,2193700,1406861,1516136,1368061,1528988,1529528,2616023,3422183,3870140,4240131,3725012],
   'Liverpool':    [0,0,0,0,0,0,0,278981,379890,421116,469263,524848],
@@ -671,7 +671,7 @@ const avb2026Val = {
   'Coppel':       [0,0,0,445377,0,0,0,0,0,0,0,0],
 };
 const avb2026Pcs = {
-  'AT&T':         [30710,20985,18176,19397,18409,19345,24194,25188,26254,30225,35221,35228],
+  'AT&T':         [30710,20985,18176,19397,18409,19345,24194,25190,26256,30226,35223,35230],
   'MacStore':     [7961,4633,3011,2947,2520,2908,2824,5623,7499,8269,9003,7854],
   'iShop':        [3969,4928,6123,3132,4095,2508,3031,4574,8947,5159,7066,4860],
   'Liverpool':    [0,0,0,0,0,0,0,630,874,973,1089,1223],
@@ -704,7 +704,7 @@ const q2025Pcs = {
 
 
 const qValorAll = {
-  'AT&T':         [16805610,12660051,19430961,25047663],
+  'AT&T':         [16805610,12660051,19433135,25048314],
   'MacStore':     [7027688,4413185,7567734,11835283],
   'iShop':        [6749901,4356476,7361018,7684966],
   'Liverpool':    [0,0,658871,1415227],
@@ -712,7 +712,7 @@ const qValorAll = {
   'Coppel':       [0,445377,0,0]
 };
 const qPiezas = {
-  'AT&T':         [69871,57151,75636,100674],
+  'AT&T':         [69871,57151,75640,100679],
   'MacStore':     [15605,8375,15946,25126],
   'iShop':        [15020,9735,16552,17085],
   'Liverpool':    [0,0,1504,3285],
@@ -851,7 +851,7 @@ const marcaRaw = {
   },
   'Quikcell':{
     'ATT':{
-      'Cables':{pcs:{Jan:11224,Feb:9129,Mar:8501,Apr:9707,May:9383,Jun:9486,Jul:9978,Aug:10538,Sep:11161,Oct:12318,Nov:13757,Dec:13754},val:{Jan:1836215,Feb:1577163,Mar:1426273,Apr:1588019,May:1524565,Jun:1558080,Jul:1645422,Aug:1735936,Sep:1841030,Oct:2030677,Nov:2266112,Dec:2265415}},
+      'Cables':{pcs:{Jan:11224,Feb:9129,Mar:8501,Apr:9707,May:9383,Jun:9486,Jul:9978,Aug:10540,Sep:11163,Oct:12319,Nov:13759,Dec:13756},val:{Jan:1836215,Feb:1577163,Mar:1426273,Apr:1588019,May:1524565,Jun:1558080,Jul:1645422,Aug:1736271,Sep:1841365,Oct:2030858,Nov:2266447,Dec:2265750}},
       'Cases iPhone':{pcs:{Jan:45,Feb:74,Mar:0,Apr:0,May:0,Jun:0,Jul:0,Aug:0,Sep:0,Oct:0,Nov:0,Dec:0},val:{Jan:9287,Feb:15273,Mar:0,Apr:0,May:0,Jun:0,Jul:0,Aug:0,Sep:0,Oct:0,Nov:0,Dec:0}},
       'Liquid':{pcs:{Jan:1834,Feb:1252,Mar:830,Apr:991,May:778,Jun:813,Jul:3500,Aug:3500,Sep:3500,Oct:5000,Nov:7500,Dec:7500},val:{Jan:568228,Feb:387907,Mar:257159,Apr:307042,May:241048,Jun:251892,Jul:1084405,Aug:1084405,Sep:1084405,Oct:1549150,Nov:2323725,Dec:2323725}},
       'Micas':{pcs:{Jan:44,Feb:14,Mar:23,Apr:22,May:10,Jun:14,Jul:8,Aug:4,Sep:14,Oct:5,Nov:3,Dec:5},val:{Jan:12495,Feb:3976,Mar:6532,Apr:6247,May:2840,Jun:3976,Jul:2272,Aug:1136,Sep:3976,Oct:1420,Nov:852,Dec:1420}},
@@ -876,8 +876,6 @@ const marcaRaw = {
     },
     'Coppel':{
       'Cases iPhone':{pcs:{Jan:0,Feb:0,Mar:0,Apr:1470,May:0,Jun:0,Jul:0,Aug:0,Sep:0,Oct:0,Nov:0,Dec:0},val:{Jan:0,Feb:0,Mar:0,Apr:445377,May:0,Jun:0,Jul:0,Aug:0,Sep:0,Oct:0,Nov:0,Dec:0}},
-    },
-    'Liverpool':{
     },
     'MacStore':{
       'Cases AirTag':{pcs:{Jan:48,Feb:26,Mar:22,Apr:38,May:34,Jun:41,Jul:36,Aug:33,Sep:26,Oct:30,Nov:36,Dec:39},val:{Jan:14500,Feb:7854,Mar:6646,Apr:11479,May:10271,Jun:12385,Jul:10875,Aug:9969,Sep:7854,Oct:9062,Nov:10875,Dec:11781}},
@@ -1319,12 +1317,12 @@ function buildAnualKpis() {
     : [anualSelectedClient];
   const totVal = clients.reduce((s,c)=>(valorFull[c]||[]).reduce((a,b)=>a+b,0)+s, 0);
   const totPcs = clients.reduce((s,c)=>(piezasAnual[c]||[]).reduce((a,b)=>a+b,0)+s, 0);
-  const h1Val  = clients.reduce((s,c)=>(valorFull[c]||[]).slice(0,6).reduce((a,b)=>a+b,0)+s, 0);
-  const h2Val  = clients.reduce((s,c)=>(valorFull[c]||[]).slice(6).reduce((a,b)=>a+b,0)+s, 0);
+  const h1Val  = clients.reduce((s,c)=>(valorFull[c]||[]).slice(0,7).reduce((a,b)=>a+b,0)+s, 0);
+  const h2Val  = clients.reduce((s,c)=>(valorFull[c]||[]).slice(7).reduce((a,b)=>a+b,0)+s, 0);
   document.getElementById('anualKpiRow').innerHTML = [
     {label:'Valor Total Anual', val:'$'+(totVal/1e6).toFixed(1)+' M', sub:'2026 Budget'},
-    {label:'Invoice Ene–Jun',    val:'$'+(h1Val/1e6).toFixed(1)+' M', sub:'Ene–Jun'},
-    {label:'Proyección Jul–Dic', val:'$'+(h2Val/1e6).toFixed(1)+' M', sub:'Jul–Dic'},
+    {label:'Invoice Ene–Jul',    val:'$'+(h1Val/1e6).toFixed(1)+' M', sub:'Ene–Jul'},
+    {label:'Proyección Ago–Dic', val:'$'+(h2Val/1e6).toFixed(1)+' M', sub:'Ago–Dic'},
     {label:'Piezas Anuales',    val:totPcs.toLocaleString('es-MX'), sub:'unidades'},
   ].map(k=>`<div class="kpi-card">
     <div class="kpi-label">${k.label}</div>
@@ -2067,7 +2065,7 @@ function setAVBMode(mode) {
   if (mode === 'invoice') {
     iBtn.style.background='#fff'; iBtn.style.color='#374151'; iBtn.style.borderColor='#cbd5e1';
     pBtn.style.background='#e5e7eb'; pBtn.style.color='#6b7280'; pBtn.style.borderColor='#9ca3af';
-    document.getElementById('avbModeNote').textContent = 'Mostrando facturas emitidas Ene–Jun 2026 — celdas sin sombrear';
+    document.getElementById('avbModeNote').textContent = 'Mostrando facturas emitidas Ene–Jul 2026 — celdas sin sombrear';
   } else {
     iBtn.style.background='#e5e7eb'; iBtn.style.color='#6b7280'; iBtn.style.borderColor='#cbd5e1';
     pBtn.style.background='#6b7280'; pBtn.style.color='#fff'; pBtn.style.borderColor='#6b7280';
@@ -2080,7 +2078,7 @@ function avbGet26(retail, useInvoice) {
   const isVal = gMetric === 'valor';
   const src = isVal ? avb2026Val : avb2026Pcs;
   if (!src[retail]) return 0;
-  const months = useInvoice ? src[retail].slice(0,6) : src[retail];
+  const months = useInvoice ? src[retail].slice(0,7) : src[retail];
   return months.reduce((s,v)=>s+v,0);
 }
 function avbGet25(retail) {
@@ -2125,9 +2123,9 @@ function renderAVBKpis() {
       <div class="kpi-sub">SI/ST ${isVal?'valor MXN':'piezas'}</div>
     </div>
     <div class="kpi-card">
-      <div class="kpi-label">2026 ${inv?'Invoice · Ene–Jun':'Projection · Full Year'}</div>
+      <div class="kpi-label">2026 ${inv?'Invoice · Ene–Jul':'Projection · Full Year'}</div>
       <div class="kpi-value">${fmt(total26shown)}</div>
-      <div class="kpi-sub">${inv?'Ene–Jun 2026 · facturado':'Ene–Dic 2026 · budget total'}</div>
+      <div class="kpi-sub">${inv?'Ene–Jul 2026 · facturado':'Ene–Dic 2026 · budget total'}</div>
     </div>
     <div class="kpi-card">
       <div class="kpi-label">2026 Projection (Full Year)</div>
@@ -2158,7 +2156,7 @@ function renderAVBKpis() {
 function renderAVBCharts() {
   const isVal = gMetric === 'valor';
   const inv = avbMode === 'invoice';
-  const nMonths = inv ? 6 : 12;
+  const nMonths = inv ? 7 : 12;
   const labels = MONTHS_AVB.slice(0,nMonths);
   const src25 = isVal ? avb2025Val : avb2025Pcs;
   const src26 = isVal ? avb2026Val : avb2026Pcs;
@@ -2167,7 +2165,7 @@ function renderAVBCharts() {
 
   // ── Chart 1: Doughnut – retail share 2025 (inner) vs 2026 (outer)
   const retailsActive=retails.filter(r=>avbGet25(r)>0||avbGet26(r,inv)>0);
-  const d25a=retailsActive.map(r=>inv?((isVal?avb2025Val:avb2025Pcs)[r]||[]).slice(0,6).reduce((a,b)=>a+b,0):avbGet25(r));
+  const d25a=retailsActive.map(r=>inv?((isVal?avb2025Val:avb2025Pcs)[r]||[]).slice(0,7).reduce((a,b)=>a+b,0):avbGet25(r));
   const d26a=retailsActive.map(r=>avbGet26(r,inv));
   if (chartAVBRetailInst) chartAVBRetailInst.destroy();
   chartAVBRetailInst = new Chart(document.getElementById('chartAVBRetail'), {
@@ -2175,7 +2173,7 @@ function renderAVBCharts() {
     data:{
       labels:retailsActive,
       datasets:[
-        {label:inv?'2025 Ene–Jun':'2025 Full Year', data:d25a, backgroundColor:retailsActive.map(r=>avbRetailColors[r]+'88'), borderColor:'#fff', borderWidth:2},
+        {label:inv?'2025 Ene–Jul':'2025 Full Year', data:d25a, backgroundColor:retailsActive.map(r=>avbRetailColors[r]+'88'), borderColor:'#fff', borderWidth:2},
         {label:`2026 ${inv?'Invoice':'Proyección'}`, data:d26a, backgroundColor:retailsActive.map(r=>avbRetailColors[r]), borderColor:'#fff', borderWidth:2}
       ]
     },
@@ -2231,7 +2229,7 @@ function renderAVBTable() {
   const allRetails = Object.keys(avbRetailColors);
 
   // Helper: get H1 2025 for a retail
-  const get25H1 = r => src25[r] ? src25[r].slice(0,6).reduce((s,v)=>s+v,0) : 0;
+  const get25H1 = r => src25[r] ? src25[r].slice(0,7).reduce((s,v)=>s+v,0) : 0;
 
   const s25all = allRetails.reduce((s,r)=>s+(inv?get25H1(r):avbGet25(r)),0);
   const s26all = allRetails.reduce((s,r)=>s+avbGet26(r,inv),0);
@@ -2259,7 +2257,7 @@ function renderAVBTable() {
   const thead = document.querySelector('#avbTable thead tr');
   if (thead) thead.innerHTML = `
     <th style="cursor:pointer" onclick="setAvbTblSort('retail')">Retail${arrow('retail')}</th>
-    <th class="num" style="cursor:pointer" onclick="setAvbTblSort('v25')">2025 ${inv?'Ene–Jun':'Full Year'}${arrow('v25')}</th>
+    <th class="num" style="cursor:pointer" onclick="setAvbTblSort('v25')">2025 ${inv?'Ene–Jul':'Full Year'}${arrow('v25')}</th>
     <th class="num" style="cursor:pointer" onclick="setAvbTblSort('v26')">2026 ${inv?'Invoice H1':'Projection'}${arrow('v26')}</th>
     <th class="num" style="cursor:pointer" onclick="setAvbTblSort('yoy')">YoY %${arrow('yoy')}</th>
     <th class="num" style="cursor:pointer" onclick="setAvbTblSort('sh25')">Share 2025${arrow('sh25')}</th>
