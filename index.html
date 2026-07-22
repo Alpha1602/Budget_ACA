@@ -348,6 +348,16 @@
       <button id="avbResetBtn" onclick="resetAvbChartFilters()" style="display:none;padding:4px 12px;font-size:12px;font-weight:600;border:1.5px solid var(--accent);border-radius:20px;background:white;color:var(--accent);cursor:pointer;transition:.15s" onmouseover="this.style.background='var(--accent)';this.style.color='white'" onmouseout="this.style.background='white';this.style.color='var(--accent)'">↺ Resetear</button>
     </div>
     <canvas id="chartAnualDual" style="max-height:380px"></canvas>
+    <!-- Tabla numérica del mismo gráfico -->
+    <div style="margin-top:18px;border-top:1px solid var(--border);padding-top:14px">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
+        <span style="font-size:12px;font-weight:600;color:var(--text-muted);letter-spacing:.04em;text-transform:uppercase">Detalle Numérico</span>
+        <button onclick="toggleDualTable()" id="dualTableToggle" style="font-size:11px;padding:3px 10px;border:1px solid var(--border);border-radius:12px;background:var(--surface);color:var(--text-muted);cursor:pointer">▲ Ocultar</button>
+      </div>
+      <div id="anualDualTableWrap" style="overflow-x:auto">
+        <div id="anualDualTable"></div>
+      </div>
+    </div>
   </div>
 
   <!-- KPI summary row -->
@@ -1295,6 +1305,9 @@ function buildAnualDualChart() {
     }
   };
 
+  // Build numeric table with same data
+  buildAnualDualTable(val2025, val2026, pcs2026);
+
   chartAnualDualInst = new Chart(document.getElementById('chartAnualDual'), {
     data: {
       labels: MONTHS_FULL,
@@ -1324,6 +1337,104 @@ function buildAnualDualChart() {
       }
     }
   });
+}
+
+let dualTableVisible = true;
+function toggleDualTable() {
+  dualTableVisible = !dualTableVisible;
+  const wrap = document.getElementById('anualDualTableWrap');
+  const btn  = document.getElementById('dualTableToggle');
+  wrap.style.display = dualTableVisible ? '' : 'none';
+  btn.textContent    = dualTableVisible ? '▲ Ocultar' : '▼ Ver tabla';
+}
+
+function buildAnualDualTable(val2025, val2026, pcs2026) {
+  const el = document.getElementById('anualDualTable');
+  if (!el) return;
+  const MES = ['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
+  const isVal = true; // always show MXN in this table (pcs as secondary row)
+
+  const fmt  = v => v ? '$' + (v/1e6).toFixed(2) + 'M' : '—';
+  const fmtP = v => v ? v.toLocaleString('es-MX') : '—';
+  const fmtG = (v26, v25) => {
+    if (!v25 || !v26) return {txt:'—', color:'#94a3b8'};
+    const g = (v26/v25-1)*100;
+    return {txt:(g>=0?'+':'')+g.toFixed(1)+'%', color: g>=0?'#16a34a':'#dc2626'};
+  };
+
+  // combined 2026 (invoice jan-jul, proj aug-dec)
+  const val26comb = val2026;
+
+  const totalV25  = val2025.reduce((a,b)=>a+b,0);
+  const totalV26  = val26comb.reduce((a,b)=>a+b,0);
+  const totalPcs  = pcs2026.reduce((a,b)=>a+b,0);
+  const totalG    = fmtG(totalV26, totalV25);
+
+  // cell bg for 2026 split
+  const cellBg = i => i < 7
+    ? 'background:rgba(45,212,191,.08);'    // invoice teal
+    : 'background:rgba(147,197,253,.10);';  // proy blue
+
+  let html = `<table style="width:100%;border-collapse:collapse;font-size:12px;min-width:720px">
+  <colgroup>
+    <col style="width:130px">
+    ${MES.map(()=>'<col style="min-width:68px">').join('')}
+    <col style="min-width:84px">
+  </colgroup>
+  <thead>
+    <tr style="border-bottom:2px solid var(--border)">
+      <th style="text-align:left;padding:6px 8px;color:var(--text-muted);font-weight:600;font-size:11px">Métrica</th>
+      ${MES.map((m,i)=>`<th style="text-align:right;padding:6px 4px;color:var(--text-muted);font-weight:600;font-size:11px;${cellBg(i)}">${m}</th>`).join('')}
+      <th style="text-align:right;padding:6px 8px;color:var(--text-muted);font-weight:600;font-size:11px;background:rgba(100,116,139,.06)">Total</th>
+    </tr>
+    <tr style="border-bottom:1px solid var(--border)">
+      <td style="padding:2px 8px;font-size:10px;color:#94a3b8"></td>
+      ${MES.map((m,i)=>`<td style="text-align:center;padding:2px 4px;font-size:9px;font-weight:600;${cellBg(i)};color:${i<7?'#0d9488':'#3b82f6'}">${i<7?'Invoice':'Proyección'}</td>`).join('')}
+      <td style="background:rgba(100,116,139,.06)"></td>
+    </tr>
+  </thead>
+  <tbody>
+    <!-- 2025 -->
+    <tr style="border-bottom:1px solid var(--border)">
+      <td style="padding:7px 8px;font-weight:600;color:#64748b;white-space:nowrap">
+        <span style="display:inline-block;width:10px;height:10px;border-radius:2px;background:#CBD5E1;margin-right:5px;vertical-align:middle"></span>2025 Real
+      </td>
+      ${val2025.map((v,i)=>`<td style="text-align:right;padding:7px 4px;${cellBg(i)}">${fmt(v)}</td>`).join('')}
+      <td style="text-align:right;padding:7px 8px;font-weight:700;background:rgba(100,116,139,.06)">${fmt(totalV25)}</td>
+    </tr>
+    <!-- 2026 Invoice Jan-Jul -->
+    <tr style="border-bottom:1px dashed var(--border)">
+      <td style="padding:7px 8px;font-weight:600;color:#0d9488;white-space:nowrap">
+        <span style="display:inline-block;width:10px;height:10px;border-radius:2px;background:#2DD4BF;margin-right:5px;vertical-align:middle"></span>2026 Invoice
+      </td>
+      ${val26comb.map((v,i)=>`<td style="text-align:right;padding:7px 4px;${cellBg(i)}">${i<7?fmt(v):'—'}</td>`).join('')}
+      <td style="text-align:right;padding:7px 8px;font-weight:700;background:rgba(100,116,139,.06)">${fmt(val26comb.slice(0,7).reduce((a,b)=>a+b,0))}</td>
+    </tr>
+    <!-- 2026 Proyección Aug-Dec -->
+    <tr style="border-bottom:1px solid var(--border)">
+      <td style="padding:7px 8px;font-weight:600;color:#3b82f6;white-space:nowrap">
+        <span style="display:inline-block;width:10px;height:10px;border-radius:2px;background:#93C5FD;margin-right:5px;vertical-align:middle"></span>2026 Proy.
+      </td>
+      ${val26comb.map((v,i)=>`<td style="text-align:right;padding:7px 4px;${cellBg(i)}">${i>=7?fmt(v):'—'}</td>`).join('')}
+      <td style="text-align:right;padding:7px 8px;font-weight:700;background:rgba(100,116,139,.06)">${fmt(val26comb.slice(7).reduce((a,b)=>a+b,0))}</td>
+    </tr>
+    <!-- YoY -->
+    <tr style="border-bottom:1px solid var(--border);background:rgba(241,245,249,.5)">
+      <td style="padding:7px 8px;font-weight:600;color:#475569;white-space:nowrap;font-size:11px">YoY vs 2025</td>
+      ${val26comb.map((v,i)=>{ const g=fmtG(v,val2025[i]); return `<td style="text-align:right;padding:7px 4px;font-weight:700;color:${g.color};${cellBg(i)}">${g.txt}</td>`; }).join('')}
+      <td style="text-align:right;padding:7px 8px;font-weight:700;color:${totalG.color};background:rgba(100,116,139,.06)">${totalG.txt}</td>
+    </tr>
+    <!-- Piezas -->
+    <tr>
+      <td style="padding:7px 8px;font-weight:600;color:#ea580c;white-space:nowrap">
+        <span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:#F97316;margin-right:5px;vertical-align:middle"></span>Piezas 2026
+      </td>
+      ${pcs2026.map((v,i)=>`<td style="text-align:right;padding:7px 4px;color:#ea580c;${cellBg(i)}">${fmtP(v)}</td>`).join('')}
+      <td style="text-align:right;padding:7px 8px;font-weight:700;color:#ea580c;background:rgba(100,116,139,.06)">${fmtP(totalPcs)}</td>
+    </tr>
+  </tbody>
+</table>`;
+  el.innerHTML = html;
 }
 
 function buildAnualKpis() {
