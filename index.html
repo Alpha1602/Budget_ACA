@@ -415,9 +415,9 @@
       <div style="display:flex;align-items:center;gap:8px">
         <span class="filter-label" style="margin-bottom:0">Tipo de gráfica</span>
         <div class="metric-toggle">
-          <button id="mChartGrouped" class="active" onclick="setMarcaChartType('grouped')">Agrupada</button>
+          <button id="mChartGrouped" onclick="setMarcaChartType('grouped')">Agrupada</button>
           <button id="mChartStacked" onclick="setMarcaChartType('stacked')">Apilada</button>
-          <button id="mChartLine" onclick="setMarcaChartType('line')">Lineal</button>
+          <button id="mChartLine" class="active" onclick="setMarcaChartType('line')">Lineal</button>
         </div>
       </div>
     </div>
@@ -1679,7 +1679,7 @@ function renderMarcaKpis(summary){
   ).join('');
 }
 
-let marcaChartType = 'grouped'; // 'grouped' | 'stacked' | 'line'
+let marcaChartType = 'line'; // 'grouped' | 'stacked' | 'line'
 let chartMarcaMainInst = null;
 let chartPart2025Inst = null, chartPart2026Inst = null;
 
@@ -1950,9 +1950,40 @@ function renderMarcaCatChart(){
   }
 }
 
+// Hide brand/retail chips that have no data for the current selection
+function updateMarcaChipVisibility(){
+  const brandsWithData = new Set();
+  const retailsWithData = new Set();
+
+  for(const [marca, clients] of Object.entries(marcaRaw)){
+    for(const [retail, cats] of Object.entries(clients)){
+      const hasData = ALL_MONTHS.some(m =>
+        Object.values(cats).some(c => (c.pcs[m]||0) + (c.val[m]||0) > 0)
+      );
+      if(!hasData) continue;
+      // brand is valid for current retail filter
+      if(marcaState.cliente==='all' || retail===marcaState.cliente) brandsWithData.add(marca);
+      // retail is valid for current brand filter
+      if(marcaState.brand==='all' || marca===marcaState.brand) retailsWithData.add(retail);
+    }
+  }
+
+  // Show/hide brand chips
+  document.querySelectorAll('#marcaBrandFilter .chip').forEach(btn => {
+    const b = btn.dataset.brand;
+    btn.style.display = (b==='all' || brandsWithData.has(b)) ? '' : 'none';
+  });
+  // Show/hide retail chips (data-cliente values match marcaRaw keys: ATT, MacStore, iShop, Liverpool)
+  document.querySelectorAll('#marcaClienteFilter .chip').forEach(btn => {
+    const r = btn.dataset.cliente;
+    btn.style.display = (r==='all' || retailsWithData.has(r)) ? '' : 'none';
+  });
+}
+
 function renderMarca(){
   const s=getMarcaSummary();
   renderMarcaKpis(s); renderMarcaCharts(s); renderMarcaCatChart();
+  updateMarcaChipVisibility();
   updateTblCatChips();
   renderMarcaTable();
 }
