@@ -593,18 +593,18 @@ const MONTHS_FULL = ['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct'
 
 // Full year valor: V12 Datos HTML
 const valorFull = {
-  'AT&T':         [7601182,4629061,3940834,4076768,3796639,4062202,4139329,3698131,6529017,7582742,8733574,8732206],
-  'MacStore':     [3427115,2193818,1406857,1516132,1368618,1528990,1366707,1349219,3422177,3870143,4240127,3725006],
-  'iShop':        [1622461,2109508,2856344,1355335,1826767,1150355,1376235,1929449,4023825,2208814,3012877,2116666],
+  'AT&T':         [7601182,5031586,4172841,4289140,4051382,4319528,4377537,3698131,6529017,7582742,8733574,8732206],
+  'MacStore':     [3427115,2193818,1406857,1516132,1368618,1528990,1366707,1350731,3422177,3870143,4240127,3725006],
+  'iShop':        [800677,1989708,2678803,1120086,1877298,1219616,1138671,1920826,4073536,2317374,3152455,2215145],
   'Liverpool':    [0,0,0,0,0,0,0,278983,379891,421115,469262,524847],
   'MercadoLibre': [0,11882,35843,51897,58065,37476,37705,0,0,0,0,0],
-  'Coppel':       [0,0,0,445377,0,0,0,0,0,0,0,0],
+  'Coppel':       [0,0,0,0,0,0,0,0,0,0,0,0],
 };
-// catData: 7 values per cat = Jun..Dec (V12)
+// catData: 7 values per cat = Jun..Dec (V13)
 const catData = {
   'ATT':{
     'Cables':{pcs:[9486,11036,8609,11163,12319,13759,13756],val:[1558080,1846937,1406902,1841366,2030859,2266447,2265751]},
-    'Cases iPhone':{pcs:[400,346,622,3566,4055,4061,4066],val:[203585,178164,320366,1597240,1793151,1671553,1669152]},
+    'Cases iPhone':{pcs:[898,807,622,3566,4055,4061,4066],val:[460912,416372,320366,1597240,1793151,1671553,1669152]},
     'Liquid':{pcs:[813,947,1223,3500,5000,7500,7500],val:[251892,293409,378922,1084405,1549150,2323725,2323725]},
     'Micas':{pcs:[22,22,35,25,20,18,20],val:[6868,6946,10715,7953,6843,6275,6843]},
     'Others':{pcs:[154,174,93,252,274,308,311],val:[37162,41185,24933,61705,64952,73237,74399]},
@@ -616,7 +616,7 @@ const catData = {
     'Cases Apple Watch':{pcs:[8,11,6,225,216,216,218],val:[3470,5210,2523,36216,34768,34768,35090]},
     'Cases Macbook':{pcs:[303,193,192,302,328,392,429],val:[171112,107914,107410,164965,178979,213664,233831]},
     'Cases Sleeves':{pcs:[6,3,3,12,11,13,18],val:[3023,1511,1511,6046,5542,6550,9069]},
-    'Cases iPad':{pcs:[460,355,316,465,490,589,642],val:[247506,189317,168369,254405,264983,318547,347378]},
+    'Cases iPad':{pcs:[460,355,319,465,490,589,642],val:[247506,189317,169880,254405,264983,318547,347378]},
     'Cases iPhone':{pcs:[1072,953,820,2688,2814,3299,3063],val:[556430,488571,423630,1234124,1294631,1517974,1408908]},
     'Micas':{pcs:[302,161,140,1427,1975,1927,849],val:[45629,24736,21078,519762,863755,835125,334719]},
     'Others':{pcs:[91,63,56,77,84,99,109],val:[23255,15669,13684,19695,21392,25243,27717]},
@@ -625,15 +625,15 @@ const catData = {
     'Wall Charger':{pcs:[0,1,1,5,13,13,12],val:[0,784,784,3919,10190,10190,9407]},
   },
   'iShop':{
-    'Cases AirTag':{pcs:[37,59,80,36,84,100,51],val:[8598,13710,18590,8365,19519,23237,11851]},
-    'Cases Airpods':{pcs:[165,104,173,190,144,90,90],val:[55464,31902,57368,60329,44487,25889,25889]},
-    'Cases Macbook':{pcs:[417,378,1400,777,797,1482,1077],val:[212127,189298,647993,353435,376594,688905,489942]},
-    'Cases Sleeves':{pcs:[8,17,21,12,33,12,12],val:[3445,7320,9043,5167,14210,5167,5167]},
-    'Cases iPad':{pcs:[801,690,1495,1086,751,1556,821],val:[370689,322763,690992,493840,352606,718551,400507]},
-    'Cases iPhone':{pcs:[681,1324,650,6699,2644,2844,2189],val:[277230,550289,259996,2933745,1107028,1168796,939329]},
-    'None':{pcs:[0,96,50,22,0,0,0],val:[0,37204,19377,8526,0,0,0]},
+    'Cases AirTag':{pcs:[2,1,80,36,84,100,51],val:[465,232,18590,8365,19519,23237,11851]},
+    'Cases Airpods':{pcs:[161,109,173,190,144,90,90],val:[54086,33454,57368,60329,44487,25889,25889]},
+    'Cases Macbook':{pcs:[1006,393,1400,777,797,1482,1077],val:[464888,196382,647993,353435,376594,688905,489942]},
+    'Cases Sleeves':{pcs:[8,9,21,12,33,12,12],val:[3445,3875,9043,5167,14210,5167,5167]},
+    'Cases iPad':{pcs:[711,483,1495,1086,751,1556,821],val:[329823,225783,690992,493840,352606,718551,400507]},
+    'Cases iPhone':{pcs:[580,1094,650,6699,2644,2844,2189],val:[229006,432995,259996,2933745,1107028,1168796,939329]},
+    'None':{pcs:[0,96,50,22,0,0,0],val:[0,20649,10754,4732,0,0,0]},
     'Others':{pcs:[0,30,27,38,10,40,38],val:[0,6971,6274,8830,2324,9295,8830]},
-    'Straps':{pcs:[399,378,429,389,696,942,582],val:[222803,216777,219816,151587,292046,373036,235150]},
+    'Straps':{pcs:[265,380,429,389,696,942,582],val:[137904,218328,219816,205092,400606,512613,333629]},
   },
   'Liverpool':{
     'Cases Airpods':{pcs:[0,0,300,354,418,494,582],val:[0,0,108465,127989,151128,178606,210422]},
@@ -671,35 +671,35 @@ const clientColors = {
 const MONTHS_AVB = ['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
 const avb2025Val = {
   'AT&T':         [4678900,3399383,3956583,3612164,3419782,4863453,4088204,4246650,4426318,5259168,4733823,6139439],
-  'iShop':        [2230246,952864,1244354,1231195,1631467,1328852,1695788,1502992,1672809,1880754,2511067,2819374],
-  'MacStore':     [3119713,1812803,1377847,1311547,1347492,1410314,1532846,1509544,1659574,1878693,2393420,2316107],
-  'MercadoLibre': [1,1,1,26393,20616,17245,8784,6078,3524,2014,0,0],
+  'iShop': [2230245,952863,1244353,1231194,1631465,1328846,1695790,1502996,1672811,1880750,2511066,2819373],
+  'MacStore': [3119711,1812800,1377849,1311543,1347496,1410319,1532847,1509542,1659571,1878689,2393414,2316101],
+  'MercadoLibre': [1,1,1,26393,20614,17243,8783,6078,3525,2014,0,0],
   'Coppel':       [0,0,0,0,0,0,0,0,0,0,0,0],
   'Liverpool':    [0,0,0,0,0,0,0,0,0,0,0,0],
 };
 const avb2025Pcs = {
   'AT&T':         [19033,14310,16708,15231,14173,18107,15518,16042,16202,18647,18135,24735],
-  'iShop':        [5114,2227,2914,2819,3810,3082,4000,3545,3936,4406,5899,6592],
-  'MacStore':     [7390,4383,3367,3046,3224,3388,3385,3390,3657,4008,5467,5884],
+  'iShop': [5114,2227,2914,2819,3810,3082,4000,3545,3936,4406,5899,6592],
+  'MacStore': [7390,4383,3367,3046,3224,3388,3385,3390,3657,4008,5467,5884],
   'MercadoLibre': [1,1,1,42,35,30,15,10,5,3,0,0],
   'Coppel':       [0,0,0,0,0,0,0,0,0,0,0,0],
   'Liverpool':    [0,0,0,0,0,0,0,0,0,0,0,0],
 };
 const avb2026Val = {
-  'AT&T':         [7601182,4629061,3940834,4076768,3796639,4062202,4139329,3698131,6529017,7582742,8733574,8732206],
-  'iShop':        [1622461,2109508,2856344,1355335,1826767,1150355,1376235,1929449,4023825,2208814,3012877,2116666],
-  'MacStore':     [3427115,2193818,1406857,1516132,1368618,1528990,1366707,1349219,3422177,3870143,4240127,3725006],
+  'AT&T':         [7601182,5031586,4172841,4289140,4051382,4319528,4377537,3698131,6529017,7582742,8733574,8732206],
+  'iShop':        [800677,1989708,2678803,1120086,1877298,1219616,1138671,1920826,4073536,2317374,3152455,2215145],
+  'MacStore':     [3427115,2193818,1406857,1516132,1368618,1528990,1366707,1350731,3422177,3870143,4240127,3725006],
   'Liverpool':    [0,0,0,0,0,0,0,278983,379891,421115,469262,524847],
   'MercadoLibre': [0,11882,35843,51897,58065,37476,37705,0,0,0,0,0],
-  'Coppel':       [0,0,0,445377,0,0,0,0,0,0,0,0],
+  'Coppel':       [0,0,0,0,0,0,0,0,0,0,0,0],
 };
 const avb2026Pcs = {
-  'AT&T':         [30710,20206,17727,18986,17916,18847,19542,16806,26256,30226,35223,35230],
-  'MacStore':     [7961,4634,3011,2947,2521,2908,2452,2481,7499,8269,9003,7854],
-  'iShop':        [3807,4706,6090,3089,4076,2508,3076,4325,9249,5159,7066,4860],
+  'AT&T':         [30710,20985,18176,19397,18409,19345,20003,16806,26256,30226,35223,35230],
+  'MacStore':     [7961,4634,3011,2947,2521,2908,2452,2484,7499,8269,9003,7854],
+  'iShop':        [1884,4502,5686,2687,4318,2733,2595,4325,9249,5159,7066,4860],
   'Liverpool':    [0,0,0,0,0,0,0,630,874,973,1089,1223],
   'MercadoLibre': [0,25,70,123,156,118,105,0,0,0,0,0],
-  'Coppel':       [0,0,0,1470,0,0,0,0,0,0,0,0],
+  'Coppel':       [0,0,0,0,0,0,0,0,0,0,0,0],
 };
 const piezasAnual = avb2026Pcs; // Jan-Dec pcs from Budget/Consenso
 const avbRetailColors = {
@@ -727,20 +727,20 @@ const q2025Pcs = {
 
 
 const qValorAll = {
-  'AT&T':         [16171077, 11935609, 14366477, 25048522],
-  'MacStore':     [7027790, 4413740, 6138103, 11835276],
-  'iShop':        [6588313, 4332457, 7329509, 7338357],
+  'AT&T':         [16805609, 12660050, 14604685, 25048522],
+  'MacStore':     [7027790, 4413740, 6139615, 11835276],
+  'iShop':        [5469188, 4217000, 7133033, 7684974],
   'Liverpool':    [0, 0, 658874, 1415224],
   'MercadoLibre': [47725, 147438, 37705, 0],
-  'Coppel':       [0, 445377, 0, 0]
+  'Coppel':       [0, 0, 0, 0]
 };
 const qPiezas = {
-  'AT&T':         [68643, 55749, 62604, 100679],
-  'MacStore':     [15606, 8376, 12432, 25126],
-  'iShop':        [14603, 9673, 16650, 17085],
+  'AT&T':         [69871, 57151, 63065, 100679],
+  'MacStore':     [15606, 8376, 12435, 25126],
+  'iShop':        [12072, 9738, 16169, 17085],
   'Liverpool':    [0, 0, 1504, 3285],
   'MercadoLibre': [95, 397, 105, 0],
-  'Coppel':       [0, 1470, 0, 0]
+  'Coppel':       [0, 0, 0, 0]
 };
 const sales2025Raw = {
   'Nomad':{
@@ -750,10 +750,10 @@ const sales2025Raw = {
     'MacStore':{
       'Cables':{Jan:301,Feb:602,Mar:301,Apr:0,May:301,Jun:0,Jul:1204,Aug:301,Sep:0,Oct:0,Nov:0,Dec:0},
       'Cases AirTag':{Jan:10607,Feb:5786,Mar:4339,Apr:4339,May:1929,Jun:964,Jul:482,Aug:482,Sep:0,Oct:0,Nov:964,Dec:0},
-      'Cases Airpods':{Jan:112543,Feb:77598,Mar:55908,Apr:48740,May:48618,Jun:50245,Jul:54464,Aug:49642,Sep:49883,Oct:28195,Nov:13796,Dec:27593},
-      'Cases iPhone':{Jan:438266,Feb:244752,Mar:177237,Apr:185677,May:161562,Jun:172413,Jul:208584,Aug:146491,Sep:116288,Oct:320712,Nov:431634,Dec:341810},
-      'Straps':{Jan:715737,Feb:455021,Mar:349783,Apr:366236,May:378492,Jun:396275,Jul:411106,Aug:369931,Sep:348830,Oct:333810,Nov:392611,Dec:400058},
-      'Wall Charger':{Jan:33218,Feb:16700,Mar:20982,Apr:15614,May:23332,Jun:23150,Jul:19112,Aug:25863,Sep:13143,Oct:11938,Nov:21523,Dec:13143},
+      'Cases Airpods':{Jan:112543,Feb:77597,Mar:55909,Apr:48739,May:48618,Jun:50245,Jul:54464,Aug:49642,Sep:49883,Oct:28195,Nov:13796,Dec:27592},
+      'Cases iPhone':{Jan:438265,Feb:244753,Mar:177235,Apr:185675,May:161561,Jun:172412,Jul:208583,Aug:146490,Sep:116288,Oct:320711,Nov:431633,Dec:341810},
+      'Straps':{Jan:715737,Feb:455022,Mar:349784,Apr:366238,May:378493,Jun:396276,Jul:411105,Aug:369932,Sep:348829,Oct:333810,Nov:392612,Dec:400056},
+      'Wall Charger':{Jan:33218,Feb:16700,Mar:20982,Apr:15614,May:23332,Jun:23151,Jul:19112,Aug:25863,Sep:13143,Oct:11937,Nov:21523,Dec:13143},
     },
     'MercadoLibre':{
       'Cables':{Jan:0,Feb:0,Mar:0,Apr:1006,May:0,Jun:0,Jul:0,Aug:0,Sep:503,Oct:503,Nov:0,Dec:0},
@@ -761,16 +761,16 @@ const sales2025Raw = {
       'Straps':{Jan:0,Feb:0,Mar:0,Apr:12939,May:6537,Jun:1406,Jul:0,Aug:0,Sep:0,Oct:0,Nov:0,Dec:0},
     },
     'iShop':{
-      'Cases Airpods':{Jan:56543,Feb:40278,Mar:75392,Apr:63773,May:78490,Jun:70486,Jul:80555,Aug:69453,Sep:35114,Oct:23237,Nov:25045,Dec:13684},
-      'Cases iPhone':{Jan:179517,Feb:85259,Mar:128835,Apr:112258,May:163412,Jun:124099,Jul:124573,Aug:79575,Sep:241443,Oct:314255,Nov:313262,Dec:351396},
-      'Straps':{Jan:446683,Feb:194932,Mar:294095,Apr:349615,May:408484,Jun:366283,Jul:384413,Aug:297105,Sep:297142,Oct:293232,Nov:352707,Dec:418206},
+      'Cases Airpods':{Jan:56544,Feb:40278,Mar:75391,Apr:63773,May:78490,Jun:70486,Jul:80555,Aug:69453,Sep:35114,Oct:23237,Nov:25044,Dec:13684},
+      'Cases iPhone':{Jan:179517,Feb:85259,Mar:128836,Apr:112257,May:163413,Jun:124099,Jul:124573,Aug:79575,Sep:241443,Oct:314255,Nov:313262,Dec:351396},
+      'Straps':{Jan:446683,Feb:194933,Mar:294094,Apr:349615,May:408484,Jun:366282,Jul:384413,Aug:297106,Sep:297142,Oct:293231,Nov:352708,Dec:418206},
     },
   },
   'Pitaka':{
     'MacStore':{
-      'Cases iPhone':{Jan:180664,Feb:93708,Mar:92863,Apr:59939,May:66693,Jun:72602,Jul:80201,Aug:53185,Sep:38834,Oct:20261,Nov:22794,Dec:66314},
-      'Others':{Jan:6030,Feb:843,Mar:4583,Apr:12303,May:2411,Jun:964,Jul:3014,Aug:1446,Sep:1446,Oct:3857,Nov:964,Dec:964},
-      'Straps':{Jan:12901,Feb:11575,Mar:8681,Apr:3135,May:4823,Jun:603,Jul:1206,Aug:2533,Sep:1809,Oct:3135,Nov:0,Dec:1809},
+      'Cases iPhone':{Jan:180663,Feb:93708,Mar:92864,Apr:59940,May:66693,Jun:72603,Jul:80201,Aug:53186,Sep:38834,Oct:20261,Nov:22794,Dec:66315},
+      'Others':{Jan:6030,Feb:842,Mar:4583,Apr:12303,May:2411,Jun:964,Jul:3015,Aug:1446,Sep:1446,Oct:3857,Nov:964,Dec:964},
+      'Straps':{Jan:12901,Feb:11575,Mar:8681,Apr:3135,May:4823,Jun:603,Jul:1206,Aug:2532,Sep:1809,Oct:3135,Nov:0,Dec:1809},
     },
   },
   'Quikcell':{
@@ -783,7 +783,7 @@ const sales2025Raw = {
       'Wall Charger':{Jan:2509542,Feb:1675041,Mar:1570003,Apr:1775183,May:1746474,Jun:1950363,Jul:1612638,Aug:1564592,Sep:1493203,Oct:1824036,Nov:1776639,Dec:2487303},
     },
     'MacStore':{
-      'Micas':{Jan:302390,Feb:209934,Mar:170316,Apr:127604,May:151731,Jun:160758,Jul:110362,Aug:113460,Sep:105211,Oct:92803,Nov:202619,Dec:327828},
+      'Micas':{Jan:302390,Feb:209933,Mar:170318,Apr:127604,May:151732,Jun:160758,Jul:110362,Aug:113460,Sep:105210,Oct:92802,Nov:202617,Dec:327828},
       'Others':{Jan:213,Feb:213,Mar:0,Apr:0,May:0,Jun:213,Jul:1277,Aug:426,Sep:426,Oct:0,Nov:213,Dec:9154},
     },
     'MercadoLibre':{
@@ -792,7 +792,7 @@ const sales2025Raw = {
   },
   'Raptic':{
     'MacStore':{
-      'Cases Apple Watch':{Jan:203754,Feb:81304,Mar:94130,Apr:53375,May:42057,Jun:78289,Jul:82548,Aug:61917,Sep:57104,Oct:38527,Nov:45620,Dec:28564},
+      'Cases Apple Watch':{Jan:203754,Feb:81303,Mar:94128,Apr:53374,May:42057,Jun:78289,Jul:82548,Aug:61916,Sep:57104,Oct:38527,Nov:45620,Dec:28564},
     },
   },
   'Speck':{
@@ -803,23 +803,24 @@ const sales2025Raw = {
     },
     'MacStore':{
       'Cases AirTag':{Jan:16312,Feb:8760,Mar:10875,Apr:14198,May:18125,Jun:16614,Jul:17521,Aug:20541,Sep:16312,Oct:12083,Nov:10271,Dec:11177},
-      'Cases Macbook':{Jan:0,Feb:0,Mar:0,Apr:33251,May:44839,Jun:52396,Jul:45847,Aug:76076,Sep:97740,Oct:25190,Nov:52396,Dec:110334},
-      'Cases iPad':{Jan:100763,Feb:84140,Mar:39300,Apr:32044,May:54316,Jun:23982,Jul:26906,Aug:95325,Sep:313019,Oct:263492,Nov:223290,Dec:278912},
-      'Cases iPhone':{Jan:694119,Feb:365442,Mar:226118,Apr:253577,May:256523,Jun:260211,Jul:346000,Aug:381574,Sep:283158,Oct:413923,Nov:576390,Dec:415043},
-      'Others':{Jan:29194,Feb:18466,Mar:15151,Apr:18652,May:13907,Jun:13815,Jul:18604,Aug:15288,Sep:23989,Oct:11742,Nov:11743,Dec:11881},
-      'Speakers':{Jan:25694,Feb:4344,Mar:8686,Apr:3257,May:2171,Jun:9048,Jul:10856,Aug:16287,Sep:3619,Oct:6152,Nov:3981,Dec:19905},
+      'Cases Macbook':{Jan:0,Feb:0,Mar:0,Apr:33251,May:44839,Jun:52396,Jul:45847,Aug:76075,Sep:97739,Oct:25190,Nov:52396,Dec:110334},
+      'Cases iPad':{Jan:100764,Feb:84140,Mar:39300,Apr:32044,May:54316,Jun:23983,Jul:26905,Aug:95325,Sep:313019,Oct:263492,Nov:223290,Dec:278911},
+      'Cases iPhone':{Jan:694118,Feb:365442,Mar:226117,Apr:253575,May:256525,Jun:260212,Jul:346001,Aug:381573,Sep:283158,Oct:413922,Nov:576387,Dec:415038},
+      'Others':{Jan:29194,Feb:18466,Mar:15151,Apr:18651,May:13907,Jun:13815,Jul:18604,Aug:15288,Sep:23989,Oct:11741,Nov:11743,Dec:11881},
+      'Speakers':{Jan:25694,Feb:4343,Mar:8686,Apr:3257,May:2171,Jun:9048,Jul:10857,Aug:16286,Sep:3619,Oct:6152,Nov:3981,Dec:19905},
     },
     'MercadoLibre':{
       'Cases Macbook':{Jan:0,Feb:0,Mar:0,Apr:791,May:0,Jun:0,Jul:0,Aug:0,Sep:0,Oct:0,Nov:0,Dec:0},
       'Cases iPhone':{Jan:0,Feb:0,Mar:0,Apr:0,May:0,Jun:136,Jul:0,Aug:0,Sep:0,Oct:0,Nov:0,Dec:0},
     },
         'iShop':{
-      'Cases AirTag':{Jan:20737,Feb:16392,Mar:15644,Apr:20407,May:25062,Jun:18192,Jul:31221,Aug:25065,Sep:15470,Oct:15438,Nov:14253,Dec:24244},
-      'Cases Macbook':{Jan:210572,Feb:80637,Mar:87415,Apr:89945,May:168267,Jun:149642,Jul:240499,Aug:210406,Sep:85262,Oct:99851,Nov:246421,Dec:187040},
-      'Cases Sleeves':{Jan:4737,Feb:1292,Mar:2584,Apr:2153,May:2153,Jun:3014,Jul:5167,Aug:8181,Sep:3876,Oct:2153,Nov:2153,Dec:4306},
-      'Cases iPad':{Jan:708242,Feb:266209,Mar:313617,Apr:285804,May:351773,Jun:241318,Jul:397622,Aug:503215,Sep:246007,Oct:219483,Nov:426471,Dec:565560},
-      'Cases iPhone':{Jan:418926,Feb:188561,Mar:230505,Apr:205382,May:273643,Jun:226276,Jul:282697,Aug:205996,Sep:394873,Oct:456368,Nov:590917,Dec:603278},
-      'Others':{Jan:46927,Feb:21604,Mar:18575,Apr:20721,May:34416,Jun:20000,Jul:20745,Aug:13741,Sep:17105,Oct:16719,Nov:21419,Dec:32408},
+      'Accesories':{Jan:7901,Feb:4880,Mar:7203,Apr:6274,May:9295,Jun:5809,Jul:9760,Aug:7436,Sep:5112,Oct:4415,Nov:7901,Dec:6971},
+      'Audio':{Jan:39027,Feb:16724,Mar:11372,Apr:14447,May:25122,Jun:14191,Jul:10986,Aug:6306,Sep:11994,Oct:12304,Nov:13519,Dec:25438},
+      'Cases AirTag':{Jan:20736,Feb:16392,Mar:15644,Apr:20407,May:25062,Jun:18191,Jul:31220,Aug:25065,Sep:15471,Oct:15439,Nov:14253,Dec:24244},
+      'Cases Macbook':{Jan:210572,Feb:80636,Mar:87414,Apr:89945,May:168266,Jun:149642,Jul:240499,Aug:210407,Sep:85262,Oct:99851,Nov:246420,Dec:187039},
+      'Cases Sleeves':{Jan:4737,Feb:1292,Mar:2584,Apr:2153,May:2153,Jun:3014,Jul:5167,Aug:8181,Sep:3875,Oct:2153,Nov:2153,Dec:4306},
+      'Cases iPad':{Jan:708241,Feb:266209,Mar:313619,Apr:285805,May:351772,Jun:241318,Jul:397622,Aug:503215,Sep:246007,Oct:219482,Nov:426472,Dec:565561},
+      'Cases iPhone':{Jan:418927,Feb:188561,Mar:230505,Apr:205382,May:273642,Jun:226272,Jul:282699,Aug:205994,Sep:394872,Oct:456363,Nov:590915,Dec:603277},
     },
   },
   'Tech21':{
@@ -828,8 +829,8 @@ const sales2025Raw = {
     },
     'MacStore':{
       'Cases Airpods':{Jan:0,Feb:0,Mar:0,Apr:0,May:0,Jun:906,Jul:6340,Aug:5434,Sep:7472,Oct:3849,Nov:5661,Dec:7925},
-      'Cases Macbook':{Jan:0,Feb:0,Mar:0,Apr:0,May:0,Jun:0,Jul:0,Aug:0,Sep:77449,Oct:58416,Nov:59728,Dec:48570},
-      'Cases iPhone':{Jan:222207,Feb:127188,Mar:91805,Apr:74571,May:72359,Jun:73261,Jul:85457,Aug:72051,Sep:101622,Oct:229576,Nov:315260,Dec:194607},
+      'Cases Macbook':{Jan:0,Feb:0,Mar:0,Apr:0,May:0,Jun:0,Jul:0,Aug:0,Sep:77449,Oct:58415,Nov:59728,Dec:48570},
+      'Cases iPhone':{Jan:222208,Feb:127187,Mar:91805,Apr:74571,May:72360,Jun:73262,Jul:85458,Aug:72052,Sep:101622,Oct:229576,Nov:315261,Dec:194607},
     },
     'MercadoLibre':{
       'Cases iPhone':{Jan:0,Feb:0,Mar:0,Apr:672,May:1120,Jun:1680,Jul:672,Aug:0,Sep:0,Oct:0,Nov:0,Dec:0},
@@ -879,9 +880,9 @@ const marcaRaw = {
       'Straps':{pcs:{Jan:0,Feb:0,Mar:3,Apr:4,May:4,Jun:5,Jul:11,Aug:0,Sep:0,Oct:0,Nov:0,Dec:0},val:{Jan:0,Feb:0,Mar:3330,Apr:2680,May:2655,Jun:3459,Jul:6471,Aug:0,Sep:0,Oct:0,Nov:0,Dec:0}},
     },
     'iShop': {
-      'Cases Airpods':{pcs:{Jan:447,Feb:240,Mar:319,Apr:113,May:275,Jun:157,Jul:81,Aug:160,Sep:160,Oct:114,Nov:60,Dec:60},val:{Jan:153947,Feb:82656,Mar:109864,Apr:38917,May:94710,Jun:54071,Jul:27896,Aug:55104,Sep:55104,Oct:39262,Nov:20664,Dec:20664}},
-      'Cases iPhone':{pcs:{Jan:388,Feb:343,Mar:452,Apr:145,May:344,Jun:154,Jul:246,Aug:228,Sep:1170,Oct:670,Nov:710,Dec:570},val:{Jan:202179,Feb:178730,Mar:235528,Apr:75557,May:179252,Jun:80246,Jul:128186,Aug:118806,Sep:586565,Oct:330315,Nov:349263,Dec:282944}},
-      'Straps':{pcs:{Jan:331,Feb:684,Mar:859,Apr:485,May:711,Jun:399,Jul:378,Aug:429,Sep:389,Oct:696,Nov:942,Dec:582},val:{Jan:188780,Feb:431732,Mar:479933,Apr:278025,May:413143,Jun:222803,Jul:216777,Aug:219816,Sep:151587,Oct:292046,Nov:373036,Dec:235150}},
+      'Cases Airpods':{pcs:{Jan:435,Feb:234,Mar:298,Apr:113,May:275,Jun:153,Jul:85,Aug:160,Sep:160,Oct:114,Nov:60,Dec:60},val:{Jan:149814,Feb:80590,Mar:102631,Apr:38917,May:94710,Jun:52693,Jul:29274,Aug:55104,Sep:55104,Oct:39262,Nov:20664,Dec:20664}},
+      'Cases iPhone':{pcs:{Jan:352,Feb:241,Mar:435,Apr:142,May:344,Jun:151,Jul:247,Aug:228,Sep:1170,Oct:670,Nov:710,Dec:570},val:{Jan:183420,Feb:125580,Mar:226670,Apr:73993,May:179252,Jun:78683,Jul:128707,Aug:118806,Sep:586565,Oct:330315,Nov:349263,Dec:282944}},
+      'Straps':{pcs:{Jan:102,Feb:613,Mar:814,Apr:400,May:711,Jun:265,Jul:380,Aug:429,Sep:389,Oct:696,Nov:942,Dec:582},val:{Jan:48318,Feb:388443,Mar:455297,Apr:217242,May:413143,Jun:137904,Jul:218328,Aug:219816,Sep:205092,Oct:400606,Nov:512613,Dec:333629}},
     },
   },
   'Pitaka': {
@@ -921,18 +922,15 @@ const marcaRaw = {
   },
   'Speck': {
     'ATT': {
-      'Cases iPhone':{pcs:{Jan:3093,Feb:710,Mar:517,Apr:408,May:351,Jun:391,Jul:337,Aug:606,Sep:2479,Oct:2724,Nov:2388,Dec:2373},val:{Jan:1595318,Feb:363975,Mar:265075,Apr:208753,May:180748,Jun:198934,Jul:173514,Aug:312719,Sep:1157533,Oct:1256264,Nov:996859,Dec:986285}},
+      'Cases iPhone':{pcs:{Jan:3093,Feb:1489,Mar:966,Apr:819,May:844,Jun:889,Jul:798,Aug:606,Sep:2479,Oct:2724,Nov:2388,Dec:2373},val:{Jan:1595318,Feb:766500,Mar:497083,Apr:421125,May:435491,Jun:456261,Jul:411722,Aug:312719,Sep:1157533,Oct:1256264,Nov:996859,Dec:986285}},
       'Micas':{pcs:{Jan:14,Feb:26,Mar:12,Apr:15,May:8,Jun:8,Jul:9,Aug:10,Sep:11,Oct:15,Nov:15,Dec:15},val:{Jan:5062,Feb:9400,Mar:4339,Apr:5423,May:2892,Jun:2892,Jul:3254,Aug:3616,Sep:3977,Oct:5423,Nov:5423,Dec:5423}},
       'Others':{pcs:{Jan:28,Feb:29,Mar:25,Apr:12,May:7,Jun:18,Jul:10,Aug:16,Sep:14,Oct:11,Nov:13,Dec:16},val:{Jan:9606,Feb:9450,Mar:10305,Apr:3718,May:2169,Jun:5577,Jul:3098,Aug:7051,Sep:6432,Oct:3873,Nov:4726,Dec:5888}},
-    },
-    'Coppel': {
-      'Cases iPhone':{pcs:{Jan:0,Feb:0,Mar:0,Apr:1470,May:0,Jun:0,Jul:0,Aug:0,Sep:0,Oct:0,Nov:0,Dec:0},val:{Jan:0,Feb:0,Mar:0,Apr:445377,May:0,Jun:0,Jul:0,Aug:0,Sep:0,Oct:0,Nov:0,Dec:0}},
     },
     'MacStore': {
       'Cases AirTag':{pcs:{Jan:48,Feb:26,Mar:22,Apr:38,May:34,Jun:41,Jul:36,Aug:32,Sep:26,Oct:30,Nov:36,Dec:39},val:{Jan:14500,Feb:7854,Mar:6646,Apr:11479,May:10271,Jun:12385,Jul:10875,Aug:9667,Sep:7854,Oct:9062,Nov:10875,Dec:11781}},
       'Cases Macbook':{pcs:{Jan:274,Feb:254,Mar:152,Apr:213,May:141,Jun:182,Jul:123,Aug:122,Sep:218,Oct:238,Nov:286,Dec:313},val:{Jan:138044,Feb:127968,Mar:76579,Apr:107312,May:71037,Jun:91693,Jul:61969,Aug:61465,Sep:109831,Oct:119907,Nov:144090,Dec:157693}},
       'Cases Sleeves':{pcs:{Jan:0,Feb:0,Mar:0,Apr:0,May:3,Jun:6,Jul:3,Aug:3,Sep:12,Oct:11,Nov:13,Dec:18},val:{Jan:0,Feb:0,Mar:0,Apr:0,May:1511,Jun:3023,Jul:1511,Aug:1511,Sep:6046,Oct:5542,Nov:6550,Dec:9069}},
-      'Cases iPad':{pcs:{Jan:1538,Feb:865,Mar:352,Apr:394,May:374,Jun:393,Jul:305,Aug:273,Sep:363,Oct:397,Nov:477,Dec:519},val:{Jan:768757,Feb:435593,Mar:178954,Apr:197492,May:187819,Jun:199863,Jul:153763,Aug:137792,Sep:181874,Oct:198852,Nov:238905,Dec:259914}},
+      'Cases iPad':{pcs:{Jan:1538,Feb:865,Mar:352,Apr:394,May:374,Jun:393,Jul:305,Aug:276,Sep:363,Oct:397,Nov:477,Dec:519},val:{Jan:768757,Feb:435593,Mar:178954,Apr:197492,May:187819,Jun:199863,Jul:153763,Aug:139303,Sep:181874,Oct:198852,Nov:238905,Dec:259914}},
       'Cases iPhone':{pcs:{Jan:1521,Feb:859,Mar:460,Apr:425,May:364,Jun:403,Jul:380,Aug:241,Sep:829,Oct:784,Nov:997,Dec:953},val:{Jan:690469,Feb:390065,Mar:207702,Apr:191391,May:162178,Jun:182361,Jul:169550,Aug:106982,Sep:376242,Oct:356799,Nov:454938,Dec:434481}},
       'Others':{pcs:{Jan:64,Feb:43,Mar:46,Apr:30,May:33,Jun:41,Jul:27,Aug:30,Sep:31,Oct:35,Nov:41,Dec:45},val:{Jan:19018,Feb:13355,Mar:13215,Apr:8703,May:10362,Jun:12341,Jul:7736,Aug:8149,Sep:9902,Oct:10960,Nov:12895,Dec:14092}},
       'Speakers':{pcs:{Jan:11,Feb:6,Mar:4,Apr:3,May:2,Jun:7,Jul:3,Aug:13,Sep:5,Oct:9,Nov:9,Dec:9},val:{Jan:13752,Feb:7600,Mar:4342,Apr:3981,May:2533,Jun:9047,Jul:3981,Aug:18096,Sep:6514,Oct:12305,Nov:12305,Dec:12305}},
@@ -945,13 +943,13 @@ const marcaRaw = {
       'Micas':{pcs:{Jan:0,Feb:0,Mar:0,Apr:0,May:0,Jun:1,Jul:0,Aug:0,Sep:0,Oct:0,Nov:0,Dec:0},val:{Jan:0,Feb:0,Mar:0,Apr:0,May:0,Jun:128,Jul:0,Aug:0,Sep:0,Oct:0,Nov:0,Dec:0}},
     },
     'iShop': {
-      'Cases AirTag':{pcs:{Jan:36,Feb:51,Mar:128,Apr:36,May:85,Jun:37,Jul:59,Aug:80,Sep:36,Oct:84,Nov:100,Dec:51},val:{Jan:8365,Feb:11851,Mar:29743,Apr:8365,May:19751,Jun:8598,Jul:13710,Aug:18590,Sep:8365,Oct:19519,Nov:23237,Dec:11851}},
-      'Cases Macbook':{pcs:{Jan:229,Feb:561,Mar:800,Apr:267,May:565,Jun:254,Jul:260,Aug:1200,Sep:707,Oct:677,Nov:1282,Dec:1037},val:{Jan:103457,Feb:258377,Mar:370235,Apr:125962,May:264518,Jun:117347,Jul:120685,Aug:531699,Sep:312732,Oct:306818,Nov:572611,Dec:466683}},
-      'Cases Sleeves':{pcs:{Jan:0,Feb:0,Mar:35,Apr:9,May:0,Jun:8,Jul:17,Aug:21,Sep:12,Oct:33,Nov:12,Dec:12},val:{Jan:0,Feb:0,Mar:15071,Apr:3875,May:0,Jun:3445,Jul:7320,Aug:9043,Sep:5167,Oct:14210,Nov:5167,Dec:5167}},
-      'Cases iPad':{pcs:{Jan:1038,Feb:1133,Mar:1389,Apr:548,May:1058,Jun:659,Jul:547,Aug:1345,Sep:979,Oct:644,Nov:1411,Dec:601},val:{Jan:449594,Feb:488993,Mar:598451,Apr:237522,May:447560,Jun:285060,Jul:236531,Aug:600539,Sep:429317,Oct:288083,Nov:631113,Dec:267843}},
-      'Cases iPhone':{pcs:{Jan:617,Feb:912,Mar:478,Apr:512,May:481,Jun:316,Jul:632,Aug:230,Sep:2324,Oct:899,Nov:929,Dec:744},val:{Jan:238802,Feb:353436,Mar:185244,Apr:197955,May:185631,Jun:122463,Jul:244537,Aug:78428,Sep:922915,Oct:345064,Nov:346992,Dec:284995}},
-      'None':{pcs:{Jan:0,Feb:0,Mar:0,Apr:0,May:0,Jun:0,Jul:96,Aug:50,Sep:22,Oct:0,Nov:0,Dec:0},val:{Jan:0,Feb:0,Mar:0,Apr:0,May:0,Jun:0,Jul:37204,Aug:19377,Sep:8526,Oct:0,Nov:0,Dec:0}},
-      'Others':{pcs:{Jan:31,Feb:6,Mar:35,Apr:30,May:64,Jun:0,Jul:30,Aug:27,Sep:38,Oct:10,Nov:40,Dec:38},val:{Jan:7203,Feb:1394,Mar:8133,Apr:6971,May:14872,Jun:0,Jul:6971,Aug:6274,Sep:8830,Oct:2324,Nov:9295,Dec:8830}},
+      'Cases AirTag':{pcs:{Jan:36,Feb:49,Mar:122,Apr:32,May:85,Jun:2,Jul:1,Aug:80,Sep:36,Oct:84,Nov:100,Dec:51},val:{Jan:8365,Feb:11386,Mar:28349,Apr:7436,May:19751,Jun:465,Jul:232,Aug:18590,Sep:8365,Oct:19519,Nov:23237,Dec:11851}},
+      'Cases Macbook':{pcs:{Jan:17,Feb:540,Mar:711,Apr:148,May:565,Jun:843,Jul:273,Aug:1200,Sep:707,Oct:677,Nov:1282,Dec:1037},val:{Jan:7428,Feb:247503,Mar:324691,Apr:63729,May:264518,Jun:370108,Jul:126606,Aug:531699,Sep:312732,Oct:306818,Nov:572611,Dec:466683}},
+      'Cases Sleeves':{pcs:{Jan:0,Feb:0,Mar:31,Apr:9,May:0,Jun:8,Jul:9,Aug:21,Sep:12,Oct:33,Nov:12,Dec:12},val:{Jan:0,Feb:0,Mar:13349,Apr:3875,May:0,Jun:3445,Jul:3875,Aug:9043,Sep:5167,Oct:14210,Nov:5167,Dec:5167}},
+      'Cases iPad':{pcs:{Jan:575,Feb:930,Mar:1202,Apr:374,May:1058,Jun:571,Jul:375,Aug:1345,Sep:979,Oct:644,Nov:1411,Dec:601},val:{Jan:263243,Feb:401150,Mar:524307,Apr:166821,May:447560,Jun:245400,Jul:160657,Aug:600539,Sep:429317,Oct:288083,Nov:631113,Dec:267843}},
+      'Cases iPhone':{pcs:{Jan:105,Feb:906,Mar:476,Apr:630,May:704,Jun:279,Jul:480,Aug:230,Sep:2324,Oct:899,Nov:929,Dec:744},val:{Jan:40459,Feb:351111,Mar:184469,Apr:210712,May:228799,Jun:98232,Jul:161386,Aug:78428,Sep:922915,Oct:345064,Nov:346992,Dec:284995}},
+      'None':{pcs:{Jan:0,Feb:0,Mar:0,Apr:0,May:0,Jun:0,Jul:96,Aug:50,Sep:22,Oct:0,Nov:0,Dec:0},val:{Jan:0,Feb:0,Mar:0,Apr:0,May:0,Jun:0,Jul:20649,Aug:10754,Sep:4732,Oct:0,Nov:0,Dec:0}},
+      'Others':{pcs:{Jan:30,Feb:6,Mar:29,Apr:0,May:64,Jun:0,Jul:30,Aug:27,Sep:38,Oct:10,Nov:40,Dec:38},val:{Jan:6971,Feb:1394,Mar:6739,Apr:0,May:14872,Jun:0,Jul:6971,Aug:6274,Sep:8830,Oct:2324,Nov:9295,Dec:8830}},
     },
   },
   'Tech21': {
@@ -969,10 +967,10 @@ const marcaRaw = {
       'Cases iPhone':{pcs:{Jan:0,Feb:0,Mar:0,Apr:1,May:1,Jun:5,Jul:1,Aug:0,Sep:0,Oct:0,Nov:0,Dec:0},val:{Jan:0,Feb:0,Mar:0,Apr:390,May:272,Jun:1677,Jul:343,Aug:0,Sep:0,Oct:0,Nov:0,Dec:0}},
     },
     'iShop': {
-      'Cases Airpods':{pcs:{Jan:0,Feb:0,Mar:0,Apr:81,May:39,Jun:8,Jul:23,Aug:13,Sep:30,Oct:30,Nov:30,Dec:30},val:{Jan:0,Feb:0,Mar:0,Apr:14109,May:6793,Jun:1393,Jul:4006,Aug:2264,Sep:5225,Oct:5225,Nov:5225,Dec:5225}},
-      'Cases Macbook':{pcs:{Jan:0,Feb:0,Mar:302,Apr:112,May:0,Jun:163,Jul:118,Aug:200,Sep:70,Oct:120,Nov:200,Dec:40},val:{Jan:0,Feb:0,Mar:175604,Apr:65125,May:0,Jun:94780,Jul:68613,Aug:116294,Sep:40703,Oct:69776,Nov:116294,Dec:23259}},
-      'Cases iPad':{pcs:{Jan:0,Feb:0,Mar:449,Apr:139,May:74,Jun:142,Jul:143,Aug:150,Sep:107,Oct:107,Nov:145,Dec:220},val:{Jan:0,Feb:0,Mar:270756,Apr:83820,May:44623,Jun:85629,Jul:86232,Aug:90453,Sep:64523,Oct:64523,Nov:87438,Dec:132664}},
-      'Cases iPhone':{pcs:{Jan:690,Feb:776,Mar:844,Apr:612,May:380,Jun:211,Jul:446,Aug:192,Sep:3205,Oct:1075,Nov:1205,Dec:875},val:{Jan:270133,Feb:302338,Mar:377782,Apr:219133,May:155914,Jun:74521,Jul:177566,Aug:62762,Sep:1424265,Oct:431649,Nov:472541,Dec:371390}},
+      'Cases Airpods':{pcs:{Jan:0,Feb:0,Mar:0,Apr:81,May:39,Jun:8,Jul:24,Aug:13,Sep:30,Oct:30,Nov:30,Dec:30},val:{Jan:0,Feb:0,Mar:0,Apr:14109,May:6793,Jun:1393,Jul:4180,Aug:2264,Sep:5225,Oct:5225,Nov:5225,Dec:5225}},
+      'Cases Macbook':{pcs:{Jan:0,Feb:0,Mar:302,Apr:80,May:0,Jun:163,Jul:120,Aug:200,Sep:70,Oct:120,Nov:200,Dec:40},val:{Jan:0,Feb:0,Mar:175604,Apr:46518,May:0,Jun:94780,Jul:69776,Aug:116294,Sep:40703,Oct:69776,Nov:116294,Dec:23259}},
+      'Cases iPad':{pcs:{Jan:0,Feb:0,Mar:449,Apr:139,May:74,Jun:140,Jul:108,Aug:150,Sep:107,Oct:107,Nov:145,Dec:220},val:{Jan:0,Feb:0,Mar:270756,Apr:83820,May:44623,Jun:84423,Jul:65126,Aug:90453,Sep:64523,Oct:64523,Nov:87438,Dec:132664}},
+      'Cases iPhone':{pcs:{Jan:232,Feb:983,Mar:817,Apr:539,May:399,Jun:150,Jul:367,Aug:192,Sep:3205,Oct:1075,Nov:1205,Dec:875},val:{Jan:92658,Feb:382550,Mar:365941,Apr:192915,May:163276,Jun:52091,Jul:142902,Aug:62762,Sep:1424265,Oct:431649,Nov:472541,Dec:371390}},
     },
   },
   'Uniq': {
@@ -1054,7 +1052,7 @@ let anualState = {marca:'all', cat:'all'};
 const anualRetails = ['ATT','MacStore','iShop','Liverpool'];
 const anualRetailDisplay = {ATT:'AT&T',MacStore:'MacStore',iShop:'iShop',Liverpool:'Liverpool'};
 const anualRetailColorVar = {ATT:'var(--att)',MacStore:'var(--macstore)',iShop:'var(--ishop)',Liverpool:'var(--liverpool)'};
-const anualH2 = new Set(['Jul','Aug','Sep','Oct','Nov','Dec']);
+const anualH2 = new Set(['Aug','Sep','Oct','Nov','Dec']);
 
 function switchAnualTable(mode) {
   anualTableMode = mode;
@@ -1355,8 +1353,8 @@ function buildAnualDualChart() {
       labels: MONTHS_FULL,
       datasets: [
         {type:'bar', label:'2025 Real', data:val2025, backgroundColor:'#CBD5E1', borderRadius:4, yAxisID:'y', order:2},
-        {type:'bar', label:'2026 Invoice (Ene–Jul)', data:val2026.map((v,i)=>i<7?v:0), backgroundColor:'#2DD4BF', borderRadius:4, yAxisID:'y', order:2},
-        {type:'bar', label:'2026 Proyección (Ago–Dic)', data:val2026.map((v,i)=>i>=7?v:0), backgroundColor:'#93C5FD', borderRadius:4, yAxisID:'y', order:2},
+        {type:'bar', label:'2026 Invoice (Ene–Jul)', data:val2026.map((v,i)=>i<8?v:0), backgroundColor:'#2DD4BF', borderRadius:4, yAxisID:'y', order:2},
+        {type:'bar', label:'2026 Proyección (Ago–Dic)', data:val2026.map((v,i)=>i>=8?v:0), backgroundColor:'#93C5FD', borderRadius:4, yAxisID:'y', order:2},
         {type:'line', label:'2026 Piezas', data:pcs2026, borderColor:'#F97316', backgroundColor:'transparent', borderWidth:2.5, pointRadius:4, pointBackgroundColor:'#F97316', tension:.35, yAxisID:'y2', order:1}
       ]
     },
@@ -1367,7 +1365,7 @@ function buildAnualDualChart() {
         if (!chartArea) return;
         const xScale = scales.x;
         // shade months 7-11 (Aug-Dec)
-        const x1 = xScale.getPixelForValue(6.5);
+        const x1 = xScale.getPixelForValue(7.5);
         const x2 = xScale.getPixelForValue(11.5);
         ctx.save();
         ctx.fillStyle = 'rgba(148,163,184,0.10)';
@@ -1435,7 +1433,7 @@ function buildAnualDualTable(val2025, val2026, pcs2026) {
   const totalG    = fmtG(totalV26, totalV25);
 
   // cell bg for 2026 split
-  const cellBg = i => i < 7
+  const cellBg = i => i < 8
     ? ''                                      // invoice: white
     : 'background:rgba(148,163,184,.10);';  // proy: shaded
 
@@ -1453,7 +1451,7 @@ function buildAnualDualTable(val2025, val2026, pcs2026) {
     </tr>
     <tr style="border-bottom:1px solid var(--border)">
       <td style="padding:2px 8px;font-size:10px;color:#94a3b8"></td>
-      ${MES.map((m,i)=>`<td style="text-align:center;padding:2px 4px;font-size:9px;font-weight:600;${cellBg(i)};color:${i<7?'#94a3b8':'#475569'}">${i<7?'Invoice':'Proyección'}</td>`).join('')}
+      ${MES.map((m,i)=>`<td style="text-align:center;padding:2px 4px;font-size:9px;font-weight:600;${cellBg(i)};color:${i<8?'#94a3b8':'#475569'}">${i<8?'Invoice':'Proyección'}</td>`).join('')}
       <td style="background:rgba(100,116,139,.06)"></td>
     </tr>
   </thead>
