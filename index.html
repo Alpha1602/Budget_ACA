@@ -658,11 +658,28 @@ const catData = {
 };
 
 const catColors = {
-  'Others':'#64B5F6','Cases iPhone':'#1565C0','Micas':'#00BFA5',
-  'Cases Airpods':'#FF6D00','Cases iPad':'#FFB300','Cases Macbook':'#7B1FA2','Cases Sleeves':'#78909C',
-  'Cases Apple Watch':'#e11d48','Straps':'#0d9488',
-  'Cases AirTag':'#f59e0b','Cables':'#6366f1','Sleeves':'#475569',
-  'Speakers':'#0ea5e9','Wall Charger':'#16a34a',
+  'Cases iPhone':'#ef4444',       // rojo vivo
+  'Cases iPad':'#3b82f6',         // azul primario
+  'Cases Macbook':'#8b5cf6',      // morado
+  'Cases Airpods':'#f97316',      // naranja
+  'Cases Apple Watch':'#ec4899',  // rosa fuerte
+  'Cases AirTag':'#eab308',       // amarillo
+  'Cases Sleeves':'#06b6d4',      // cian
+  'Straps':'#10b981',             // verde esmeralda
+  'Cables':'#6366f1',             // índigo
+  'Wall Charger':'#22c55e',       // verde brillante
+  'Micas':'#f43f5e',              // rojo rosado
+  'Speakers':'#0ea5e9',           // azul cielo
+  'Liquid':'#14b8a6',             // teal
+  'Others':'#94a3b8',             // gris
+  'None':'#cbd5e1',
+  'Audio':'#a855f7',
+  'Gaming':'#84cc16',
+  'Wearable':'#fb923c',
+  'Charger':'#4ade80',
+  'Cases Universal':'#60a5fa',
+  'Accesories':'#f472b6',
+  'Sleeves':'#475569',
 };
 const clientColors = {
   'AT&T':'#00A8E0','MacStore':'#555555','iShop':'#FF6D00','Liverpool':'#C62828','MercadoLibre':'#7B1FA2','Coppel':'#388E3C',
@@ -1680,8 +1697,8 @@ function buildAVBSection(){
       data:{
         labels:months,
         datasets:[
-          {label:'2025 Real',data:total25,borderColor:'#94a3b8',backgroundColor:'rgba(148,163,184,.15)',borderWidth:2,fill:true,tension:.35,pointRadius:3,pointBackgroundColor:'#94a3b8'},
-          {label:'2026 '+(avbMode==='invoice'?'Invoice':'FCST'),data:total26,borderColor:'#0891b2',backgroundColor:'rgba(8,145,178,.12)',borderWidth:2.5,fill:true,tension:.35,pointRadius:4,pointBackgroundColor:'#0891b2'}
+          {label:'2025 Real',data:total25,borderColor:'#eab308',backgroundColor:'rgba(234,179,8,.15)',borderWidth:2,fill:true,tension:.35,pointRadius:3,pointBackgroundColor:'#eab308'},
+          {label:'2026 '+(avbMode==='invoice'?'Invoice':'FCST'),data:total26,borderColor:'#16a34a',backgroundColor:'rgba(22,163,74,.12)',borderWidth:2.5,fill:true,tension:.35,pointRadius:4,pointBackgroundColor:'#16a34a'}
         ]
       },
       options:{
