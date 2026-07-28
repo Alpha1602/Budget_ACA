@@ -1052,7 +1052,7 @@ let anualState = {marca:'all', cat:'all'};
 const anualRetails = ['ATT','MacStore','iShop','Liverpool'];
 const anualRetailDisplay = {ATT:'AT&T',MacStore:'MacStore',iShop:'iShop',Liverpool:'Liverpool'};
 const anualRetailColorVar = {ATT:'var(--att)',MacStore:'var(--macstore)',iShop:'var(--ishop)',Liverpool:'var(--liverpool)'};
-const anualH2 = new Set(['Aug','Sep','Oct','Nov','Dec']);
+const anualH2 = new Set(['Sep','Oct','Nov','Dec']);
 
 function switchAnualTable(mode) {
   anualTableMode = mode;
@@ -1127,9 +1127,11 @@ function renderAnualTable(){
     }
   }
   const monthCols = ALL_MONTHS.map((m,i)=>`<th class="num${anualH2.has(m)?' h2-col':''}">${ALL_MONTHS_ES[i]}</th>`).join('');
+  const augProjRetails = new Set(['iShop','Liverpool']);
+  const isH2 = (m, r) => anualH2.has(m) || (m==='Aug' && augProjRetails.has(r));
   const bodyRows = anualRetails.map(r=>{
     const rowTotal = ALL_MONTHS.reduce((s,m)=>s+(data[r][m]||0),0);
-    const cells = ALL_MONTHS.map(m=>`<td class="num${anualH2.has(m)?' h2-col':''}">${fmt(data[r][m]||0)}</td>`).join('');
+    const cells = ALL_MONTHS.map(m=>`<td class="num${isH2(m,r)?' h2-col':''}">${fmt(data[r][m]||0)}</td>`).join('');
     return `<tr><td><span class="dot" style="background:${anualRetailColorVar[r]}"></span>${anualRetailDisplay[r]}</td>${cells}<td class="num"><strong>${fmt(rowTotal)}</strong></td></tr>`;
   }).join('');
   const monthTotals = ALL_MONTHS.map(m=>anualRetails.reduce((s,r)=>s+(data[r][m]||0),0));
@@ -1365,7 +1367,7 @@ function buildAnualDualChart() {
         if (!chartArea) return;
         const xScale = scales.x;
         // shade months 7-11 (Aug-Dec)
-        const x1 = xScale.getPixelForValue(7.5);
+        const x1 = xScale.getPixelForValue(8.5);
         const x2 = xScale.getPixelForValue(11.5);
         ctx.save();
         ctx.fillStyle = 'rgba(148,163,184,0.10)';
