@@ -123,6 +123,7 @@
   <div class="tab" onclick="switchTab('quarter',this)">📊 Dashboard by Quarter</div>
   <div class="tab" onclick="switchTab('marca',this)">🏷️ Brand</div>
   <div class="tab" onclick="switchTab('cliente',this)">🏪 Retail</div>
+  <div class="tab" onclick="switchTab('moi',this)">📦 MOI</div>
 </div>
 
 <!-- ══ CONTENT ══ -->
@@ -596,11 +597,83 @@
   </div>
 </div><!-- /section-cliente -->
 
+<!-- ─── TAB 5: MOI ─── -->
+<div class="section" id="section-moi">
+  <div style="padding:20px 24px 8px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px">
+    <div>
+      <div style="font-size:18px;font-weight:700;color:var(--text)">📦 Months of Inventory (MOI)</div>
+      <div style="font-size:12px;color:var(--muted);margin-top:2px">MOI = OH / (FCST Anual ÷ 12) &nbsp;·&nbsp; Solo SKUs con venta registrada en el retail</div>
+    </div>
+    <div style="display:flex;gap:6px" id="moiViewBtns">
+      <button class="toggle-btn active" onclick="setMoiView('retail',this)">Por Cliente</button>
+      <button class="toggle-btn" onclick="setMoiView('cat',this)">Por Categoría</button>
+      <button class="toggle-btn" onclick="setMoiView('brand',this)">Por Marca</button>
+    </div>
+  </div>
 
+  <!-- KPI row -->
+  <div id="moiKpis" style="display:flex;flex-wrap:wrap;gap:12px;padding:0 24px 16px"></div>
 
+  <!-- Chart -->
+  <div style="background:white;border-radius:10px;border:1px solid var(--border);margin:0 24px 18px;padding:16px">
+    <canvas id="moiChart" height="80"></canvas>
+  </div>
+
+  <!-- Table -->
+  <div style="background:white;border-radius:10px;border:1px solid var(--border);margin:0 24px 24px;overflow-x:auto">
+    <table id="moiTable" style="width:100%;border-collapse:collapse;font-size:12px">
+      <thead id="moiHead"></thead>
+      <tbody id="moiBody"></tbody>
+    </table>
+  </div>
+</div><!-- /section-moi -->
 
 <script>
 /* ══════ DATA ══════ */
+
+/* ── MOI Data (from Consenso sheet) ── */
+const moiByRetail = [
+  {key:'AT&T',       oh_retail:52493, oh_aca:172179, oh_retail_val:16158114, oh_aca_val:43596051, moi_retail_val:2.8, moi_aca_val:7.6, monthly_val:5799329},
+  {key:'MacStore',   oh_retail:23079, oh_aca:43813,  oh_retail_val:11225591, oh_aca_val:14685808, moi_retail_val:5.8, moi_aca_val:7.6, monthly_val:1935619},
+  {key:'iShop',      oh_retail:16209, oh_aca:21418,  oh_retail_val:6957846,  oh_aca_val:8755705,  moi_retail_val:4.5, moi_aca_val:5.6, monthly_val:1537975},
+  {key:'Liverpool',  oh_retail:0,     oh_aca:3121,   oh_retail_val:0,        oh_aca_val:1422755,  moi_retail_val:0,   moi_aca_val:11.2,monthly_val:126988},
+  {key:'Coppel',     oh_retail:1151,  oh_aca:125,    oh_retail_val:351382,   oh_aca_val:29979,    moi_retail_val:9.5, moi_aca_val:0.8, monthly_val:36982},
+];
+const moiByCat = [
+  {key:'Cases iPhone',    oh_retail:33594, oh_aca:36043,  oh_retail_val:15704134, oh_aca_val:16280329, moi_retail_val:8.8,  moi_aca_val:9.1,   monthly_val:1783655},
+  {key:'Wall Charger',    oh_retail:12126, oh_aca:49485,  oh_retail_val:3231555,  oh_aca_val:11843922, moi_retail_val:1.5,  moi_aca_val:5.5,   monthly_val:2158826},
+  {key:'Cables',          oh_retail:15683, oh_aca:56013,  oh_retail_val:2721168,  oh_aca_val:9710171,  moi_retail_val:1.5,  moi_aca_val:5.5,   monthly_val:1763386},
+  {key:'Liquid',          oh_retail:7572,  oh_aca:46460,  oh_retail_val:2346033,  oh_aca_val:14394702, moi_retail_val:2.5,  moi_aca_val:15.1,  monthly_val:953272},
+  {key:'Straps',          oh_retail:3912,  oh_aca:5070,   oh_retail_val:2811527,  oh_aca_val:3324534,  moi_retail_val:2.9,  moi_aca_val:3.4,   monthly_val:976793},
+  {key:'Cases iPad',      oh_retail:5695,  oh_aca:2769,   oh_retail_val:2898867,  oh_aca_val:1348081,  moi_retail_val:3.8,  moi_aca_val:1.8,   monthly_val:760940},
+  {key:'Cases Macbook',   oh_retail:2887,  oh_aca:920,    oh_retail_val:1522199,  oh_aca_val:466009,   moi_retail_val:2.8,  moi_aca_val:0.8,   monthly_val:549116},
+  {key:'Cases Airpods',   oh_retail:1692,  oh_aca:4116,   oh_retail_val:569430,   oh_aca_val:1564744,  moi_retail_val:2.5,  moi_aca_val:6.8,   monthly_val:229736},
+  {key:'Micas',           oh_retail:5916,  oh_aca:28392,  oh_retail_val:1501926,  oh_aca_val:5844542,  moi_retail_val:17.8, moi_aca_val:69.3,  monthly_val:84316},
+  {key:'Others',          oh_retail:2268,  oh_aca:9201,   oh_retail_val:590265,   oh_aca_val:2689838,  moi_retail_val:6.6,  moi_aca_val:29.9,  monthly_val:89717},
+  {key:'Audio',           oh_retail:462,   oh_aca:1549,   oh_retail_val:410915,   oh_aca_val:855473,   moi_retail_val:31.9, moi_aca_val:66.5,  monthly_val:12870},
+  {key:'Cases AirTag',    oh_retail:628,   oh_aca:360,    oh_retail_val:163884,   oh_aca_val:80800,    moi_retail_val:6.6,  moi_aca_val:3.3,   monthly_val:24928},
+  {key:'Cases Apple Watch',oh_retail:189,  oh_aca:169,    oh_retail_val:85253,    oh_aca_val:26138,    moi_retail_val:10.3, moi_aca_val:3.2,   monthly_val:8275},
+  {key:'Cases Sleeves',   oh_retail:277,   oh_aca:0,      oh_retail_val:132674,   oh_aca_val:0,        moi_retail_val:14.2, moi_aca_val:0,     monthly_val:9340},
+  {key:'Speakers',        oh_retail:29,    oh_aca:109,    oh_retail_val:2239,     oh_aca_val:61016,    moi_retail_val:48.0, moi_aca_val:1308,  monthly_val:47},
+];
+const moiByBrand = [
+  {key:'Quikcell', oh_retail:9093,  oh_aca:172179, oh_retail_val:9093370,  oh_aca_val:42638749, moi_retail_val:1.8, moi_aca_val:8.5,  monthly_val:5018985},
+  {key:'Speck',    oh_retail:23079, oh_aca:43813,  oh_retail_val:16040173, oh_aca_val:16026058, moi_retail_val:6.9, moi_aca_val:6.9,  monthly_val:2325561},
+  {key:'Nomad',    oh_retail:5180,  oh_aca:8623,   oh_retail_val:4534032,  oh_aca_val:7267014,  moi_retail_val:3.8, moi_aca_val:6.1,  monthly_val:1194178},
+  {key:'Tech21',   oh_retail:4219,  oh_aca:1716,   oh_retail_val:3588293,  oh_aca_val:1474225,  moi_retail_val:6.8, moi_aca_val:2.8,  monthly_val:528655},
+  {key:'Uniq',     oh_retail:1124,  oh_aca:831,    oh_retail_val:952938,   oh_aca_val:715868,   moi_retail_val:3.7, moi_aca_val:2.8,  monthly_val:255497},
+  {key:'Pitaka',   oh_retail:688,   oh_aca:218,    oh_retail_val:365585,   oh_aca_val:116951,   moi_retail_val:5.3, moi_aca_val:1.7,  monthly_val:69014},
+  {key:'Raptic',   oh_retail:189,   oh_aca:169,    oh_retail_val:85253,    oh_aca_val:26138,    moi_retail_val:10.3,moi_aca_val:3.2,  monthly_val:8275},
+  {key:'Moment',   oh_retail:24,    oh_aca:0,      oh_retail_val:14468,    oh_aca_val:0,        moi_retail_val:24.0,moi_aca_val:0,    monthly_val:603},
+  {key:'Hypergear',oh_retail:27,    oh_aca:0,      oh_retail_val:13938,    oh_aca_val:0,        moi_retail_val:54.0,moi_aca_val:0,    monthly_val:258},
+  {key:'Mophie',   oh_retail:1,     oh_aca:111,    oh_retail_val:1651,     oh_aca_val:164278,   moi_retail_val:8.0, moi_aca_val:796, monthly_val:206},
+  {key:'Cubitt',   oh_retail:29,    oh_aca:109,    oh_retail_val:2687,     oh_aca_val:61016,    moi_retail_val:57.6,moi_aca_val:1308,monthly_val:47},
+  {key:'Vivitar',  oh_retail:1,     oh_aca:0,      oh_retail_val:544,      oh_aca_val:0,        moi_retail_val:2.9, moi_aca_val:0,   monthly_val:189},
+];
+
+let moiView = 'retail'; // 'retail' | 'cat' | 'brand'
+let moiChart = null;
+
 const MONTHS_H2   = ['Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
 const MONTHS_FULL = ['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
 
@@ -1122,12 +1195,125 @@ function switchTab(id, el) {
   document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
   document.getElementById('section-'+id).classList.add('active');
   el.classList.add('active');
-  // Rebuild charts so they render correctly after becoming visible
   if (id === 'attainment') buildAVBSection();
   else if (id === 'quarter') buildQSection();
-
   else if (id === 'marca')   { resetMarcaFilters(); }
   else if (id === 'cliente') buildClienteTab();
+  else if (id === 'moi')     buildMOITab();
+}
+
+/* ══════ MOI TAB ══════ */
+function setMoiView(view, el) {
+  moiView = view;
+  document.querySelectorAll('#moiViewBtns .toggle-btn').forEach(b=>b.classList.remove('active'));
+  el.classList.add('active');
+  buildMOITab();
+}
+
+function moiColor(moi) {
+  if (moi <= 0)  return '#94a3b8';
+  if (moi <= 2)  return '#22c55e';
+  if (moi <= 4)  return '#84cc16';
+  if (moi <= 6)  return '#eab308';
+  if (moi <= 9)  return '#f97316';
+  return '#ef4444';
+}
+
+function buildMOITab() {
+  const datasets = moiView === 'retail' ? moiByRetail
+                 : moiView === 'cat'    ? moiByCat
+                 :                        moiByBrand;
+
+  // ── KPIs ──────────────────────────────────────────────────────────────────
+  const totalOHRval  = datasets.reduce((s,d)=>s+d.oh_retail_val,0);
+  const totalOHAval  = datasets.reduce((s,d)=>s+d.oh_aca_val,0);
+  const totalMonthly = datasets.reduce((s,d)=>s+d.monthly_val,0);
+  const overallMOIR  = totalMonthly>0 ? totalOHRval/totalMonthly : 0;
+  const overallMOIA  = totalMonthly>0 ? totalOHAval/totalMonthly : 0;
+  const fmt = v => '$'+Math.round(v).toLocaleString('es-MX');
+  document.getElementById('moiKpis').innerHTML = [
+    {label:'OH Retail',   val:fmt(totalOHRval),  sub:'Inventario en tiendas'},
+    {label:'OH Almacén (ACA)', val:fmt(totalOHAval), sub:'Inventario en ACA'},
+    {label:'MOI Retail',  val:overallMOIR.toFixed(1)+' meses', sub:'Total combinado'},
+    {label:'MOI Almacén', val:overallMOIA.toFixed(1)+' meses', sub:'Total combinado'},
+  ].map(k=>`
+    <div style="background:white;border:1px solid var(--border);border-radius:10px;padding:14px 18px;min-width:160px;flex:1">
+      <div style="font-size:11px;color:var(--muted);font-weight:600;text-transform:uppercase;letter-spacing:.5px">${k.label}</div>
+      <div style="font-size:20px;font-weight:700;color:var(--text);margin:4px 0">${k.val}</div>
+      <div style="font-size:11px;color:var(--muted)">${k.sub}</div>
+    </div>`).join('');
+
+  // ── Chart ─────────────────────────────────────────────────────────────────
+  // Sort by OH Retail value desc for chart (cap at 12 items for readability)
+  const sorted = [...datasets].sort((a,b)=>(b.oh_retail_val+b.oh_aca_val)-(a.oh_retail_val+a.oh_aca_val)).slice(0,12);
+  const labels  = sorted.map(d=>d.key);
+  const moiR    = sorted.map(d=>+d.moi_retail_val.toFixed(1));
+  const moiA    = sorted.map(d=>+d.moi_aca_val.toFixed(1));
+
+  if (moiChart) { moiChart.destroy(); moiChart = null; }
+  const ctx = document.getElementById('moiChart').getContext('2d');
+  moiChart = new Chart(ctx, {
+    type: 'bar',
+    data: {
+      labels,
+      datasets: [
+        {
+          label: 'MOI Retail (meses)',
+          data: moiR,
+          backgroundColor: moiR.map(v=>moiColor(v)+'cc'),
+          borderColor:     moiR.map(v=>moiColor(v)),
+          borderWidth:1, borderRadius:4,
+        },
+        {
+          label: 'MOI Almacén/ACA (meses)',
+          data: moiA,
+          backgroundColor: moiA.map(v=>moiColor(v)+'66'),
+          borderColor:     moiA.map(v=>moiColor(v)),
+          borderWidth:1, borderRadius:4, borderDash:[4,3],
+        },
+      ]
+    },
+    options: {
+      responsive:true, maintainAspectRatio:true,
+      plugins:{
+        legend:{position:'top',labels:{font:{size:11}}},
+        tooltip:{callbacks:{label:c=>`${c.dataset.label}: ${c.parsed.y.toFixed(1)} meses`}}
+      },
+      scales:{
+        y:{title:{display:true,text:'Meses de Inventario',font:{size:11}}, beginAtZero:true,
+           ticks:{callback:v=>v+'m'}},
+        x:{ticks:{font:{size:11}}}
+      }
+    }
+  });
+
+  // ── Table ─────────────────────────────────────────────────────────────────
+  const thStyle = 'padding:9px 12px;text-align:left;font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;border-bottom:2px solid var(--border);white-space:nowrap';
+  const thR = s=>`<th style="${thStyle};text-align:right">${s}</th>`;
+  document.getElementById('moiHead').innerHTML = `<tr>
+    <th style="${thStyle}">Grupo</th>
+    ${thR('OH Retail (pcs)')}${thR('OH Retail ($)')}${thR('MOI Retail')}
+    ${thR('OH ACA (pcs)')}${thR('OH ACA ($)')}${thR('MOI ACA')}
+  </tr>`;
+
+  const allSorted = [...datasets].sort((a,b)=>(b.oh_retail_val+b.oh_aca_val)-(a.oh_retail_val+a.oh_aca_val));
+  const tdBase = 'padding:8px 12px;border-bottom:1px solid var(--border)';
+  const tdR    = 'padding:8px 12px;border-bottom:1px solid var(--border);text-align:right;font-variant-numeric:tabular-nums';
+  function moiBadge(moi) {
+    if(moi<=0) return '<span style="color:#94a3b8">—</span>';
+    const c=moiColor(moi);
+    return `<span style="background:${c}22;color:${c};font-weight:700;padding:2px 8px;border-radius:12px;border:1px solid ${c}66">${moi.toFixed(1)}m</span>`;
+  }
+  document.getElementById('moiBody').innerHTML = allSorted.map((d,i)=>`
+    <tr style="background:${i%2?'var(--bg)':'white'}">
+      <td style="${tdBase};font-weight:600">${d.key}</td>
+      <td style="${tdR}">${(d.oh_retail).toLocaleString('es-MX')}</td>
+      <td style="${tdR}">$${Math.round(d.oh_retail_val).toLocaleString('es-MX')}</td>
+      <td style="${tdR}">${moiBadge(d.moi_retail_val)}</td>
+      <td style="${tdR}">${(d.oh_aca).toLocaleString('es-MX')}</td>
+      <td style="${tdR}">$${Math.round(d.oh_aca_val).toLocaleString('es-MX')}</td>
+      <td style="${tdR}">${moiBadge(d.moi_aca_val)}</td>
+    </tr>`).join('');
 }
 
 /* ══════ ANNUAL TABLE — DYNAMIC ══════ */
