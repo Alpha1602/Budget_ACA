@@ -549,8 +549,8 @@
     <div class="card-title" style="flex-wrap:wrap;gap:8px">
       <span id="clteChartTitle">Categorías Ene–Dic 2026 — <span style="font-weight:400;color:var(--muted);font-size:12px">fuente: Consenso FCST</span></span>
       <div style="display:flex;gap:4px;margin-left:auto">
-        <button id="clteChartGrouped" class="toggle-btn" onclick="setClteChartType('grouped')">Agrupada</button>
-        <button id="clteChartStacked" class="toggle-btn active" onclick="setClteChartType('stacked')">Apilada</button>
+        <button id="clteChartGrouped" class="toggle-btn active" onclick="setClteChartType('grouped')">Agrupada</button>
+        <button id="clteChartStacked" class="toggle-btn" onclick="setClteChartType('stacked')">Apilada</button>
         <button id="clteChartLine" class="toggle-btn" onclick="setClteChartType('line')">Lineal</button>
       </div>
     </div>
@@ -1550,7 +1550,7 @@ let avbMode   = 'invoice'; // 'invoice' | 'projection'
 let qMetric   = 'val';
 let qView     = 'grouped';
 let marcaState = { mode:'val', brand:'all', cliente:'all', chartType:'line', tblCat:'all', tblSort:{col:'total',dir:-1} };
-let clteState  = { client:'ATT', mode:'val', chartType:'stacked', tblSort:{col:'total',dir:-1} };
+let clteState  = { client:'ATT', mode:'val', chartType:'grouped', tblSort:{col:'total',dir:-1} };
 
 /* chart instances */
 let chartAVBRetailInst=null, chartAVBMonthlyInst=null;
@@ -1635,7 +1635,7 @@ function buildAVBSection(){
     kpiCard('YoY vs 2025', pct(sum26,sum25), avbMode==='invoice'?'Ene–Ago':'Full Year', sum26>=sum25?'#16a34a':'#dc2626') +
     kpiCard('Retails activos', '6', '2026 FCST', '#7c3aed');
 
-  // Chart 1: Doughnut — participación por retail 2026
+  // Chart 1: Doughnut concéntrico — 2025 (inner) + 2026 (outer)
   const retails = ['AT&T','MacStore','iShop','Liverpool','MercadoLibre','Coppel'];
   const colors = retails.map(r=>avbRetailColors[r]||'#999');
   const ret25 = retails.map(r=>byRetail[r].d25.reduce((s,v)=>s+v,0));
@@ -1647,22 +1647,27 @@ function buildAVBSection(){
       type:'doughnut',
       data:{
         labels:retails,
-        datasets:[{
-          data:ret26,
-          backgroundColor:colors,
-          borderColor:'#fff',
-          borderWidth:2
-        }]
+        datasets:[
+          {label:'2025 Real', data:ret25, backgroundColor:colors.map(c=>c+'99'), borderColor:'#fff', borderWidth:2, weight:1},
+          {label:'2026 FCST', data:ret26, backgroundColor:colors, borderColor:'#fff', borderWidth:2, weight:1}
+        ]
       },
       options:{
         responsive:true, maintainAspectRatio:false,
         plugins:{
-          legend:{position:'right',labels:{boxWidth:12,font:{size:11},padding:10}},
-          tooltip:{callbacks:{label:ctx=>{const v=ctx.raw;const pct=(v/sum26*100).toFixed(1);return ` ${ctx.label}: ${fmt(v)} (${pct}%)`;}}}
+          legend:{position:'right',labels:{boxWidth:12,font:{size:11},padding:8,
+            generateLabels: chart => retails.map((r,i)=>({text:r, fillStyle:colors[i], strokeStyle:'#fff', lineWidth:1, hidden:false, index:i}))
+          }},
+          tooltip:{callbacks:{label:ctx=>{
+            const v=ctx.raw;
+            const sum=ctx.datasetIndex===0?sum25:sum26;
+            const yr=ctx.datasetIndex===0?'2025':'2026';
+            return ` ${yr} ${ctx.label}: ${fmt(v)} (${sum?(v/sum*100).toFixed(1):0}%)`;
+          }}}
         }
       }
     });
-    document.getElementById('avbRetailTitle').textContent='Participación por Retail — 2026 '+(avbMode==='invoice'?'Ene–Ago':'Full Year');
+    document.getElementById('avbRetailTitle').textContent='Participación por Retail — 2025 (interior) · 2026 (exterior)';
   }
 
   // Chart 2: Línea — tendencia mensual 2025 vs 2026
@@ -1786,7 +1791,7 @@ function buildQSection(){
     const yoyRetails = retails.filter(r=>(src25[r]||[]).reduce((s,v)=>s+v,0)>=threshold);
     const yoyColors = yoyRetails.map(r=>avbRetailColors[r]||'#999');
     const yoyByRetail = yoyRetails.map(r=>quarters.map((_,qi)=>{const v25=(src25[r]||[])[qi]||0;const v26=(src26[r]||[])[qi]||0;return v25?((v26-v25)/v25*100):null;}));
-    chartQYoYInst = new Chart(ctxY,{type:'bar',data:{labels:quarters,datasets:yoyRetails.map((r,i)=>({label:r,data:yoyByRetail[i],backgroundColor:yoyColors[i]+'bb',borderColor:yoyColors[i],borderWidth:1}))},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'top',labels:{boxWidth:10,font:{size:10}}}},scales:{y:{ticks:{callback:v=>v.toFixed(0)+'%'}}}}});
+    chartQYoYInst = new Chart(ctxY,{type:'line',data:{labels:quarters,datasets:yoyRetails.map((r,i)=>({label:r,data:yoyByRetail[i],borderColor:yoyColors[i],backgroundColor:yoyColors[i]+'22',borderWidth:2.5,pointRadius:5,pointBackgroundColor:yoyColors[i],fill:false,tension:.3}))},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'top',labels:{boxWidth:10,font:{size:10}}}},scales:{y:{ticks:{callback:v=>v.toFixed(0)+'%'}}}}});
     document.getElementById('qYoYTitle').textContent='Crecimiento YoY — 2025 vs 2026';
   }
 
