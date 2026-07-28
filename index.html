@@ -144,14 +144,14 @@
       <div style="display:flex;gap:0">
         <button id="avbInvoiceBtn" onclick="setAVBMode('invoice',this)"
           style="padding:7px 18px;font-size:12px;font-weight:700;border:1.5px solid #cbd5e1;border-radius:6px 0 0 6px;cursor:pointer;background:#fff;color:#374151;transition:.15s">
-          ⬜ Invoice &nbsp;·&nbsp; Ene–Jul
+          ⬜ Invoice &nbsp;·&nbsp; Ene–Ago
         </button>
         <button id="avbProjBtn" onclick="setAVBMode('projection',this)"
           style="padding:7px 18px;font-size:12px;font-weight:700;border:1.5px solid #9ca3af;border-left:none;border-radius:0 6px 6px 0;cursor:pointer;background:#9ca3af;color:#fff;transition:.15s">
           ◼ Projection &nbsp;·&nbsp; Full Year
         </button>
       </div>
-      <span id="avbModeNote" style="font-size:11px;color:var(--muted)">Mostrando facturas emitidas Ene–Jul 2026</span>
+      <span id="avbModeNote" style="font-size:11px;color:var(--muted)">Mostrando facturas emitidas Ene–Ago 2026</span>
     </div>
   </div>
 
@@ -1355,7 +1355,7 @@ function buildAnualDualChart() {
       labels: MONTHS_FULL,
       datasets: [
         {type:'bar', label:'2025 Real', data:val2025, backgroundColor:'#CBD5E1', borderRadius:4, yAxisID:'y', order:2},
-        {type:'bar', label:'2026 Invoice (Ene–Jul)', data:val2026.map((v,i)=>i<8?v:0), backgroundColor:'#2DD4BF', borderRadius:4, yAxisID:'y', order:2},
+        {type:'bar', label:'2026 Invoice (Ene–Ago)', data:val2026.map((v,i)=>i<8?v:0), backgroundColor:'#2DD4BF', borderRadius:4, yAxisID:'y', order:2},
         {type:'bar', label:'2026 Proyección (Ago–Dic)', data:val2026.map((v,i)=>i>=8?v:0), backgroundColor:'#93C5FD', borderRadius:4, yAxisID:'y', order:2},
         {type:'line', label:'2026 Piezas', data:pcs2026, borderColor:'#F97316', backgroundColor:'transparent', borderWidth:2.5, pointRadius:4, pointBackgroundColor:'#F97316', tension:.35, yAxisID:'y2', order:1}
       ]
@@ -1466,13 +1466,13 @@ function buildAnualDualTable(val2025, val2026, pcs2026) {
       ${val2025.map((v,i)=>`<td style="text-align:right;padding:7px 4px;${cellBg(i)}">${fmt(v)}</td>`).join('')}
       <td style="text-align:right;padding:7px 8px;font-weight:700;background:rgba(100,116,139,.06)">${fmt(totalV25)}</td>
     </tr>
-    <!-- 2026 Invoice Jan-Jul -->
+    <!-- 2026 Invoice Jan-Aug -->
     <tr style="border-bottom:1px dashed var(--border)">
       <td style="padding:7px 8px;font-weight:600;color:#0d9488;white-space:nowrap">
         <span style="display:inline-block;width:10px;height:10px;border-radius:2px;background:#2DD4BF;margin-right:5px;vertical-align:middle"></span>2026 Invoice
       </td>
       ${val26comb.map((v,i)=>`<td style="text-align:right;padding:7px 4px;${cellBg(i)}">${i<7?fmt(v):'—'}</td>`).join('')}
-      <td style="text-align:right;padding:7px 8px;font-weight:700;background:rgba(100,116,139,.06)">${fmt(val26comb.slice(0,7).reduce((a,b)=>a+b,0))}</td>
+      <td style="text-align:right;padding:7px 8px;font-weight:700;background:rgba(100,116,139,.06)">${fmt(val26comb.slice(0,8).reduce((a,b)=>a+b,0))}</td>
     </tr>
     <!-- 2026 Proyección Aug-Dec -->
     <tr style="border-bottom:1px solid var(--border)">
@@ -1507,12 +1507,12 @@ function buildAnualKpis() {
     : [anualSelectedClient];
   const totVal = clients.reduce((s,c)=>(valorFull[c]||[]).reduce((a,b)=>a+b,0)+s, 0);
   const totPcs = clients.reduce((s,c)=>(piezasAnual[c]||[]).reduce((a,b)=>a+b,0)+s, 0);
-  const h1Val  = clients.reduce((s,c)=>(valorFull[c]||[]).slice(0,7).reduce((a,b)=>a+b,0)+s, 0);
-  const h2Val  = clients.reduce((s,c)=>(valorFull[c]||[]).slice(7).reduce((a,b)=>a+b,0)+s, 0);
+  const h1Val  = clients.reduce((s,c)=>(valorFull[c]||[]).slice(0,8).reduce((a,b)=>a+b,0)+s, 0);
+  const h2Val  = clients.reduce((s,c)=>(valorFull[c]||[]).slice(8).reduce((a,b)=>a+b,0)+s, 0);
   document.getElementById('anualKpiRow').innerHTML = [
     {label:'Valor Total Anual', val:'$'+(totVal/1e6).toFixed(1)+' M', sub:'2026 Budget'},
-    {label:'Invoice Ene–Jul',    val:'$'+(h1Val/1e6).toFixed(1)+' M', sub:'Ene–Jul'},
-    {label:'Proyección Ago–Dic', val:'$'+(h2Val/1e6).toFixed(1)+' M', sub:'Ago–Dic'},
+    {label:'Invoice Ene–Ago',    val:'$'+(h1Val/1e6).toFixed(1)+' M', sub:'Ene–Ago'},
+    {label:'Proyección Sep–Dic', val:'$'+(h2Val/1e6).toFixed(1)+' M', sub:'Sep–Dic'},
     {label:'Piezas Anuales',    val:totPcs.toLocaleString('es-MX'), sub:'unidades'},
   ].map(k=>`<div class="kpi-card">
     <div class="kpi-label">${k.label}</div>
@@ -2255,7 +2255,7 @@ function setAVBMode(mode) {
   if (mode === 'invoice') {
     iBtn.style.background='#fff'; iBtn.style.color='#374151'; iBtn.style.borderColor='#cbd5e1';
     pBtn.style.background='#e5e7eb'; pBtn.style.color='#6b7280'; pBtn.style.borderColor='#9ca3af';
-    document.getElementById('avbModeNote').textContent = 'Mostrando facturas emitidas Ene–Jul 2026 — celdas sin sombrear';
+    document.getElementById('avbModeNote').textContent = 'Mostrando facturas emitidas Ene–Ago 2026 — celdas sin sombrear';
   } else {
     iBtn.style.background='#e5e7eb'; iBtn.style.color='#6b7280'; iBtn.style.borderColor='#cbd5e1';
     pBtn.style.background='#6b7280'; pBtn.style.color='#fff'; pBtn.style.borderColor='#6b7280';
@@ -2268,7 +2268,7 @@ function avbGet26(retail, useInvoice) {
   const isVal = gMetric === 'valor';
   const src = isVal ? avb2026Val : avb2026Pcs;
   if (!src[retail]) return 0;
-  const months = useInvoice ? src[retail].slice(0,7) : src[retail];
+  const months = useInvoice ? src[retail].slice(0,8) : src[retail];
   return months.reduce((s,v)=>s+v,0);
 }
 function avbGet25(retail) {
@@ -2313,9 +2313,9 @@ function renderAVBKpis() {
       <div class="kpi-sub">SI/ST ${isVal?'valor MXN':'piezas'}</div>
     </div>
     <div class="kpi-card">
-      <div class="kpi-label">2026 ${inv?'Invoice · Ene–Jul':'Projection · Full Year'}</div>
+      <div class="kpi-label">2026 ${inv?'Invoice · Ene–Ago':'Projection · Full Year'}</div>
       <div class="kpi-value">${fmt(total26shown)}</div>
-      <div class="kpi-sub">${inv?'Ene–Jul 2026 · facturado':'Ene–Dic 2026 · budget total'}</div>
+      <div class="kpi-sub">${inv?'Ene–Ago 2026 · facturado':'Ene–Dic 2026 · budget total'}</div>
     </div>
     <div class="kpi-card">
       <div class="kpi-label">2026 Projection (Full Year)</div>
@@ -2346,7 +2346,7 @@ function renderAVBKpis() {
 function renderAVBCharts() {
   const isVal = gMetric === 'valor';
   const inv = avbMode === 'invoice';
-  const nMonths = inv ? 7 : 12;
+  const nMonths = inv ? 8 : 12;
   const labels = MONTHS_AVB.slice(0,nMonths);
   const src25 = isVal ? avb2025Val : avb2025Pcs;
   const src26 = isVal ? avb2026Val : avb2026Pcs;
@@ -2355,7 +2355,7 @@ function renderAVBCharts() {
 
   // ── Chart 1: Doughnut – retail share 2025 (inner) vs 2026 (outer)
   const retailsActive=retails.filter(r=>avbGet25(r)>0||avbGet26(r,inv)>0);
-  const d25a=retailsActive.map(r=>inv?((isVal?avb2025Val:avb2025Pcs)[r]||[]).slice(0,7).reduce((a,b)=>a+b,0):avbGet25(r));
+  const d25a=retailsActive.map(r=>inv?((isVal?avb2025Val:avb2025Pcs)[r]||[]).slice(0,8).reduce((a,b)=>a+b,0):avbGet25(r));
   const d26a=retailsActive.map(r=>avbGet26(r,inv));
   if (chartAVBRetailInst) chartAVBRetailInst.destroy();
   chartAVBRetailInst = new Chart(document.getElementById('chartAVBRetail'), {
@@ -2363,7 +2363,7 @@ function renderAVBCharts() {
     data:{
       labels:retailsActive,
       datasets:[
-        {label:inv?'2025 Ene–Jul':'2025 Full Year', data:d25a, backgroundColor:retailsActive.map(r=>avbRetailColors[r]+'88'), borderColor:'#fff', borderWidth:2},
+        {label:inv?'2025 Ene–Ago':'2025 Full Year', data:d25a, backgroundColor:retailsActive.map(r=>avbRetailColors[r]+'88'), borderColor:'#fff', borderWidth:2},
         {label:`2026 ${inv?'Invoice':'Proyección'}`, data:d26a, backgroundColor:retailsActive.map(r=>avbRetailColors[r]), borderColor:'#fff', borderWidth:2}
       ]
     },
@@ -2419,7 +2419,7 @@ function renderAVBTable() {
   const allRetails = Object.keys(avbRetailColors);
 
   // Helper: get H1 2025 for a retail
-  const get25H1 = r => src25[r] ? src25[r].slice(0,7).reduce((s,v)=>s+v,0) : 0;
+  const get25H1 = r => src25[r] ? src25[r].slice(0,8).reduce((s,v)=>s+v,0) : 0;
 
   const s25all = allRetails.reduce((s,r)=>s+(inv?get25H1(r):avbGet25(r)),0);
   const s26all = allRetails.reduce((s,r)=>s+avbGet26(r,inv),0);
@@ -2447,7 +2447,7 @@ function renderAVBTable() {
   const thead = document.querySelector('#avbTable thead tr');
   if (thead) thead.innerHTML = `
     <th style="cursor:pointer" onclick="setAvbTblSort('retail')">Retail${arrow('retail')}</th>
-    <th class="num" style="cursor:pointer" onclick="setAvbTblSort('v25')">2025 ${inv?'Ene–Jul':'Full Year'}${arrow('v25')}</th>
+    <th class="num" style="cursor:pointer" onclick="setAvbTblSort('v25')">2025 ${inv?'Ene–Ago':'Full Year'}${arrow('v25')}</th>
     <th class="num" style="cursor:pointer" onclick="setAvbTblSort('v26')">2026 ${inv?'Invoice H1':'Projection'}${arrow('v26')}</th>
     <th class="num" style="cursor:pointer" onclick="setAvbTblSort('yoy')">YoY %${arrow('yoy')}</th>
     <th class="num" style="cursor:pointer" onclick="setAvbTblSort('sh25')">Share 2025${arrow('sh25')}</th>
