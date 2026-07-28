@@ -602,12 +602,24 @@
   <div style="padding:20px 24px 8px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px">
     <div>
       <div style="font-size:18px;font-weight:700;color:var(--text)">📦 Months of Inventory (MOI)</div>
-      <div style="font-size:12px;color:var(--muted);margin-top:2px">MOI = OH / (FCST Anual ÷ 12) &nbsp;·&nbsp; Solo SKUs con venta registrada en el retail</div>
+      <div style="font-size:12px;color:var(--muted);margin-top:2px">MOI = OH valor / Promedio ventas Jun–Jul 2026 &nbsp;·&nbsp; Rankeado de mayor a menor &nbsp;·&nbsp; Solo SKUs con venta registrada en el retail</div>
     </div>
     <div style="display:flex;gap:6px" id="moiViewBtns">
-      <button class="toggle-btn active" onclick="setMoiView('retail',this)">Por Cliente</button>
-      <button class="toggle-btn" onclick="setMoiView('cat',this)">Por Categoría</button>
+      <button class="toggle-btn active" onclick="setMoiView('cat',this)">Por Categoría</button>
       <button class="toggle-btn" onclick="setMoiView('brand',this)">Por Marca</button>
+    </div>
+  </div>
+
+  <!-- Client chips -->
+  <div style="display:flex;flex-wrap:wrap;align-items:center;gap:6px;padding:4px 24px 14px">
+    <span style="font-size:11px;font-weight:600;color:var(--muted)">Cliente:</span>
+    <div class="chip-row" id="moiClientChips">
+      <button class="chip on" data-retail="all" onclick="setMoiClient(this)">Todos</button>
+      <button class="chip" data-retail="AT&T"      style="border-color:#00A8E0" onclick="setMoiClient(this)">AT&amp;T</button>
+      <button class="chip" data-retail="MacStore"  style="" onclick="setMoiClient(this)">MacStore</button>
+      <button class="chip" data-retail="iShop"     style="" onclick="setMoiClient(this)">iShop</button>
+      <button class="chip" data-retail="Liverpool" style="" onclick="setMoiClient(this)">Liverpool</button>
+      <button class="chip" data-retail="Coppel"    style="" onclick="setMoiClient(this)">Coppel</button>
     </div>
   </div>
 
@@ -632,46 +644,11 @@
 /* ══════ DATA ══════ */
 
 /* ── MOI Data (from Consenso sheet) ── */
-const moiByRetail = [
-  {key:'AT&T',       oh_retail:52493, oh_aca:172179, oh_retail_val:16158114, oh_aca_val:43596051, moi_retail_val:2.8, moi_aca_val:7.6, monthly_val:5799329},
-  {key:'MacStore',   oh_retail:23079, oh_aca:43813,  oh_retail_val:11225591, oh_aca_val:14685808, moi_retail_val:5.8, moi_aca_val:7.6, monthly_val:1935619},
-  {key:'iShop',      oh_retail:16209, oh_aca:21418,  oh_retail_val:6957846,  oh_aca_val:8755705,  moi_retail_val:4.5, moi_aca_val:5.6, monthly_val:1537975},
-  {key:'Liverpool',  oh_retail:0,     oh_aca:3121,   oh_retail_val:0,        oh_aca_val:1422755,  moi_retail_val:0,   moi_aca_val:11.2,monthly_val:126988},
-  {key:'Coppel',     oh_retail:1151,  oh_aca:125,    oh_retail_val:351382,   oh_aca_val:29979,    moi_retail_val:9.5, moi_aca_val:0.8, monthly_val:36982},
-];
-const moiByCat = [
-  {key:'Cases iPhone',    oh_retail:33594, oh_aca:36043,  oh_retail_val:15704134, oh_aca_val:16280329, moi_retail_val:8.8,  moi_aca_val:9.1,   monthly_val:1783655},
-  {key:'Wall Charger',    oh_retail:12126, oh_aca:49485,  oh_retail_val:3231555,  oh_aca_val:11843922, moi_retail_val:1.5,  moi_aca_val:5.5,   monthly_val:2158826},
-  {key:'Cables',          oh_retail:15683, oh_aca:56013,  oh_retail_val:2721168,  oh_aca_val:9710171,  moi_retail_val:1.5,  moi_aca_val:5.5,   monthly_val:1763386},
-  {key:'Liquid',          oh_retail:7572,  oh_aca:46460,  oh_retail_val:2346033,  oh_aca_val:14394702, moi_retail_val:2.5,  moi_aca_val:15.1,  monthly_val:953272},
-  {key:'Straps',          oh_retail:3912,  oh_aca:5070,   oh_retail_val:2811527,  oh_aca_val:3324534,  moi_retail_val:2.9,  moi_aca_val:3.4,   monthly_val:976793},
-  {key:'Cases iPad',      oh_retail:5695,  oh_aca:2769,   oh_retail_val:2898867,  oh_aca_val:1348081,  moi_retail_val:3.8,  moi_aca_val:1.8,   monthly_val:760940},
-  {key:'Cases Macbook',   oh_retail:2887,  oh_aca:920,    oh_retail_val:1522199,  oh_aca_val:466009,   moi_retail_val:2.8,  moi_aca_val:0.8,   monthly_val:549116},
-  {key:'Cases Airpods',   oh_retail:1692,  oh_aca:4116,   oh_retail_val:569430,   oh_aca_val:1564744,  moi_retail_val:2.5,  moi_aca_val:6.8,   monthly_val:229736},
-  {key:'Micas',           oh_retail:5916,  oh_aca:28392,  oh_retail_val:1501926,  oh_aca_val:5844542,  moi_retail_val:17.8, moi_aca_val:69.3,  monthly_val:84316},
-  {key:'Others',          oh_retail:2268,  oh_aca:9201,   oh_retail_val:590265,   oh_aca_val:2689838,  moi_retail_val:6.6,  moi_aca_val:29.9,  monthly_val:89717},
-  {key:'Audio',           oh_retail:462,   oh_aca:1549,   oh_retail_val:410915,   oh_aca_val:855473,   moi_retail_val:31.9, moi_aca_val:66.5,  monthly_val:12870},
-  {key:'Cases AirTag',    oh_retail:628,   oh_aca:360,    oh_retail_val:163884,   oh_aca_val:80800,    moi_retail_val:6.6,  moi_aca_val:3.3,   monthly_val:24928},
-  {key:'Cases Apple Watch',oh_retail:189,  oh_aca:169,    oh_retail_val:85253,    oh_aca_val:26138,    moi_retail_val:10.3, moi_aca_val:3.2,   monthly_val:8275},
-  {key:'Cases Sleeves',   oh_retail:277,   oh_aca:0,      oh_retail_val:132674,   oh_aca_val:0,        moi_retail_val:14.2, moi_aca_val:0,     monthly_val:9340},
-  {key:'Speakers',        oh_retail:29,    oh_aca:109,    oh_retail_val:2239,     oh_aca_val:61016,    moi_retail_val:48.0, moi_aca_val:1308,  monthly_val:47},
-];
-const moiByBrand = [
-  {key:'Quikcell', oh_retail:9093,  oh_aca:172179, oh_retail_val:9093370,  oh_aca_val:42638749, moi_retail_val:1.8, moi_aca_val:8.5,  monthly_val:5018985},
-  {key:'Speck',    oh_retail:23079, oh_aca:43813,  oh_retail_val:16040173, oh_aca_val:16026058, moi_retail_val:6.9, moi_aca_val:6.9,  monthly_val:2325561},
-  {key:'Nomad',    oh_retail:5180,  oh_aca:8623,   oh_retail_val:4534032,  oh_aca_val:7267014,  moi_retail_val:3.8, moi_aca_val:6.1,  monthly_val:1194178},
-  {key:'Tech21',   oh_retail:4219,  oh_aca:1716,   oh_retail_val:3588293,  oh_aca_val:1474225,  moi_retail_val:6.8, moi_aca_val:2.8,  monthly_val:528655},
-  {key:'Uniq',     oh_retail:1124,  oh_aca:831,    oh_retail_val:952938,   oh_aca_val:715868,   moi_retail_val:3.7, moi_aca_val:2.8,  monthly_val:255497},
-  {key:'Pitaka',   oh_retail:688,   oh_aca:218,    oh_retail_val:365585,   oh_aca_val:116951,   moi_retail_val:5.3, moi_aca_val:1.7,  monthly_val:69014},
-  {key:'Raptic',   oh_retail:189,   oh_aca:169,    oh_retail_val:85253,    oh_aca_val:26138,    moi_retail_val:10.3,moi_aca_val:3.2,  monthly_val:8275},
-  {key:'Moment',   oh_retail:24,    oh_aca:0,      oh_retail_val:14468,    oh_aca_val:0,        moi_retail_val:24.0,moi_aca_val:0,    monthly_val:603},
-  {key:'Hypergear',oh_retail:27,    oh_aca:0,      oh_retail_val:13938,    oh_aca_val:0,        moi_retail_val:54.0,moi_aca_val:0,    monthly_val:258},
-  {key:'Mophie',   oh_retail:1,     oh_aca:111,    oh_retail_val:1651,     oh_aca_val:164278,   moi_retail_val:8.0, moi_aca_val:796, monthly_val:206},
-  {key:'Cubitt',   oh_retail:29,    oh_aca:109,    oh_retail_val:2687,     oh_aca_val:61016,    moi_retail_val:57.6,moi_aca_val:1308,monthly_val:47},
-  {key:'Vivitar',  oh_retail:1,     oh_aca:0,      oh_retail_val:544,      oh_aca_val:0,        moi_retail_val:2.9, moi_aca_val:0,   monthly_val:189},
-];
+// MOI = OH valor / Promedio ventas Jun-Jul 2026 — per client, pre-sorted high→low
+const moiDataByClient = {"all":{"cat":[{"key":"Audio","oh_retail":462,"oh_aca":1549,"oh_retail_val":410915,"oh_aca_val":855473,"monthly_val":6514,"moi_retail_val":63.1,"moi_aca_val":131.3},{"key":"Micas","oh_retail":5916,"oh_aca":28392,"oh_retail_val":1501926,"oh_aca_val":5844542,"monthly_val":42644,"moi_retail_val":35.2,"moi_aca_val":137.1},{"key":"Cases Sleeves","oh_retail":277,"oh_aca":0,"oh_retail_val":132674,"oh_aca_val":0,"monthly_val":5927,"moi_retail_val":22.4,"moi_aca_val":0.0},{"key":"Cases Apple Watch","oh_retail":189,"oh_aca":169,"oh_retail_val":85253,"oh_aca_val":26138,"monthly_val":4340,"moi_retail_val":19.6,"moi_aca_val":6.0},{"key":"Cases AirTag","oh_retail":628,"oh_aca":360,"oh_retail_val":163884,"oh_aca_val":80800,"monthly_val":11979,"moi_retail_val":13.7,"moi_aca_val":6.7},{"key":"Others","oh_retail":2268,"oh_aca":9201,"oh_retail_val":590265,"oh_aca_val":2689838,"monthly_val":67346,"moi_retail_val":8.8,"moi_aca_val":39.9},{"key":"Cases iPhone","oh_retail":33594,"oh_aca":36043,"oh_retail_val":15704134,"oh_aca_val":16280329,"monthly_val":1998707,"moi_retail_val":7.9,"moi_aca_val":8.1},{"key":"Cases iPad","oh_retail":5695,"oh_aca":2769,"oh_retail_val":2898867,"oh_aca_val":1348081,"monthly_val":496214,"moi_retail_val":5.8,"moi_aca_val":2.7},{"key":"Straps","oh_retail":3912,"oh_aca":5070,"oh_retail_val":2811527,"oh_aca_val":3324534,"monthly_val":577592,"moi_retail_val":4.9,"moi_aca_val":5.8},{"key":"Cases Airpods","oh_retail":1692,"oh_aca":4116,"oh_retail_val":569430,"oh_aca_val":1564744,"monthly_val":129703,"moi_retail_val":4.4,"moi_aca_val":12.1},{"key":"Liquid","oh_retail":7572,"oh_aca":46460,"oh_retail_val":2346033,"oh_aca_val":14394702,"monthly_val":668148,"moi_retail_val":3.5,"moi_aca_val":21.5},{"key":"Cases Macbook","oh_retail":2887,"oh_aca":920,"oh_retail_val":1522199,"oh_aca_val":466009,"monthly_val":470148,"moi_retail_val":3.2,"moi_aca_val":1.0},{"key":"Wall Charger","oh_retail":12126,"oh_aca":49485,"oh_retail_val":3231555,"oh_aca_val":11843922,"monthly_val":1868440,"moi_retail_val":1.7,"moi_aca_val":6.3},{"key":"Cables","oh_retail":15683,"oh_aca":56013,"oh_retail_val":2721168,"oh_aca_val":9710171,"monthly_val":1601751,"moi_retail_val":1.7,"moi_aca_val":6.1},{"key":"Speakers","oh_retail":29,"oh_aca":109,"oh_retail_val":2239,"oh_aca_val":61016,"monthly_val":0,"moi_retail_val":null,"moi_aca_val":null},{"key":"Sleeves","oh_retail":2,"oh_aca":0,"oh_retail_val":861,"oh_aca_val":0,"monthly_val":0,"moi_retail_val":null,"moi_aca_val":null}],"brand":[{"key":"Uniq","oh_retail":2034,"oh_aca":1317,"oh_retail_val":952938,"oh_aca_val":715868,"monthly_val":20969,"moi_retail_val":45.4,"moi_aca_val":34.1},{"key":"Raptic","oh_retail":189,"oh_aca":169,"oh_retail_val":85253,"oh_aca_val":26138,"monthly_val":4340,"moi_retail_val":19.6,"moi_aca_val":6.0},{"key":"Tech21","oh_retail":7671,"oh_aca":3254,"oh_retail_val":3588293,"oh_aca_val":1474225,"monthly_val":451739,"moi_retail_val":7.9,"moi_aca_val":3.3},{"key":"Speck","oh_retail":34975,"oh_aca":36241,"oh_retail_val":16040173,"oh_aca_val":16026058,"monthly_val":2199829,"moi_retail_val":7.3,"moi_aca_val":7.3},{"key":"Nomad","oh_retail":7212,"oh_aca":13424,"oh_retail_val":4534032,"oh_aca_val":7267014,"monthly_val":946725,"moi_retail_val":4.8,"moi_aca_val":7.7},{"key":"Pitaka","oh_retail":590,"oh_aca":194,"oh_retail_val":365585,"oh_aca_val":116951,"monthly_val":100132,"moi_retail_val":3.7,"moi_aca_val":1.2},{"key":"Quikcell","oh_retail":40139,"oh_aca":185152,"oh_retail_val":9093370,"oh_aca_val":42638749,"monthly_val":4225720,"moi_retail_val":2.2,"moi_aca_val":10.1},{"key":"Mophie","oh_retail":8,"oh_aca":796,"oh_retail_val":1651,"oh_aca_val":164278,"monthly_val":0,"moi_retail_val":null,"moi_aca_val":null},{"key":"Cubitt","oh_retail":32,"oh_aca":109,"oh_retail_val":2687,"oh_aca_val":61016,"monthly_val":0,"moi_retail_val":null,"moi_aca_val":null},{"key":"Moment","oh_retail":24,"oh_aca":0,"oh_retail_val":14468,"oh_aca_val":0,"monthly_val":0,"moi_retail_val":null,"moi_aca_val":null},{"key":"Hypergear","oh_retail":54,"oh_aca":0,"oh_retail_val":13938,"oh_aca_val":0,"monthly_val":0,"moi_retail_val":null,"moi_aca_val":null},{"key":"Vivitar","oh_retail":4,"oh_aca":0,"oh_retail_val":544,"oh_aca_val":0,"monthly_val":0,"moi_retail_val":null,"moi_aca_val":null}]},"AT&T":{"cat":[{"key":"Micas","oh_retail":3457,"oh_aca":8355,"oh_retail_val":1126138,"oh_aca_val":2482112,"monthly_val":7462,"moi_retail_val":150.9,"moi_aca_val":332.6},{"key":"Others","oh_retail":1102,"oh_aca":5224,"oh_retail_val":275016,"oh_aca_val":1848246,"monthly_val":44399,"moi_retail_val":6.2,"moi_aca_val":41.6},{"key":"Cases iPhone","oh_retail":13152,"oh_aca":6778,"oh_retail_val":6760937,"oh_aca_val":3374263,"monthly_val":1145205,"moi_retail_val":5.9,"moi_aca_val":2.9},{"key":"Liquid","oh_retail":7572,"oh_aca":46460,"oh_retail_val":2346033,"oh_aca_val":14394702,"monthly_val":668148,"moi_retail_val":3.5,"moi_aca_val":21.5},{"key":"Cables","oh_retail":15679,"oh_aca":56013,"oh_retail_val":2719873,"oh_aca_val":9710171,"monthly_val":1601751,"moi_retail_val":1.7,"moi_aca_val":6.1},{"key":"Wall Charger","oh_retail":11531,"oh_aca":49349,"oh_retail_val":2930117,"oh_aca_val":11786556,"monthly_val":1868048,"moi_retail_val":1.6,"moi_aca_val":6.3}],"brand":[{"key":"Nomad","oh_retail":181,"oh_aca":113,"oh_retail_val":93526,"oh_aca_val":58389,"monthly_val":258,"moi_retail_val":362.0,"moi_aca_val":226.0},{"key":"Tech21","oh_retail":105,"oh_aca":5,"oh_retail_val":54256,"oh_aca_val":2584,"monthly_val":2067,"moi_retail_val":26.2,"moi_aca_val":1.2},{"key":"Speck","oh_retail":14974,"oh_aca":10121,"oh_retail_val":7362579,"oh_aca_val":4934683,"monthly_val":1151091,"moi_retail_val":6.4,"moi_aca_val":4.3},{"key":"Quikcell","oh_retail":37233,"oh_aca":161940,"oh_retail_val":8647753,"oh_aca_val":38600394,"monthly_val":4181597,"moi_retail_val":2.1,"moi_aca_val":9.2}]},"MacStore":{"cat":[{"key":"Wall Charger","oh_retail":595,"oh_aca":136,"oh_retail_val":301438,"oh_aca_val":57366,"monthly_val":392,"moi_retail_val":769.1,"moi_aca_val":146.4},{"key":"Audio","oh_retail":390,"oh_aca":469,"oh_retail_val":323538,"oh_aca_val":334055,"monthly_val":6514,"moi_retail_val":49.7,"moi_aca_val":51.3},{"key":"Cases Sleeves","oh_retail":183,"oh_aca":0,"oh_retail_val":92197,"oh_aca_val":0,"monthly_val":2267,"moi_retail_val":40.7,"moi_aca_val":0.0},{"key":"Cases Apple Watch","oh_retail":189,"oh_aca":169,"oh_retail_val":85253,"oh_aca_val":26138,"monthly_val":4340,"moi_retail_val":19.6,"moi_aca_val":6.0},{"key":"Others","oh_retail":1038,"oh_aca":3974,"oh_retail_val":285584,"oh_aca_val":840895,"monthly_val":19462,"moi_retail_val":14.7,"moi_aca_val":43.2},{"key":"Micas","oh_retail":2459,"oh_aca":20037,"oh_retail_val":375788,"oh_aca_val":3362429,"monthly_val":35182,"moi_retail_val":10.7,"moi_aca_val":95.6},{"key":"Cases iPhone","oh_retail":9675,"oh_aca":13312,"oh_retail_val":4719331,"oh_aca_val":6447180,"monthly_val":522501,"moi_retail_val":9.0,"moi_aca_val":12.3},{"key":"Cases iPad","oh_retail":2981,"oh_aca":1257,"oh_retail_val":1640635,"oh_aca_val":652269,"monthly_val":218411,"moi_retail_val":7.5,"moi_aca_val":3.0},{"key":"Cases AirTag","oh_retail":261,"oh_aca":0,"oh_retail_val":78843,"oh_aca_val":0,"monthly_val":11630,"moi_retail_val":6.8,"moi_aca_val":0.0},{"key":"Cases Macbook","oh_retail":1424,"oh_aca":310,"oh_retail_val":791105,"oh_aca_val":160605,"monthly_val":139513,"moi_retail_val":5.7,"moi_aca_val":1.2},{"key":"Straps","oh_retail":2796,"oh_aca":2587,"oh_retail_val":2149205,"oh_aca_val":2088875,"monthly_val":399476,"moi_retail_val":5.4,"moi_aca_val":5.2},{"key":"Cases Airpods","oh_retail":1055,"oh_aca":1453,"oh_retail_val":379139,"oh_aca_val":654979,"monthly_val":85933,"moi_retail_val":4.4,"moi_aca_val":7.6},{"key":"Speakers","oh_retail":29,"oh_aca":109,"oh_retail_val":2239,"oh_aca_val":61016,"monthly_val":0,"moi_retail_val":null,"moi_aca_val":null},{"key":"Cables","oh_retail":4,"oh_aca":0,"oh_retail_val":1295,"oh_aca_val":0,"monthly_val":0,"moi_retail_val":null,"moi_aca_val":null}],"brand":[{"key":"Uniq","oh_retail":2034,"oh_aca":1317,"oh_retail_val":952938,"oh_aca_val":715868,"monthly_val":20969,"moi_retail_val":45.4,"moi_aca_val":34.1},{"key":"Raptic","oh_retail":189,"oh_aca":169,"oh_retail_val":85253,"oh_aca_val":26138,"monthly_val":4340,"moi_retail_val":19.6,"moi_aca_val":6.0},{"key":"Quikcell","oh_retail":2906,"oh_aca":23212,"oh_retail_val":445617,"oh_aca_val":4038355,"monthly_val":44123,"moi_retail_val":10.1,"moi_aca_val":91.5},{"key":"Speck","oh_retail":9514,"oh_aca":10902,"oh_retail_val":4478217,"oh_aca_val":5092099,"monthly_val":460050,"moi_retail_val":9.7,"moi_aca_val":11.1},{"key":"Tech21","oh_retail":3303,"oh_aca":1488,"oh_retail_val":1768976,"oh_aca_val":765485,"monthly_val":192336,"moi_retail_val":9.2,"moi_aca_val":4.0},{"key":"Nomad","oh_retail":4421,"oh_aca":5626,"oh_retail_val":3095716,"oh_aca_val":3705618,"monthly_val":623673,"moi_retail_val":5.0,"moi_aca_val":5.9},{"key":"Pitaka","oh_retail":590,"oh_aca":194,"oh_retail_val":365585,"oh_aca_val":116951,"monthly_val":100132,"moi_retail_val":3.7,"moi_aca_val":1.2},{"key":"Mophie","oh_retail":8,"oh_aca":796,"oh_retail_val":1651,"oh_aca_val":164278,"monthly_val":0,"moi_retail_val":null,"moi_aca_val":null},{"key":"Cubitt","oh_retail":32,"oh_aca":109,"oh_retail_val":2687,"oh_aca_val":61016,"monthly_val":0,"moi_retail_val":null,"moi_aca_val":null},{"key":"Moment","oh_retail":24,"oh_aca":0,"oh_retail_val":14468,"oh_aca_val":0,"monthly_val":0,"moi_retail_val":null,"moi_aca_val":null},{"key":"Hypergear","oh_retail":54,"oh_aca":0,"oh_retail_val":13938,"oh_aca_val":0,"monthly_val":0,"moi_retail_val":null,"moi_aca_val":null},{"key":"Vivitar","oh_retail":4,"oh_aca":0,"oh_retail_val":544,"oh_aca_val":0,"monthly_val":0,"moi_retail_val":null,"moi_aca_val":null}]},"iShop":{"cat":[{"key":"Cases AirTag","oh_retail":367,"oh_aca":360,"oh_retail_val":85041,"oh_aca_val":80800,"monthly_val":349,"moi_retail_val":244.0,"moi_aca_val":231.8},{"key":"Cases iPhone","oh_retail":9616,"oh_aca":15066,"oh_retail_val":3872484,"oh_aca_val":6035166,"monthly_val":331000,"moi_retail_val":11.7,"moi_aca_val":18.2},{"key":"Cases Sleeves","oh_retail":94,"oh_aca":0,"oh_retail_val":40476,"oh_aca_val":0,"monthly_val":3660,"moi_retail_val":11.1,"moi_aca_val":0.0},{"key":"Others","oh_retail":128,"oh_aca":3,"oh_retail_val":29666,"oh_aca_val":697,"monthly_val":3486,"moi_retail_val":8.5,"moi_aca_val":0.2},{"key":"Cases iPad","oh_retail":2714,"oh_aca":1512,"oh_retail_val":1258232,"oh_aca_val":695811,"monthly_val":277803,"moi_retail_val":4.5,"moi_aca_val":2.5},{"key":"Cases Airpods","oh_retail":637,"oh_aca":1439,"oh_retail_val":190291,"oh_aca_val":467227,"monthly_val":43770,"moi_retail_val":4.3,"moi_aca_val":10.7},{"key":"Straps","oh_retail":1116,"oh_aca":1348,"oh_retail_val":662322,"oh_aca_val":649181,"monthly_val":178116,"moi_retail_val":3.7,"moi_aca_val":3.6},{"key":"Cases Macbook","oh_retail":1463,"oh_aca":610,"oh_retail_val":731094,"oh_aca_val":305404,"monthly_val":330635,"moi_retail_val":2.2,"moi_aca_val":0.9},{"key":"Audio","oh_retail":72,"oh_aca":1080,"oh_retail_val":87378,"oh_aca_val":521418,"monthly_val":0,"moi_retail_val":null,"moi_aca_val":null},{"key":"Sleeves","oh_retail":2,"oh_aca":0,"oh_retail_val":861,"oh_aca_val":0,"monthly_val":0,"moi_retail_val":null,"moi_aca_val":null}],"brand":[{"key":"Tech21","oh_retail":4263,"oh_aca":1761,"oh_retail_val":1765061,"oh_aca_val":706156,"monthly_val":257336,"moi_retail_val":6.9,"moi_aca_val":2.7},{"key":"Speck","oh_retail":9336,"oh_aca":15093,"oh_retail_val":3847995,"oh_aca_val":5969297,"monthly_val":588689,"moi_retail_val":6.5,"moi_aca_val":10.1},{"key":"Nomad","oh_retail":2610,"oh_aca":4564,"oh_retail_val":1344790,"oh_aca_val":2080252,"monthly_val":322794,"moi_retail_val":4.2,"moi_aca_val":6.4}]},"Liverpool":{"cat":[{"key":"Straps","oh_retail":0,"oh_aca":1135,"oh_retail_val":0,"oh_aca_val":586477,"monthly_val":0,"moi_retail_val":null,"moi_aca_val":null},{"key":"Cases Airpods","oh_retail":0,"oh_aca":1224,"oh_retail_val":0,"oh_aca_val":442537,"monthly_val":0,"moi_retail_val":null,"moi_aca_val":null},{"key":"Cases iPhone","oh_retail":0,"oh_aca":762,"oh_retail_val":0,"oh_aca_val":393741,"monthly_val":0,"moi_retail_val":null,"moi_aca_val":null}],"brand":[{"key":"Nomad","oh_retail":0,"oh_aca":3121,"oh_retail_val":0,"oh_aca_val":1422755,"monthly_val":0,"moi_retail_val":null,"moi_aca_val":null}]},"Coppel":{"cat":[{"key":"Cases iPhone","oh_retail":1151,"oh_aca":125,"oh_retail_val":351382,"oh_aca_val":29979,"monthly_val":0,"moi_retail_val":null,"moi_aca_val":null}],"brand":[{"key":"Speck","oh_retail":1151,"oh_aca":125,"oh_retail_val":351382,"oh_aca_val":29979,"monthly_val":0,"moi_retail_val":null,"moi_aca_val":null}]}};
 
-let moiView = 'retail'; // 'retail' | 'cat' | 'brand'
+let moiView = 'cat'; // 'cat' | 'brand'
+let moiClient = 'all';
 let moiChart = null;
 
 const MONTHS_H2   = ['Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
@@ -1210,6 +1187,13 @@ function setMoiView(view, el) {
   buildMOITab();
 }
 
+function setMoiClient(el) {
+  moiClient = el.dataset.retail;
+  document.querySelectorAll('#moiClientChips .chip').forEach(b=>b.classList.remove('on'));
+  el.classList.add('on');
+  buildMOITab();
+}
+
 function moiColor(moi) {
   if (moi <= 0)  return '#94a3b8';
   if (moi <= 2)  return '#22c55e';
@@ -1220,9 +1204,7 @@ function moiColor(moi) {
 }
 
 function buildMOITab() {
-  const datasets = moiView === 'retail' ? moiByRetail
-                 : moiView === 'cat'    ? moiByCat
-                 :                        moiByBrand;
+  const datasets = (moiDataByClient[moiClient] || moiDataByClient['all'])[moiView] || [];
 
   // ── KPIs ──────────────────────────────────────────────────────────────────
   const totalOHRval  = datasets.reduce((s,d)=>s+d.oh_retail_val,0);
@@ -1243,12 +1225,12 @@ function buildMOITab() {
       <div style="font-size:11px;color:var(--muted)">${k.sub}</div>
     </div>`).join('');
 
-  // ── Chart ─────────────────────────────────────────────────────────────────
-  // Sort by OH Retail value desc for chart (cap at 12 items for readability)
-  const sorted = [...datasets].sort((a,b)=>(b.oh_retail_val+b.oh_aca_val)-(a.oh_retail_val+a.oh_aca_val)).slice(0,12);
-  const labels  = sorted.map(d=>d.key);
-  const moiR    = sorted.map(d=>+d.moi_retail_val.toFixed(1));
-  const moiA    = sorted.map(d=>+d.moi_aca_val.toFixed(1));
+  // ── Chart: dual-axis (MOI bars + venta promedio line) ── sorted high→low by MOI
+  const sorted = datasets.filter(d=>d.moi_retail_val!=null).slice(0,12);
+  const labels = sorted.map(d=>d.key);
+  const moiR   = sorted.map(d=>d.moi_retail_val);
+  const moiA   = sorted.map(d=>d.moi_aca_val);
+  const sales  = sorted.map(d=>d.monthly_val);
 
   if (moiChart) { moiChart.destroy(); moiChart = null; }
   const ctx = document.getElementById('moiChart').getContext('2d');
@@ -1260,28 +1242,52 @@ function buildMOITab() {
         {
           label: 'MOI Retail (meses)',
           data: moiR,
-          backgroundColor: moiR.map(v=>moiColor(v)+'cc'),
-          borderColor:     moiR.map(v=>moiColor(v)),
-          borderWidth:1, borderRadius:4,
+          backgroundColor: moiR.map(v=>v!=null?moiColor(v)+'cc':'#94a3b833'),
+          borderColor:     moiR.map(v=>v!=null?moiColor(v):'#94a3b8'),
+          borderWidth:1, borderRadius:4, yAxisID:'yMoi',
         },
         {
           label: 'MOI Almacén/ACA (meses)',
           data: moiA,
-          backgroundColor: moiA.map(v=>moiColor(v)+'66'),
-          borderColor:     moiA.map(v=>moiColor(v)),
-          borderWidth:1, borderRadius:4, borderDash:[4,3],
+          backgroundColor: moiA.map(v=>v!=null?moiColor(v)+'55':'#94a3b822'),
+          borderColor:     moiA.map(v=>v!=null?moiColor(v):'#94a3b8'),
+          borderWidth:1, borderRadius:4, yAxisID:'yMoi',
+        },
+        {
+          label: 'Venta Prom Jun-Jul ($)',
+          data: sales,
+          type:'line',
+          borderColor:'#6366f1', backgroundColor:'#6366f122',
+          borderWidth:2.5, pointRadius:4, pointBackgroundColor:'#6366f1',
+          tension:0.3, yAxisID:'ySales', fill:false,
         },
       ]
     },
     options: {
       responsive:true, maintainAspectRatio:true,
+      interaction:{mode:'index',intersect:false},
       plugins:{
         legend:{position:'top',labels:{font:{size:11}}},
-        tooltip:{callbacks:{label:c=>`${c.dataset.label}: ${c.parsed.y.toFixed(1)} meses`}}
+        tooltip:{callbacks:{
+          label: c => {
+            if(c.datasetIndex<=1) return `${c.dataset.label}: ${c.parsed.y!=null?c.parsed.y.toFixed(1)+'m':'s/d'}`;
+            return `${c.dataset.label}: $${Math.round(c.parsed.y).toLocaleString('es-MX')}`;
+          }
+        }}
       },
       scales:{
-        y:{title:{display:true,text:'Meses de Inventario',font:{size:11}}, beginAtZero:true,
-           ticks:{callback:v=>v+'m'}},
+        yMoi:{
+          position:'left',
+          title:{display:true,text:'Meses de Inventario',font:{size:11}},
+          beginAtZero:true, ticks:{callback:v=>v+'m'},
+        },
+        ySales:{
+          position:'right',
+          title:{display:true,text:'Venta Prom Jun-Jul ($)',font:{size:11}},
+          beginAtZero:true,
+          ticks:{callback:v=>'$'+Math.round(v/1000)+'k'},
+          grid:{drawOnChartArea:false},
+        },
         x:{ticks:{font:{size:11}}}
       }
     }
@@ -1294,13 +1300,14 @@ function buildMOITab() {
     <th style="${thStyle}">Grupo</th>
     ${thR('OH Retail (pcs)')}${thR('OH Retail ($)')}${thR('MOI Retail')}
     ${thR('OH ACA (pcs)')}${thR('OH ACA ($)')}${thR('MOI ACA')}
+    ${thR('Venta Prom Jun-Jul')}
   </tr>`;
 
-  const allSorted = [...datasets].sort((a,b)=>(b.oh_retail_val+b.oh_aca_val)-(a.oh_retail_val+a.oh_aca_val));
+  const allSorted = datasets; // already sorted high→low by moi_retail_val
   const tdBase = 'padding:8px 12px;border-bottom:1px solid var(--border)';
   const tdR    = 'padding:8px 12px;border-bottom:1px solid var(--border);text-align:right;font-variant-numeric:tabular-nums';
   function moiBadge(moi) {
-    if(moi<=0) return '<span style="color:#94a3b8">—</span>';
+    if(moi==null||moi<=0) return '<span style="color:#94a3b8;font-size:11px">s/d</span>';
     const c=moiColor(moi);
     return `<span style="background:${c}22;color:${c};font-weight:700;padding:2px 8px;border-radius:12px;border:1px solid ${c}66">${moi.toFixed(1)}m</span>`;
   }
@@ -1313,6 +1320,7 @@ function buildMOITab() {
       <td style="${tdR}">${(d.oh_aca).toLocaleString('es-MX')}</td>
       <td style="${tdR}">$${Math.round(d.oh_aca_val).toLocaleString('es-MX')}</td>
       <td style="${tdR}">${moiBadge(d.moi_aca_val)}</td>
+      <td style="${tdR}">${d.monthly_val>0?'$'+Math.round(d.monthly_val).toLocaleString('es-MX'):'<span style="color:#94a3b8;font-size:11px">s/d</span>'}</td>
     </tr>`).join('');
 }
 
