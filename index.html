@@ -1542,7 +1542,510 @@ function buildAnualDualTable(val2025, val2026Inv, val2026Proy, pcs2026Inv, pcs20
 </table>`;
   el.innerHTML = h;
 }
+/* ══════ MISSING FUNCTIONS — RECONSTRUCTED ══════ */
 
+/* ── State ── */
+let avbMetric = 'valor';   // 'valor' | 'piezas'
+let avbMode   = 'invoice'; // 'invoice' | 'projection'
+let qMetric   = 'val';
+let qView     = 'grouped';
+let marcaState = { mode:'val', brand:'all', cliente:'all', chartType:'line', tblCat:'all', tblSort:{col:'total',dir:-1} };
+let clteState  = { client:'ATT', mode:'val', chartType:'stacked', tblSort:{col:'total',dir:-1} };
+
+/* chart instances */
+let chartAVBRetailInst=null, chartAVBMonthlyInst=null;
+let chartQMainInst=null, chartQYoYInst=null;
+let chartMarcaCatInst=null, chartMarcaMainInst=null;
+let chartClienteCatInst=null;
+
+const catLabel = {
+  'Cases iPhone':'Cases iPhone','Cases iPad':'Cases iPad','Cases Macbook':'Cases Macbook',
+  'Cases Airpods':'Cases AirPods','Cases Apple Watch':'Cases Apple Watch',
+  'Cases AirTag':'Cases AirTag','Cases Sleeves':'Cases Sleeves',
+  'Cables':'Cables','Micas':'Micas','Straps':'Straps',
+  'Wall Charger':'Wall Charger','Speakers':'Speakers',
+  'Others':'Others','Liquid':'Liquid','None':'None',
+  'Audio':'Audio','Gaming':'Gaming','Wearable':'Wearable',
+  'Charger':'Charger','Cases Universal':'Cases Universal','Accesories':'Accesorios'
+};
+
+/* ── Helpers ── */
+function fmtV(v){ return '$'+(v>=1e6?(v/1e6).toFixed(1)+'M':v>=1e3?(v/1e3).toFixed(0)+'K':v.toFixed(0)); }
+function fmtP(v){ return v.toLocaleString('es-MX'); }
+function pct(a,b){ return b===0?'—':(((a-b)/b)*100).toFixed(1)+'%'; }
+function kpiCard(title,val,sub,color){
+  return `<div class="kpi-card"><div class="kpi-label">${title}</div><div class="kpi-value" style="color:${color||'var(--accent)'}">${val}</div>${sub?`<div class="kpi-sub">${sub}</div>`:''}</div>`;
+}
+
+/* ══════ AVB SECTION ══════ */
+function setAVBMetric(m){
+  avbMetric = m;
+  document.getElementById('avbValBtn').classList.toggle('active', m==='valor');
+  document.getElementById('avbPcsBtn').classList.toggle('active', m==='piezas');
+  buildAVBSection();
+}
+function setAVBMode(mode, el){
+  avbMode = mode;
+  const inv  = document.getElementById('avbInvoiceBtn');
+  const proj = document.getElementById('avbProjBtn');
+  const note = document.getElementById('avbModeNote');
+  if(mode==='invoice'){
+    inv.style.background='#fff'; inv.style.color='#374151'; inv.style.borderColor='#cbd5e1';
+    proj.style.background='#9ca3af'; proj.style.color='#fff'; proj.style.borderColor='#9ca3af';
+    if(note) note.textContent='Mostrando facturas emitidas Ene–Ago 2026';
+  } else {
+    proj.style.background='#334155'; proj.style.color='#fff'; proj.style.borderColor='#334155';
+    inv.style.background='#fff'; inv.style.color='#374151'; inv.style.borderColor='#cbd5e1';
+    if(note) note.textContent='Mostrando proyección completa Ene–Dic 2026';
+  }
+  buildAVBSection();
+}
+
+function avbGetData(src2025, src2026){
+  // Returns {byRetail:{retail:[12]}, total2025:[12], total2026:[12]}
+  const retails = ['AT&T','MacStore','iShop','Liverpool','MercadoLibre','Coppel'];
+  const nMonths = avbMode==='invoice' ? 8 : 12;
+  const byRetail = {};
+  const total25 = new Array(nMonths).fill(0);
+  const total26 = new Array(nMonths).fill(0);
+  for(const r of retails){
+    const d25 = (src2025[r]||[]).slice(0,nMonths);
+    const d26 = (src2026[r]||[]).slice(0,nMonths);
+    byRetail[r] = {d25, d26};
+    d25.forEach((v,i)=>total25[i]+=v);
+    d26.forEach((v,i)=>total26[i]+=v);
+  }
+  return {byRetail, total25, total26, nMonths};
+}
+
+function buildAVBSection(){
+  const isVal = avbMetric==='valor';
+  const src25 = isVal ? avb2025Val : avb2025Pcs;
+  const src26 = isVal ? avb2026Val : avb2026Pcs;
+  const {byRetail, total25, total26, nMonths} = avbGetData(src25, src26);
+  const sum25 = total25.reduce((s,v)=>s+v,0);
+  const sum26 = total26.reduce((s,v)=>s+v,0);
+  const fmt = isVal ? fmtV : fmtP;
+
+  // KPIs
+  const kpiEl = document.getElementById('avbKpis');
+  if(kpiEl) kpiEl.innerHTML =
+    kpiCard('2025 Real', fmt(sum25), avbMode==='invoice'?'Ene–Ago':'Ene–Dic', '#64748b') +
+    kpiCard('2026 '+(avbMode==='invoice'?'Invoice':'Proyección'), fmt(sum26), avbMode==='invoice'?'Ene–Ago':'Ene–Dic', 'var(--accent)') +
+    kpiCard('YoY vs 2025', pct(sum26,sum25), avbMode==='invoice'?'Ene–Ago':'Full Year', sum26>=sum25?'#16a34a':'#dc2626') +
+    kpiCard('Retails activos', '6', '2026 FCST', '#7c3aed');
+
+  // Monthly Trend Chart
+  const months = MONTHS_FULL.slice(0,nMonths);
+  const ctxM = document.getElementById('chartAVBMonthly');
+  if(ctxM){
+    if(chartAVBMonthlyInst) chartAVBMonthlyInst.destroy();
+    chartAVBMonthlyInst = new Chart(ctxM, {
+      type:'bar',
+      data:{
+        labels:months,
+        datasets:[
+          {label:'2025 Real',data:total25,backgroundColor:'rgba(100,116,139,.35)',borderColor:'#64748b',borderWidth:1.5,type:'bar'},
+          {label:'2026 '+(avbMode==='invoice'?'Invoice':'FCST'),data:total26,backgroundColor:'rgba(6,182,212,.4)',borderColor:'#0891b2',borderWidth:1.5,type:'bar'},
+          {label:'Tendencia 2026',data:total26,borderColor:'#0891b2',borderWidth:2,type:'line',fill:false,tension:.3,pointRadius:3}
+        ]
+      },
+      options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'top',labels:{boxWidth:10,font:{size:10}}}},scales:{y:{ticks:{callback:v=>isVal?'$'+(v/1e6).toFixed(0)+'M':v.toLocaleString()}}}}
+    });
+  }
+
+  // Retail Bar Chart
+  const retails = ['AT&T','MacStore','iShop','Liverpool','MercadoLibre','Coppel'];
+  const colors = retails.map(r=>avbRetailColors[r]||'#999');
+  const ret25 = retails.map(r=>byRetail[r].d25.reduce((s,v)=>s+v,0));
+  const ret26 = retails.map(r=>byRetail[r].d26.reduce((s,v)=>s+v,0));
+  const ctxR = document.getElementById('chartAVBRetail');
+  if(ctxR){
+    if(chartAVBRetailInst) chartAVBRetailInst.destroy();
+    chartAVBRetailInst = new Chart(ctxR, {
+      type:'bar',
+      data:{
+        labels:retails,
+        datasets:[
+          {label:'2025',data:ret25,backgroundColor:colors.map(c=>c+'66'),borderColor:colors,borderWidth:1.5},
+          {label:'2026',data:ret26,backgroundColor:colors,borderColor:colors,borderWidth:1.5}
+        ]
+      },
+      options:{responsive:true,maintainAspectRatio:false,
+        plugins:{legend:{position:'top',labels:{boxWidth:10,font:{size:10}}}},
+        scales:{x:{ticks:{font:{size:10}}},y:{ticks:{callback:v=>isVal?'$'+(v/1e6).toFixed(0)+'M':v.toLocaleString()}}}}
+    });
+  }
+
+  // AVB Table
+  const tbody = document.getElementById('avbTableBody');
+  const tfoot = document.getElementById('avbTableFoot');
+  if(tbody){
+    tbody.innerHTML = retails.map(r=>{
+      const s25=byRetail[r].d25.reduce((s,v)=>s+v,0);
+      const s26=byRetail[r].d26.reduce((s,v)=>s+v,0);
+      const share25=sum25?((s25/sum25)*100).toFixed(0)+'%':'—';
+      const share26=sum26?((s26/sum26)*100).toFixed(0)+'%':'—';
+      const yoy=pct(s26,s25);
+      const yoyColor=s26>=s25?'#16a34a':'#dc2626';
+      const dot=`<span class="dot" style="background:${avbRetailColors[r]}"></span>`;
+      return `<tr><td>${dot}${r}</td><td class="num">${fmt(s25)}</td><td class="num"><strong>${fmt(s26)}</strong></td><td class="num" style="color:${yoyColor};font-weight:600">${yoy}</td><td class="num">${share25}</td><td class="num">${share26}</td></tr>`;
+    }).join('');
+    if(tfoot) tfoot.innerHTML=`<tr><td>TOTAL</td><td class="num">${fmt(sum25)}</td><td class="num"><strong>${fmt(sum26)}</strong></td><td class="num" style="font-weight:600">${pct(sum26,sum25)}</td><td class="num">100%</td><td class="num">100%</td></tr>`;
+  }
+
+  // Anual KPIs + chart
+  buildAnualKpis();
+  initAnualFilters();
+  initAvbChartFilters();
+  buildAnualDualChart();
+}
+
+function buildAnualKpis(){
+  const el = document.getElementById('anualKpiRow');
+  if(!el) return;
+  const clients = anualSelectedClient==='all'
+    ? ['AT&T','MacStore','iShop','Liverpool','MercadoLibre','Coppel']
+    : [anualSelectedClient];
+  const totalVal = MONTHS_FULL.map((_,i)=>clients.reduce((s,c)=>s+((valorFull[c]||[])[i]||0),0)).reduce((s,v)=>s+v,0);
+  const totalPcs = MONTHS_FULL.map((_,i)=>clients.reduce((s,c)=>s+((piezasAnual[c]||[])[i]||0),0)).reduce((s,v)=>s+v,0);
+  const val25 = MONTHS_FULL.map((_,i)=>clients.reduce((s,c)=>s+((avb2025Val[c]||[])[i]||0),0)).reduce((s,v)=>s+v,0);
+  el.innerHTML =
+    kpiCard('Total 2026',fmtV(totalVal),anualSelectedClient==='all'?'Todos los retails':anualSelectedClient,'var(--accent)') +
+    kpiCard('vs 2025',pct(totalVal,val25),'Full Year',totalVal>=val25?'#16a34a':'#dc2626') +
+    kpiCard('Piezas 2026',fmtP(totalPcs),'FCST','#7c3aed');
+}
+
+/* ══════ QUARTER SECTION ══════ */
+function setQMetric(m){
+  qMetric = m;
+  document.getElementById('qValBtn').classList.toggle('active',m==='val');
+  document.getElementById('qPcsBtn').classList.toggle('active',m==='pcs');
+  buildQSection();
+}
+function setQView(v){
+  qView = v;
+  ['grouped','stacked','yoy'].forEach(k=>{
+    const el=document.getElementById('qView'+k.charAt(0).toUpperCase()+k.slice(1));
+    if(el) el.classList.toggle('active',k===v);
+  });
+  buildQSection();
+}
+
+function buildQSection(){
+  const isVal = qMetric==='val';
+  const src25 = isVal ? q2025Val : q2025Pcs;
+  const src26 = isVal ? qValorAll : qPiezas;
+  const fmt = isVal ? fmtV : fmtP;
+  const retails = ['AT&T','MacStore','iShop','Liverpool','MercadoLibre','Coppel'];
+  const quarters = ['Q1','Q2','Q3','Q4'];
+  const colors = retails.map(r=>avbRetailColors[r]||'#999');
+
+  // Totals per quarter
+  const tot25 = quarters.map((_,qi)=>retails.reduce((s,r)=>s+((src25[r]||[])[qi]||0),0));
+  const tot26 = quarters.map((_,qi)=>retails.reduce((s,r)=>s+((src26[r]||[])[qi]||0),0));
+  const sum25 = tot25.reduce((s,v)=>s+v,0);
+  const sum26 = tot26.reduce((s,v)=>s+v,0);
+
+  // KPIs
+  const kpiEl = document.getElementById('qKpis');
+  if(kpiEl) kpiEl.innerHTML = quarters.map((q,i)=>
+    kpiCard(q+' 2026',fmt(tot26[i]),`vs ${fmt(tot25[i])} (2025)`,tot26[i]>=tot25[i]?'var(--accent)':'#dc2626')
+  ).join('') + kpiCard('Total 2026',fmt(sum26),`YoY ${pct(sum26,sum25)}`,sum26>=sum25?'#16a34a':'#dc2626');
+
+  // Main Chart
+  const ctxM = document.getElementById('chartQMain');
+  if(ctxM){
+    if(chartQMainInst) chartQMainInst.destroy();
+    if(qView==='yoy'){
+      const yoyData = quarters.map((q,i)=>tot25[i]?((tot26[i]-tot25[i])/tot25[i]*100):0);
+      chartQMainInst = new Chart(ctxM,{type:'bar',data:{labels:quarters,datasets:[{label:'YoY %',data:yoyData,backgroundColor:yoyData.map(v=>v>=0?'rgba(16,185,129,.7)':'rgba(220,38,38,.7)')}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{y:{ticks:{callback:v=>v.toFixed(0)+'%'}}}}});
+    } else {
+      const type = qView==='stacked'?'bar':'bar';
+      chartQMainInst = new Chart(ctxM,{type:'bar',data:{labels:quarters,datasets:retails.map((r,i)=>({label:r,data:(src26[r]||[0,0,0,0]),backgroundColor:colors[i],stack:qView==='stacked'?'a':undefined}))},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'top',labels:{boxWidth:10,font:{size:10}}}},scales:{x:{stacked:qView==='stacked'},y:{stacked:qView==='stacked',ticks:{callback:v=>isVal?'$'+(v/1e6).toFixed(0)+'M':v.toLocaleString()}}}}});
+    }
+    document.getElementById('qChartTitle').textContent = (isVal?'Valor MXN':'Piezas')+' por Trimestre — '+(qView==='yoy'?'YoY %':'2026');
+  }
+
+  // YoY Chart
+  const ctxY = document.getElementById('chartQYoY');
+  if(ctxY){
+    if(chartQYoYInst) chartQYoYInst.destroy();
+    const yoyByRetail = retails.map(r=>quarters.map((q,qi)=>{const v25=(src25[r]||[])[qi]||0;const v26=(src26[r]||[])[qi]||0;return v25?((v26-v25)/v25*100):0;}));
+    chartQYoYInst = new Chart(ctxY,{type:'bar',data:{labels:quarters,datasets:retails.map((r,i)=>({label:r,data:yoyByRetail[i],backgroundColor:colors[i]+'aa'}))},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'top',labels:{boxWidth:10,font:{size:10}}}},scales:{y:{ticks:{callback:v=>v.toFixed(0)+'%'}}}}});
+    document.getElementById('qYoYTitle').textContent='Crecimiento YoY — 2025 vs 2026';
+  }
+
+  // Table
+  const tblEl = document.getElementById('qTable');
+  if(tblEl){
+    const rows = retails.map(r=>{
+      const d25=(src25[r]||[0,0,0,0]);
+      const d26=(src26[r]||[0,0,0,0]);
+      const s25=d25.reduce((s,v)=>s+v,0);
+      const s26=d26.reduce((s,v)=>s+v,0);
+      if(!s25&&!s26) return '';
+      const dot=`<span class="dot" style="background:${avbRetailColors[r]}"></span>`;
+      const qCells=quarters.map((q,i)=>`<td class="num">${fmt(d26[i])}</td><td class="num" style="color:${d26[i]>=d25[i]?'#16a34a':'#dc2626'};font-size:10px">${pct(d26[i],d25[i])}</td>`).join('');
+      return `<tr><td>${dot}${r}</td>${qCells}<td class="num"><strong>${fmt(s26)}</strong></td><td class="num" style="color:${s26>=s25?'#16a34a':'#dc2626'};font-size:10px">${pct(s26,s25)}</td></tr>`;
+    }).filter(Boolean).join('');
+    const hdr=quarters.map(q=>`<th class="num" colspan="2">${q}</th>`).join('');
+    const hdr2=quarters.map(q=>`<th class="num">2026</th><th class="num">YoY</th>`).join('');
+    tblEl.innerHTML=`<div class="table-wrap"><table style="min-width:700px"><thead><tr><th>Retail</th>${hdr}<th class="num">TOTAL</th><th class="num">YoY</th></tr><tr><th></th>${hdr2}<th></th><th></th></tr></thead><tbody>${rows}</tbody><tfoot><tr><td>TOTAL</td>${quarters.map((_,qi)=>`<td class="num">${fmt(tot26[qi])}</td><td class="num">${pct(tot26[qi],tot25[qi])}</td>`).join('')}<td class="num"><strong>${fmt(sum26)}</strong></td><td class="num">${pct(sum26,sum25)}</td></tr></tfoot></table></div>`;
+  }
+}
+
+/* ══════ MARCA SECTION ══════ */
+let tblSort = {col:'total', dir:-1};
+
+function resetMarcaFilters(){
+  marcaState.brand='all'; marcaState.cliente='all'; marcaState.tblCat='all';
+  document.querySelectorAll('#marcaBrandFilter .chip').forEach(b=>b.classList.toggle('on',b.dataset.brand==='all'));
+  document.querySelectorAll('#marcaClienteFilter .chip').forEach(b=>b.classList.toggle('on',b.dataset.cliente==='all'));
+  document.querySelectorAll('#tblCatFilter .chip').forEach(b=>b.classList.toggle('on',b.dataset.cat==='all'));
+  const rb=document.getElementById('marcaResetBtn'); if(rb) rb.style.display='none';
+  renderMarca();
+}
+function filterMarcaBrand(btn){
+  marcaState.brand=btn.dataset.brand;
+  document.querySelectorAll('#marcaBrandFilter .chip').forEach(b=>b.classList.toggle('on',b.dataset.brand===marcaState.brand));
+  updateMarcaTblCats();
+  renderMarca();
+  const rb=document.getElementById('marcaResetBtn'); if(rb) rb.style.display=(marcaState.brand!=='all'||marcaState.cliente!=='all'||marcaState.tblCat!=='all')?'':'none';
+}
+function filterMarca(btn, type){
+  if(type==='cliente'){
+    marcaState.cliente=btn.dataset.cliente;
+    document.querySelectorAll('#marcaClienteFilter .chip').forEach(b=>b.classList.toggle('on',b.dataset.cliente===marcaState.cliente));
+  }
+  updateMarcaTblCats();
+  renderMarca();
+  const rb=document.getElementById('marcaResetBtn'); if(rb) rb.style.display=(marcaState.brand!=='all'||marcaState.cliente!=='all'||marcaState.tblCat!=='all')?'':'none';
+}
+function updateMarcaTblCats(){
+  const el=document.getElementById('tblCatFilter'); if(!el) return;
+  const cats=new Set();
+  for(const [brand, retails] of Object.entries(marcaRaw)){
+    if(marcaState.brand!=='all'&&brand!==marcaState.brand) continue;
+    for(const [retail, catMap] of Object.entries(retails)){
+      if(marcaState.cliente!=='all'&&retail!==marcaState.cliente) continue;
+      Object.keys(catMap).forEach(c=>cats.add(c));
+    }
+  }
+  if(marcaState.tblCat!=='all'&&!cats.has(marcaState.tblCat)) marcaState.tblCat='all';
+  el.innerHTML=`<button class="chip on" data-cat="all" onclick="setMarcaTblCat(this)">Todas</button>`+[...cats].sort().map(c=>`<button class="chip ${marcaState.tblCat===c?'on':''}" data-cat="${c}" onclick="setMarcaTblCat(this)">${catLabel[c]||c}</button>`).join('');
+}
+function setMarcaTblCat(btn){
+  marcaState.tblCat=btn.dataset.cat;
+  document.querySelectorAll('#tblCatFilter .chip').forEach(b=>b.classList.toggle('on',b.dataset.cat===marcaState.tblCat));
+  renderMarca();
+}
+function setMarcaChartType(t){
+  marcaState.chartType=t;
+  ['grouped','stacked','line'].forEach(k=>{const el=document.getElementById('mChart'+k.charAt(0).toUpperCase()+k.slice(1));if(el)el.classList.toggle('active',k===t);});
+  renderMarca();
+}
+function setTblColSort(col){
+  if(tblSort.col===col) tblSort.dir*=-1; else {tblSort.col=col;tblSort.dir=-1;}
+  document.querySelectorAll('[id^="thSort_"]').forEach(el=>el.textContent='');
+  const el=document.getElementById('thSort_'+col); if(el) el.textContent=tblSort.dir>0?' ↑':' ↓';
+  renderMarcaTable();
+}
+
+function getMarcaRows(){
+  const rows=[];
+  for(const [brand, retails] of Object.entries(marcaRaw)){
+    if(marcaState.brand!=='all'&&brand!==marcaState.brand) continue;
+    for(const [retail, catMap] of Object.entries(retails)){
+      if(marcaState.cliente!=='all'&&retail!==marcaState.cliente) continue;
+      for(const [cat, md] of Object.entries(catMap)){
+        if(marcaState.tblCat!=='all'&&cat!==marcaState.tblCat) continue;
+        const row={brand,retail,cat};
+        ALL_MONTHS.forEach(m=>{ row[m]=(marcaState.mode==='val'?(md.val[m]||0):(md.pcs[m]||0)); });
+        row.total=ALL_MONTHS.reduce((s,m)=>s+row[m],0);
+        if(row.total>0) rows.push(row);
+      }
+    }
+  }
+  return rows;
+}
+
+function renderMarcaTable(){
+  const tbody=document.getElementById('marcaTableBody'); if(!tbody) return;
+  const isVal=marcaState.mode==='val';
+  const fmt=isVal?fmtV:fmtP;
+  const rows=getMarcaRows();
+  rows.sort((a,b)=>{
+    const col=tblSort.col;
+    if(col==='marca') return tblSort.dir*(a.brand.localeCompare(b.brand));
+    if(col==='retail') return tblSort.dir*(a.retail.localeCompare(b.retail));
+    if(col==='cat') return tblSort.dir*(a.cat.localeCompare(b.cat));
+    return tblSort.dir*((b[col]||0)-(a[col]||0));
+  });
+  tbody.innerHTML=rows.map(r=>{
+    const cells=ALL_MONTHS.map(m=>`<td class="num">${r[m]?fmt(r[m]):'—'}</td>`).join('');
+    const mcolor=marcaColors[r.brand]||'#64748b';
+    return `<tr><td style="font-weight:600;color:${mcolor}">${r.brand}</td><td>${r.retail}</td><td>${catLabel[r.cat]||r.cat}</td>${cells}<td class="num"><strong>${fmt(r.total)}</strong></td></tr>`;
+  }).join('');
+}
+
+function renderMarca(){
+  const isVal=marcaState.mode==='val';
+  const fmt=isVal?fmtV:fmtP;
+  const rows=getMarcaRows();
+
+  // KPIs
+  const kpiEl=document.getElementById('marcaKpis'); if(kpiEl){
+    const totalVal=rows.reduce((s,r)=>s+r.total,0);
+    const brands=new Set(rows.map(r=>r.brand));
+    const retails=new Set(rows.map(r=>r.retail));
+    kpiEl.innerHTML=kpiCard('Total 2026',fmt(totalVal),'Ene–Dic','var(--accent)')+kpiCard('Marcas',brands.size,'Activas','#7c3aed')+kpiCard('Retails',retails.size,'Activos','#0891b2');
+  }
+
+  // Category chart
+  const catTotals={};
+  rows.forEach(r=>{ catTotals[r.cat]=(catTotals[r.cat]||0)+r.total; });
+  const catsSorted=Object.entries(catTotals).sort((a,b)=>b[1]-a[1]);
+  const catEl=document.getElementById('chartMarcaCat');
+  if(catEl){
+    if(chartMarcaCatInst) chartMarcaCatInst.destroy();
+    const labels=catsSorted.map(([c])=>catLabel[c]||c);
+    const data=catsSorted.map(([,v])=>v);
+    const colors=catsSorted.map(([c])=>catColors[c]||'#94a3b8');
+    chartMarcaCatInst=new Chart(catEl,{type:'doughnut',data:{labels,datasets:[{data,backgroundColor:colors}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'right',labels:{boxWidth:10,font:{size:10}}}}}});
+    const legEl=document.getElementById('marcaCatLegend'); if(legEl) legEl.innerHTML='';
+    document.getElementById('marcaCatTitle').textContent='Categorías — '+(marcaState.brand==='all'?'Todos':marcaState.brand)+' '+(marcaState.cliente==='all'?'Todos los retails':marcaState.cliente);
+  }
+
+  // Main chart by brand
+  const brandTotals={};
+  rows.forEach(r=>{ if(!brandTotals[r.brand]) brandTotals[r.brand]=new Array(12).fill(0); ALL_MONTHS.forEach((m,i)=>brandTotals[r.brand][i]+=r[m]); });
+  const mainEl=document.getElementById('chartMarcaMain');
+  if(mainEl){
+    if(chartMarcaMainInst) chartMarcaMainInst.destroy();
+    const brands=Object.keys(brandTotals);
+    const type=marcaState.chartType==='line'?'line':'bar';
+    chartMarcaMainInst=new Chart(mainEl,{type,data:{labels:MONTHS_FULL,datasets:brands.map(b=>({label:b,data:brandTotals[b],backgroundColor:(marcaColors[b]||'#999')+(type==='bar'?'aa':''),borderColor:marcaColors[b]||'#999',borderWidth:2,fill:false,tension:.3,stack:marcaState.chartType==='stacked'?'a':undefined}))},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'top',labels:{boxWidth:10,font:{size:10}}}},scales:{x:{stacked:marcaState.chartType==='stacked'},y:{stacked:marcaState.chartType==='stacked',ticks:{callback:v=>isVal?'$'+(v/1e6).toFixed(0)+'M':v.toLocaleString()}}}}});
+    document.getElementById('marcaMainTitle').textContent=(isVal?'Valor MXN':'Piezas')+' por Marca — Ene–Dic 2026';
+  }
+
+  updateMarcaTblCats();
+  renderMarcaTable();
+  // Legend
+  const legEl=document.getElementById('marcaMainLegend'); if(legEl) legEl.innerHTML='';
+}
+
+/* ══════ CLIENTE SECTION ══════ */
+function setClienteClient(btn){
+  clteState.client=btn.dataset.c;
+  document.querySelectorAll('#clteClienteFilter .chip').forEach(b=>{
+    b.classList.remove('on','on-att','on-macstore','on-ishop','on-liverpool');
+  });
+  const clsMap={ATT:'on-att',MacStore:'on-macstore',iShop:'on-ishop',Liverpool:'on-liverpool'};
+  btn.classList.add(clsMap[clteState.client]||'on');
+  buildClienteTab();
+}
+function setClienteMetric(m, btn){
+  clteState.mode=m;
+  document.querySelectorAll('#clteMetricBtns button').forEach((b,i)=>b.classList.toggle('active',(m==='val'&&i===0)||(m==='pcs'&&i===1)));
+  buildClienteTab();
+}
+function setClteChartType(t){
+  clteState.chartType=t;
+  ['grouped','stacked','line'].forEach(k=>{const el=document.getElementById('clteChart'+k.charAt(0).toUpperCase()+k.slice(1));if(el)el.classList.toggle('active',k===t);});
+  buildClienteTab();
+}
+let clteTblSort={col:'total',dir:-1};
+function setClteTblSort(col){
+  if(clteTblSort.col===col) clteTblSort.dir*=-1; else {clteTblSort.col=col;clteTblSort.dir=-1;}
+  document.querySelectorAll('[id^="clteThSort_"]').forEach(el=>el.textContent='');
+  const el=document.getElementById('clteThSort_'+col); if(el) el.textContent=clteTblSort.dir>0?' ↑':' ↓';
+  buildClienteTab();
+}
+
+function buildClienteTab(){
+  const isVal=clteState.mode==='val';
+  const fmt=isVal?fmtV:fmtP;
+  const clientKey=clteState.client;
+  const catMap=catData[clientKey]||{};
+  // catData has 7 values per cat = Jun-Dec (indices 0-6 → MONTHS_FULL indices 5-11)
+  const H2_MONTHS_FULL=['Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
+  const H2_MONTHS_KEY =['Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+
+  // Per-month totals (H2 only)
+  const totals=H2_MONTHS_KEY.map((_,mi)=>Object.values(catMap).reduce((s,cd)=>s+(isVal?(cd.val[mi]||0):(cd.pcs[mi]||0)),0));
+  const grandTotal=totals.reduce((s,v)=>s+v,0);
+
+  // 2025 actuals H2
+  const clientKey25 = clientKey==='ATT'?'AT&T':clientKey;
+  const arr25full=isVal?(avb2025Val[clientKey25]||[]):(avb2025Pcs[clientKey25]||[]);
+  const sum25H2=arr25full.slice(5,12).reduce((s,v)=>s+v,0);
+  const sum25full=arr25full.reduce((s,v)=>s+v,0);
+
+  // KPIs
+  const kpiEl=document.getElementById('clteKpis');
+  if(kpiEl) kpiEl.innerHTML=
+    kpiCard('2026 Jun–Dic',fmt(grandTotal),'H2 FCST','var(--accent)')+
+    kpiCard('vs 2025 H2',pct(grandTotal,sum25H2),'YoY',grandTotal>=sum25H2?'#16a34a':'#dc2626')+
+    kpiCard('2025 Full Year',fmt(sum25full),'Real','#64748b');
+
+  // H1 card
+  const h1El=document.getElementById('clteH1Summary');
+  if(h1El){
+    const h1val26=isVal?(avb2026Val[clientKey25]||[]).slice(0,5).reduce((s,v)=>s+v,0):(avb2026Pcs[clientKey25]||[]).slice(0,5).reduce((s,v)=>s+v,0);
+    const h1val25=arr25full.slice(0,5).reduce((s,v)=>s+v,0);
+    h1El.innerHTML=`<span>Ene–May 2026 (Budget): <strong>${fmt(h1val26)}</strong></span><span style="color:#64748b">vs 2025: ${fmt(h1val25)}</span>`;
+  }
+
+  // Chart
+  const catColors_local=Object.fromEntries(Object.keys(catMap).map(c=>[c,catColors[c]||'#94a3b8']));
+  const catNames=Object.keys(catMap).sort((a,b)=>{
+    const ta=(catMap[a].val||[]).reduce((s,v)=>s+v,0);
+    const tb=(catMap[b].val||[]).reduce((s,v)=>s+v,0);
+    return tb-ta;
+  });
+  const type=clteState.chartType==='line'?'line':'bar';
+  const ctxC=document.getElementById('chartClienteCat');
+  if(ctxC){
+    if(chartClienteCatInst) chartClienteCatInst.destroy();
+    chartClienteCatInst=new Chart(ctxC,{type,data:{labels:H2_MONTHS_FULL,datasets:catNames.map(c=>({label:catLabel[c]||c,data:H2_MONTHS_KEY.map((_,i)=>isVal?(catMap[c].val[i]||0):(catMap[c].pcs[i]||0)),backgroundColor:(catColors_local[c])+(type==='bar'?'bb':''),borderColor:catColors_local[c],borderWidth:2,fill:false,tension:.3,stack:clteState.chartType==='stacked'?'a':undefined}))},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'top',labels:{boxWidth:10,font:{size:10}}}},scales:{x:{stacked:clteState.chartType==='stacked'},y:{stacked:clteState.chartType==='stacked',ticks:{callback:v=>isVal?'$'+(v/1e6).toFixed(0)+'M':v.toLocaleString()}}}}});
+  }
+
+  // Legend
+  const legEl=document.getElementById('clteLegend');
+  if(legEl) legEl.innerHTML=catNames.map(c=>`<span style="display:flex;align-items:center;gap:3px"><span style="width:10px;height:10px;background:${catColors_local[c]};border-radius:2px"></span>${catLabel[c]||c}</span>`).join('');
+
+  // Table — columns are H2 months
+  const tbody=document.getElementById('clteTableBody'); if(!tbody) return;
+  const rows=catNames.map(c=>{
+    const vals=H2_MONTHS_KEY.map((_,i)=>isVal?(catMap[c].val[i]||0):(catMap[c].pcs[i]||0));
+    const total=vals.reduce((s,v)=>s+v,0);
+    return {cat:c, vals, total};
+  }).filter(r=>r.total>0);
+  rows.sort((a,b)=>{
+    if(clteTblSort.col==='cat') return clteTblSort.dir*a.cat.localeCompare(b.cat);
+    if(clteTblSort.col==='total') return clteTblSort.dir*(b.total-a.total);
+    const mi=H2_MONTHS_KEY.indexOf(clteTblSort.col);
+    if(mi>=0) return clteTblSort.dir*((b.vals[mi]||0)-(a.vals[mi]||0));
+    return 0;
+  });
+  // Fix table headers to show H2 months
+  const tbl=document.getElementById('clteTable');
+  if(tbl){
+    const hdrRow=tbl.querySelector('thead tr');
+    if(hdrRow) hdrRow.innerHTML=`<th style="min-width:160px;cursor:pointer" onclick="setClteTblSort('cat')">Categoría<span id="clteThSort_cat" style="color:var(--accent);font-size:10px"></span></th>`+H2_MONTHS_KEY.map((m,i)=>`<th class="num" style="cursor:pointer" onclick="setClteTblSort('${m}')">${H2_MONTHS_FULL[i]}<span id="clteThSort_${m}" style="color:var(--accent);font-size:10px"></span></th>`).join('')+`<th class="num" style="cursor:pointer;background:var(--surface2)" onclick="setClteTblSort('total')">TOTAL<span id="clteThSort_total" style="color:var(--accent);font-size:10px"> ↓</span></th>`;
+  }
+  const totRow=H2_MONTHS_KEY.map((_,mi)=>rows.reduce((s,r)=>s+(r.vals[mi]||0),0));
+  const totTotal=totRow.reduce((s,v)=>s+v,0);
+  tbody.innerHTML=rows.map(r=>`<tr><td style="color:${catColors[r.cat]||'#64748b'};font-weight:600">${catLabel[r.cat]||r.cat}</td>${r.vals.map(v=>`<td class="num">${v?fmt(v):'—'}</td>`).join('')}<td class="num" style="background:var(--surface2)"><strong>${fmt(r.total)}</strong></td></tr>`).join('');
+  tbody.innerHTML+=`<tr style="background:var(--surface2);font-weight:700"><td>TOTAL</td>${totRow.map(v=>`<td class="num">${v?fmt(v):'—'}</td>`).join('')}<td class="num"><strong>${fmt(totTotal)}</strong></td></tr>`;
+
+  document.getElementById('clteTableTitle').textContent=`Detalle por Categoría — ${clientKey} Jun–Dic 2026`;
+  document.getElementById('clteChartTitle').innerHTML=`Categorías Jun–Dic 2026 — <strong>${clientKey}</strong> <span style="font-weight:400;color:var(--muted);font-size:12px">fuente: Consenso FCST</span>`;
+}
+
+/* ══════ INIT ══════ */
+buildAVBSection();
 
 </script>
 </body>
