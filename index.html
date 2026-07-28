@@ -1652,8 +1652,9 @@ function buildAVBSection(){
     kpiCard('YoY vs 2025', pct(sum26,sum25), avbMode==='invoice'?'Ene–Ago':'Full Year', sum26>=sum25?'#16a34a':'#dc2626') +
     kpiCard('Retails activos', '6', '2026 FCST', '#7c3aed');
 
-  // Chart 1: Doughnut concéntrico — 2025 (inner) + 2026 (outer)
-  const retails = ['AT&T','MacStore','iShop','Liverpool','MercadoLibre','Coppel'];
+  // Chart 1: Doughnut concéntrico — 2025 (inner) + 2026 (outer), sorted by 2026 high→low
+  const retailsBase = ['AT&T','MacStore','iShop','Liverpool','MercadoLibre','Coppel'];
+  const retails = retailsBase.slice().sort((a,b)=>byRetail[b].d26.reduce((s,v)=>s+v,0)-byRetail[a].d26.reduce((s,v)=>s+v,0));
   const colors = retails.map(r=>avbRetailColors[r]||'#999');
   const ret25 = retails.map(r=>byRetail[r].d25.reduce((s,v)=>s+v,0));
   const ret26 = retails.map(r=>byRetail[r].d26.reduce((s,v)=>s+v,0));
@@ -1770,8 +1771,10 @@ function buildQSection(){
   const src25 = isVal ? q2025Val : q2025Pcs;
   const src26 = isVal ? qValorAll : qPiezas;
   const fmt = isVal ? fmtV : fmtP;
-  const retails = ['AT&T','MacStore','iShop','Liverpool','MercadoLibre','Coppel'];
   const quarters = ['Q1','Q2','Q3','Q4'];
+  // Sort retails by total 2026 high→low
+  const retails = ['AT&T','MacStore','iShop','Liverpool','MercadoLibre','Coppel']
+    .sort((a,b)=>(src26[b]||[]).reduce((s,v)=>s+v,0)-(src26[a]||[]).reduce((s,v)=>s+v,0));
   const colors = retails.map(r=>avbRetailColors[r]||'#999');
 
   // Totals per quarter
@@ -1953,13 +1956,13 @@ function renderMarca(){
     document.getElementById('marcaCatTitle').textContent='Categorías — '+(marcaState.brand==='all'?'Todos':marcaState.brand)+' '+(marcaState.cliente==='all'?'Todos los retails':marcaState.cliente);
   }
 
-  // Main chart by brand
+  // Main chart by brand — sorted high to low by total
   const brandTotals={};
   rows.forEach(r=>{ if(!brandTotals[r.brand]) brandTotals[r.brand]=new Array(12).fill(0); ALL_MONTHS.forEach((m,i)=>brandTotals[r.brand][i]+=r[m]); });
   const mainEl=document.getElementById('chartMarcaMain');
   if(mainEl){
     if(chartMarcaMainInst) chartMarcaMainInst.destroy();
-    const brands=Object.keys(brandTotals);
+    const brands=Object.keys(brandTotals).sort((a,b)=>brandTotals[b].reduce((s,v)=>s+v,0)-brandTotals[a].reduce((s,v)=>s+v,0));
     const type=marcaState.chartType==='line'?'line':'bar';
     chartMarcaMainInst=new Chart(mainEl,{type,data:{labels:MONTHS_FULL,datasets:brands.map(b=>({label:b,data:brandTotals[b],backgroundColor:(marcaColors[b]||'#999')+(type==='bar'?'aa':''),borderColor:marcaColors[b]||'#999',borderWidth:2,fill:false,tension:.3,stack:marcaState.chartType==='stacked'?'a':undefined}))},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'top',labels:{boxWidth:10,font:{size:10}}}},scales:{x:{stacked:marcaState.chartType==='stacked'},y:{stacked:marcaState.chartType==='stacked',ticks:{callback:v=>isVal?'$'+(v/1e6).toFixed(0)+'M':v.toLocaleString()}}}}});
     document.getElementById('marcaMainTitle').textContent=(isVal?'Valor MXN':'Piezas')+' por Marca — Ene–Dic 2026';
