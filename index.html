@@ -2581,7 +2581,36 @@ function getLydeAgg(){
   return {cats, catSubs, catSubCl};
 }
 
+
+function updateLydeStatusChips(){
+  const statuses = ['all','Activo','Activo2','New','Descontinuado'];
+  const brands = ALL_LYDE_BRANDS.filter(b => lydeSelectedBrands.has(b));
+
+  statuses.forEach(status => {
+    const d = lydeData[status] || {};
+    const total = brands.reduce((sum, b) => {
+      const node = d.brand?.[b];
+      return sum + (node ? (node.disp||0) + (node.cuar||0) : 0);
+    }, 0);
+    const chip = document.querySelector('#lydeStatusChips [data-status="' + status + '"]');
+    if(!chip) return;
+    const hasData = total > 0;
+    chip.disabled = !hasData;
+    chip.style.opacity = hasData ? '1' : '0.3';
+    chip.style.cursor = hasData ? 'pointer' : 'not-allowed';
+    chip.title = hasData ? '' : 'Sin inventario para la selección actual';
+    // If current status becomes empty, switch to all
+    if(!hasData && lydeStatus === status){
+      lydeStatus = 'all';
+      document.querySelectorAll('#lydeStatusChips .chip').forEach(b => b.classList.remove('on'));
+      const allChip = document.querySelector('#lydeStatusChips [data-status="all"]');
+      if(allChip) allChip.classList.add('on');
+    }
+  });
+}
+
 function buildLydeTab(){
+  updateLydeStatusChips();
   buildLydeKpis();
   buildLydeChart();
   buildLydeTable();
