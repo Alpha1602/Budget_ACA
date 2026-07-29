@@ -140,7 +140,7 @@
     <div style="display:flex;align-items:center;gap:16px;flex-wrap:wrap">
       <span class="metric-bar-label">Métrica:</span>
       <div class="metric-toggle">
-        <button id="avbValBtn" class="active" onclick="setAVBMetric('valor')">Monto MXN</button>
+        <button id="avbValBtn" class="active" onclick="setAVBMetric('valor')">Valor $</button>
         <button id="avbPcsBtn" onclick="setAVBMetric('piezas')">Piezas</button>
       </div>
       <span class="metric-bar-label" style="margin-left:8px">2026 View:</span>
@@ -197,7 +197,7 @@
     <div class="card-title">
       Tabla Anual 2026 por Retail
       <div class="toggle-row" style="margin:0" id="anualToggle">
-        <button class="toggle-btn active" onclick="switchAnualTable('val')">Valor MXN</button>
+        <button class="toggle-btn active" onclick="switchAnualTable('val')">Valor $</button>
         <button class="toggle-btn" onclick="switchAnualTable('pcs')">Piezas</button>
       </div>
     </div>
@@ -377,7 +377,7 @@
     <div style="display:flex;align-items:center;gap:16px;flex-wrap:wrap">
       <span class="filter-label" style="margin-bottom:0">Métrica</span>
       <div class="metric-toggle">
-        <button id="qValBtn" class="active" onclick="setQMetric('val')">Monto MXN</button>
+        <button id="qValBtn" class="active" onclick="setQMetric('val')">Valor $</button>
         <button id="qPcsBtn" onclick="setQMetric('pcs')">Piezas</button>
       </div>
       <span class="filter-label" style="margin-bottom:0;margin-left:16px">Vista</span>
@@ -421,7 +421,7 @@
       <div style="display:flex;align-items:center;gap:8px">
         <span class="filter-label" style="margin-bottom:0">Métrica</span>
         <div class="metric-toggle">
-          <button id="marcaValBtnTop" class="active" onclick="syncMarcaMode('val')">Monto MXN</button>
+          <button id="marcaValBtnTop" class="active" onclick="syncMarcaMode('val')">Valor $</button>
           <button id="marcaPcsBtnTop" onclick="syncMarcaMode('pcs')">Piezas</button>
         </div>
       </div>
@@ -533,7 +533,7 @@
         <button class="chip on-liverpool" data-c="Liverpool" onclick="setClienteClient(this)">Liverpool</button>
       </div>
       <div class="metric-toggle" style="margin-left:12px" id="clteMetricBtns">
-        <button class="active" onclick="setClienteMetric('val',this)">Valor</button>
+        <button class="active" onclick="setClienteMetric('val',this)">Valor $</button>
         <button onclick="setClienteMetric('pcs',this)">Piezas</button>
       </div>
     </div>
@@ -1224,7 +1224,7 @@ function setMoiMode(mode, el) {
   moiMode = mode;
   document.querySelectorAll('#moiModeBtns .toggle-btn').forEach(b=>b.classList.remove('active'));
   el.classList.add('active');
-  buildMOITable();
+  buildMOITab();
 }
 
 function setMoiSort(col) {
