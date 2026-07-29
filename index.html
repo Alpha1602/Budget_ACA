@@ -668,7 +668,7 @@ const moiDataByClient = {"AT&T":{"cat":[{"key":"Micas","oh_retail":3457,"oh_aca"
 let moiView   = 'cat';  // 'cat' | 'brand'
 let moiClient = 'all';
 let moiMode   = 'val';  // 'val' | 'pcs'
-let moiSort   = {col:'oh_aca_val', dir:-1};
+let moiSort   = {col:'oh_retail_val', dir:-1};
 let moiExpanded = new Set();
 let moiChartPieR=null, moiChartPieA=null, moiChartBar=null;
 
@@ -1207,6 +1207,7 @@ const MOI_CLIENT_COLORS = {'AT&T':'#00A8E0','MacStore':'#555555','iShop':'#FF6D0
 function setMoiView(view, el) {
   moiView = view;
   moiExpanded = new Set();
+  moiSort = {col:'oh_retail_val', dir:-1};
   document.querySelectorAll('#moiViewBtns .toggle-btn').forEach(b=>b.classList.remove('active'));
   el.classList.add('active');
   buildMOITab();
@@ -1215,6 +1216,7 @@ function setMoiView(view, el) {
 function setMoiClient(el) {
   moiClient = el.dataset.retail;
   moiExpanded = new Set();
+  moiSort = {col:'oh_retail_val', dir:-1};
   document.querySelectorAll('#moiClientChips .chip').forEach(b=>b.classList.remove('on'));
   el.classList.add('on');
   buildMOITab();
