@@ -1414,7 +1414,8 @@ function sortMoiData(data) {
 
 /* ── Build Table only (called on sort/mode change) ─────────────────────── */
 function buildMOITable() {
-  const raw = (moiDataByClient[moiClient]||moiDataByClient['all'])[moiView]||[];
+  const hasOH = d => (d.oh_retail||0) > 0 || (d.oh_aca||0) > 0;
+  const raw = ((moiDataByClient[moiClient]||moiDataByClient['all'])[moiView]||[]).filter(hasOH);
   const datasets = sortMoiData(raw);
   const isCat  = moiView==='cat';
   const isBrand= moiView==='brand';
@@ -1531,7 +1532,7 @@ function buildMOITable() {
     if(isExp) {
       if(isCat) {
         // Category → subcategories (col 7)
-        const subcats=sortMoiData(clientData.subcat?.[d.key]||[]);
+        const subcats=sortMoiData((clientData.subcat?.[d.key]||[]).filter(hasOH));
         subcats.forEach(sc=>{
           rows+=`<tr style="background:#fefce8">
             <td style="${tdB};padding-left:28px;font-size:11px;color:#92400e;white-space:nowrap;background:#fefce8">
@@ -1550,7 +1551,7 @@ function buildMOITable() {
         });
       } else if(isBrand) {
         // Brand → categories
-        const brandCats=sortMoiData(clientData.brand_cat?.[d.key]||[]);
+        const brandCats=sortMoiData((clientData.brand_cat?.[d.key]||[]).filter(hasOH));
         brandCats.forEach(cat=>{
           const catExpKey=`${d.key}|${cat.key}`;
           const catExp=moiExpanded.has(catExpKey);
@@ -1571,7 +1572,7 @@ function buildMOITable() {
           </tr>`;
           if(catExp) {
             // Brand + Category → subcategories
-            const subs=sortMoiData(clientData.brand_cat_sub?.[d.key]?.[cat.key]||[]);
+            const subs=sortMoiData((clientData.brand_cat_sub?.[d.key]?.[cat.key]||[]).filter(hasOH));
             subs.forEach(sc=>{
               rows+=`<tr style="background:#fefce8">
                 <td style="${tdB};padding-left:40px;font-size:10.5px;color:#92400e;white-space:nowrap;background:#fefce8">
