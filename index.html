@@ -1406,9 +1406,9 @@ function sortMoiData(data) {
   const col = moiSort.col;
   const dir = moiSort.dir;
   return [...data].sort((a,b)=>{
-    const av = a[col] ?? (dir>0?Infinity:-Infinity);
-    const bv = b[col] ?? (dir>0?Infinity:-Infinity);
-    return dir*(bv-av);
+    const av = a[col] ?? (dir<0?-Infinity:Infinity);
+    const bv = b[col] ?? (dir<0?-Infinity:Infinity);
+    return dir*(av-bv);
   });
 }
 
