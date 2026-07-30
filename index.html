@@ -1653,7 +1653,7 @@ function buildQSection(){
 }
 
 /* ══════ MARCA SECTION ══════ */
-let tblSort = {col:'total', dir:-1};
+let tblSort = {col:'total', dir:1};
 let marcaExpanded = new Set();
 let clteExpanded  = new Set();
 
@@ -1813,6 +1813,23 @@ function renderMarcaTable(){
   const isVal=marcaState.mode==='val';
   const fmt=isVal?fmtV:fmtP;
   const rows=getMarcaRows();
+
+  // ── Build thead ──
+  const thead=document.getElementById('marcaThead');
+  if(thead){
+    const thS='padding:7px 9px;font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.4px;background:var(--surface2);cursor:pointer;white-space:nowrap';
+    const arr=col=>{const same=tblSort.col===col;return same?(tblSort.dir>0?' ↓':' ↑'):'<span style="opacity:.3">⇅</span>';};
+    const mths=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+    const mFull=['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
+    thead.innerHTML=`<tr>
+      <th style="${thS}" onclick="tblSort.col='marca';tblSort.dir=(tblSort.col==='marca'?-tblSort.dir:1);renderMarcaTable()">Marca${arr('marca')}</th>
+      <th style="${thS}" onclick="tblSort.col='retail';tblSort.dir=(tblSort.col==='retail'?-tblSort.dir:1);renderMarcaTable()">Retail${arr('retail')}</th>
+      <th style="${thS}" onclick="tblSort.col='cat';tblSort.dir=(tblSort.col==='cat'?-tblSort.dir:1);renderMarcaTable()">Categoría${arr('cat')}</th>
+      ${mths.map((m,i)=>`<th class="num" style="${thS}" onclick="tblSort.col='${m}';tblSort.dir=(tblSort.col==='${m}'?-tblSort.dir:1);renderMarcaTable()">${mFull[i]}${arr(m)}</th>`).join('')}
+      <th class="num" style="${thS};color:var(--accent)" onclick="tblSort.col='total';tblSort.dir=(tblSort.col==='total'?-tblSort.dir:1);renderMarcaTable()">TOTAL${arr('total')}</th>
+    </tr>`;
+  }
+
   rows.sort((a,b)=>{
     const col=tblSort.col;
     if(col==='marca') return tblSort.dir*(a.brand.localeCompare(b.brand));
@@ -1880,6 +1897,18 @@ function renderMarcaTable(){
     }
     return out;
   }).join('');
+
+  // ── Totals row ──
+  const totByMonth = ALL_MONTHS.map(m=>rows.reduce((s,r)=>s+(r[m]||0),0));
+  const grandTotal = rows.reduce((s,r)=>s+(r.total||0),0);
+  const totCells = totByMonth.map(v=>`<td class="num" style="background:var(--surface2);font-weight:700">${v?fmt(v):'—'}</td>`).join('');
+  tbody.innerHTML += `<tr style="background:var(--surface2);font-weight:700;border-top:2px solid #e2e8f0">
+    <td style="background:var(--surface2);color:var(--muted);font-size:11px;text-transform:uppercase;letter-spacing:.5px">TOTAL</td>
+    <td style="background:var(--surface2)"></td>
+    <td style="background:var(--surface2)"></td>
+    ${totCells}
+    <td class="num" style="background:var(--surface2);font-weight:700;color:var(--accent)">${fmt(grandTotal)}</td>
+  </tr>`;
 }
 
 const RETAIL_TO_MT = {ATT:'AT&T',MacStore:'MacStore',iShop:'iShop',Liverpool:'Liverpool',MercadoLibre:'MercadoLibre',Coppel:'Coppel'};
@@ -2043,11 +2072,11 @@ function setClteChartType(t){
   ['grouped','stacked','line'].forEach(k=>{const el=document.getElementById('clteChart'+k.charAt(0).toUpperCase()+k.slice(1));if(el)el.classList.toggle('active',k===t);});
   buildClienteTab();
 }
-let clteTblSort={col:'total',dir:-1};
+let clteTblSort={col:'total',dir:1};
 function setClteTblSort(col){
   if(clteTblSort.col===col) clteTblSort.dir*=-1; else {clteTblSort.col=col;clteTblSort.dir=-1;}
   document.querySelectorAll('[id^="clteThSort_"]').forEach(el=>el.textContent='');
-  const el=document.getElementById('clteThSort_'+col); if(el) el.textContent=clteTblSort.dir>0?' ↑':' ↓';
+  const el=document.getElementById('clteThSort_'+col); if(el) el.textContent=clteTblSort.dir>0?' ↓':' ↑';
   buildClienteTab();
 }
 
@@ -2552,6 +2581,18 @@ function buildLydeTable(){
 
 
 /* ══════ INIT ══════ */
+(function(){
+  const now = new Date();
+  const opts = {day:'2-digit',month:'short',year:'numeric'};
+  const d = now.toLocaleDateString('es-MX', opts).toUpperCase();
+  const mod = document.lastModified
+    ? new Date(document.lastModified).toLocaleDateString('es-MX',opts).toUpperCase()
+    : d;
+  const el = document.getElementById('dateStr');
+  if(el) el.textContent = d;
+  const hd = document.getElementById('headerDate');
+  if(hd) hd.innerHTML = `<div style="font-size:9px;opacity:.7;letter-spacing:.5px">ACTUALIZADO</div><div style="font-weight:600">${d}</div><div style="font-size:9px;opacity:.6">MOD: ${mod}</div>`;
+})();
 initMarcaChips();
 buildAVBSection();
 
