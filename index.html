@@ -368,11 +368,11 @@
   <div id="moiKpis" class="kpi-grid" style="padding:4px 0 14px"></div>
   <div class="grid-2">
     <div class="card">
-      <div class="card-title">Distribución OH Retail por Cliente</div>
+      <div class="card-title" id="moiPieRTitle">OH Retail por Cliente — Piezas</div>
       <div style="height:380px;position:relative"><canvas id="moiPieR"></canvas></div>
     </div>
     <div class="card">
-      <div class="card-title">Distribución OH ACA por Cliente</div>
+      <div class="card-title" id="moiPieATitle">OH Retail por Cliente — Monto ($)</div>
       <div style="height:380px;position:relative"><canvas id="moiPieA"></canvas></div>
     </div>
   </div>
@@ -585,8 +585,11 @@ function buildMOICharts(datasets) {
   // Destroy old charts
   [moiChartPieR, moiChartPieA, moiChartBar].forEach(c=>{ if(c){c.destroy();} });
 
-  // ── Donut: OH Retail by client
-  const pieRData = totals.map(t=>isPcs?t.oh_retail:t.oh_retail_val);
+  // ── Donut 1: OH Retail by client — SIEMPRE PIEZAS
+  const pieRData = totals.map(t=>t.oh_retail);
+  const totPieR  = pieRData.reduce((a,b)=>a+b,0);
+  const elPieRT  = document.getElementById('moiPieRTitle');
+  if(elPieRT) elPieRT.textContent = `OH Retail por Cliente — Piezas · ${moiClient==='all'?'Todos':moiClient}`;
   moiChartPieR = new Chart(document.getElementById('moiPieR').getContext('2d'), {
     type:'doughnut',
     data:{ labels:clientLabels, datasets:[{ data:pieRData, backgroundColor:clColors, borderWidth:2, hoverOffset:6 }] },
@@ -596,16 +599,18 @@ function buildMOICharts(datasets) {
       plugins:{
         legend:{position:'bottom',labels:{font:{size:10},boxWidth:10,padding:8}},
         tooltip:{callbacks:{label:c=>{
-          const v=c.parsed; const tot=pieRData.reduce((a,b)=>a+b,0);
-          const pct=(tot>0?v/tot*100:0).toFixed(1);
-          return isPcs?` ${v.toLocaleString('es-MX')} pzas (${pct}%)`:` $${Math.round(v).toLocaleString('es-MX')} (${pct}%)`;
+          const v=c.parsed; const pct=(totPieR>0?v/totPieR*100:0).toFixed(1);
+          return ` ${Math.round(v).toLocaleString('es-MX')} pzas (${pct}%)`;
         }}}
       }
     }
   });
 
-  // ── Donut: OH ACA by client
-  const pieAData = totals.map(t=>isPcs?t.oh_aca:t.oh_aca_val);
+  // ── Donut 2: OH Retail by client — SIEMPRE MONTO ($)
+  const pieAData = totals.map(t=>t.oh_retail_val);
+  const totPieA  = pieAData.reduce((a,b)=>a+b,0);
+  const elPieAT  = document.getElementById('moiPieATitle');
+  if(elPieAT) elPieAT.textContent = `OH Retail por Cliente — Monto ($) · ${moiClient==='all'?'Todos':moiClient}`;
   moiChartPieA = new Chart(document.getElementById('moiPieA').getContext('2d'), {
     type:'doughnut',
     data:{ labels:clientLabels, datasets:[{ data:pieAData, backgroundColor:clColors, borderWidth:2, hoverOffset:6 }] },
@@ -615,9 +620,8 @@ function buildMOICharts(datasets) {
       plugins:{
         legend:{position:'bottom',labels:{font:{size:10},boxWidth:10,padding:8}},
         tooltip:{callbacks:{label:c=>{
-          const v=c.parsed; const tot=pieAData.reduce((a,b)=>a+b,0);
-          const pct=(tot>0?v/tot*100:0).toFixed(1);
-          return isPcs?` ${v.toLocaleString('es-MX')} pzas (${pct}%)`:` $${Math.round(v).toLocaleString('es-MX')} (${pct}%)`;
+          const v=c.parsed; const pct=(totPieA>0?v/totPieA*100:0).toFixed(1);
+          return ` $${Math.round(v).toLocaleString('es-MX')} (${pct}%)`;
         }}}
       }
     }
