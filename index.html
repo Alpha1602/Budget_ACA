@@ -34,11 +34,11 @@
   .grid-4{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:14px}
   .card{background:#fff;border-radius:12px;padding:16px;box-shadow:0 1px 4px rgba(0,0,0,.08);margin-bottom:14px}
   .card-title{font-size:12px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:12px}
-  .kpi-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:14px}
-  .kpi-card{background:#fff;border-radius:10px;padding:14px 16px;box-shadow:0 1px 4px rgba(0,0,0,.07);border-left:4px solid var(--kpi-color,#64748b)}
-  .kpi-val{font-size:24px;font-weight:800;line-height:1;color:var(--kpi-color,var(--text))}
-  .kpi-title{font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.4px;margin-bottom:4px}
-  .kpi-sub{font-size:10px;color:var(--muted);margin-top:4px}
+  .kpi-grid{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:14px}
+  .kpi-card{background:#fff;border:0.5px solid #e2e8f0;border-radius:10px;padding:12px 16px;flex:1;min-width:140px}
+  .kpi-label{font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px}
+  .kpi-value{font-size:20px;font-weight:700;line-height:1.15;margin:3px 0}
+  .kpi-sub{font-size:10px;color:var(--muted);margin-top:2px}
   .filter-bar{background:#fff;border-radius:10px;padding:12px 16px;margin-bottom:14px;box-shadow:0 1px 3px rgba(0,0,0,.06)}
   .filter-label{font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.4px;margin-bottom:6px;display:block}
   .chip-row{display:flex;gap:6px;flex-wrap:wrap}
@@ -60,10 +60,64 @@
   .num{text-align:right;font-variant-numeric:tabular-nums}
   .h2-col{background:#fef9ec!important}
   .dot{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:6px;vertical-align:middle}
-  @media(max-width:900px){.kpi-grid{grid-template-columns:repeat(2,1fr)}.grid-2,.grid-3,.grid-4{grid-template-columns:1fr}}
+  @media(max-width:900px){.grid-2,.grid-3,.grid-4{grid-template-columns:1fr}}
 </style>
+  <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
 </head>
 <body>
+
+<!-- ═══════ ACCESS GATE ═══════ -->
+<div id="access-gate" style="
+  position:fixed;inset:0;z-index:9999;
+  background:linear-gradient(135deg,#0f172a 0%,#1e293b 60%,#0f172a 100%);
+  display:flex;align-items:center;justify-content:center;
+  font-family:system-ui,-apple-system,sans-serif">
+
+  <div style="background:#1e293b;border:1px solid #334155;border-radius:16px;padding:40px 48px;width:420px;max-width:90vw;text-align:center">
+
+    <!-- Logo / Brand -->
+    <div style="margin-bottom:24px">
+      <div style="display:inline-flex;align-items:center;justify-content:center;width:56px;height:56px;background:#0ea5e9;border-radius:14px;margin-bottom:12px">
+        <svg width="28" height="28" fill="none" viewBox="0 0 24 24"><path stroke="#fff" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 2C6.477 2 2 6.477 2 12s4.477 10 10 10 10-4.477 10-10S17.523 2 12 2z"/><path stroke="#fff" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3"/></svg>
+      </div>
+      <h1 style="color:#f8fafc;font-size:20px;font-weight:700;margin:0 0 4px">AlphaComm Americas</h1>
+      <p style="color:#94a3b8;font-size:13px;margin:0">Sales Dashboard 2026 — Acceso Restringido</p>
+    </div>
+
+    <!-- Visitor name field -->
+    <div style="margin-bottom:16px;text-align:left">
+      <label style="display:block;color:#94a3b8;font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px">Tu nombre</label>
+      <input id="gate-name" type="text" placeholder="Ej. Juan Pérez"
+        style="width:100%;box-sizing:border-box;background:#0f172a;border:1px solid #334155;border-radius:8px;color:#f8fafc;font-size:14px;padding:10px 14px;outline:none"
+        onfocus="this.style.borderColor='#0ea5e9'" onblur="this.style.borderColor='#334155'">
+    </div>
+
+    <!-- Password field -->
+    <div style="margin-bottom:8px;text-align:left">
+      <label style="display:block;color:#94a3b8;font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px">Contraseña de acceso</label>
+      <input id="gate-pass" type="password" placeholder="••••••••"
+        style="width:100%;box-sizing:border-box;background:#0f172a;border:1px solid #334155;border-radius:8px;color:#f8fafc;font-size:14px;padding:10px 14px;outline:none"
+        onfocus="this.style.borderColor='#0ea5e9'" onblur="this.style.borderColor='#334155'"
+        onkeydown="if(event.key==='Enter') gateSubmit()">
+    </div>
+
+    <!-- Status message -->
+    <p id="gate-msg" style="color:#64748b;font-size:12px;text-align:left;margin:0 0 16px;min-height:18px"></p>
+
+    <!-- Submit button -->
+    <button onclick="gateSubmit()" id="gate-btn"
+      style="width:100%;background:#0ea5e9;color:#fff;border:none;border-radius:8px;font-size:14px;font-weight:600;padding:12px;cursor:pointer;transition:background .2s">
+      Solicitar acceso
+    </button>
+
+    <p style="color:#475569;font-size:11px;margin-top:20px;line-height:1.5">
+      Al hacer clic se enviará una notificación al administrador.<br>
+      Recibirás la contraseña si tu acceso es aprobado.
+    </p>
+  </div>
+</div>
+<!-- ═══════ END GATE ═══════ -->
+
 
 <div class="header">
   <div>
@@ -689,18 +743,12 @@ function buildMOIKpis(datasets) {
   const fmt  = v => isPcs?v.toLocaleString('es-MX')+' pzas':'$'+Math.round(v).toLocaleString('es-MX');
   const sub  = moiClient==='all'?'Todos los clientes':moiClient;
 
-  document.getElementById('moiKpis').innerHTML = [
-    {label:'OH Retail',        val:fmt(totalOHR),            sub},
-    {label:'OH Almacén (ACA)', val:fmt(totalOHA),            sub},
-    {label:'Venta Prom Jun–Jul',val:fmt(totalMS),            sub:'Vista actual'},
-    {label:'MOI Retail',       val:moiR.toFixed(1)+' meses', sub:isPcs?'En piezas':'En valor $'},
-    {label:'MOI Almacén',      val:moiA.toFixed(1)+' meses', sub:isPcs?'En piezas':'En valor $'},
-  ].map(k=>`
-    <div style="background:white;border:1px solid var(--border);border-radius:10px;padding:12px 16px;min-width:130px;flex:1">
-      <div style="font-size:10px;color:var(--muted);font-weight:700;text-transform:uppercase;letter-spacing:.5px">${k.label}</div>
-      <div style="font-size:18px;font-weight:700;color:var(--text);margin:3px 0">${k.val}</div>
-      <div style="font-size:10px;color:var(--muted)">${k.sub}</div>
-    </div>`).join('');
+  document.getElementById('moiKpis').innerHTML =
+    kpiCard('OH Retail',         fmt(totalOHR),             sub,             '#0891b2') +
+    kpiCard('OH Almacén (ACA)',  fmt(totalOHA),             sub,             '#7c3aed') +
+    kpiCard('Venta Prom Jun–Jul',fmt(totalMS),              'Vista actual',  'var(--accent)') +
+    kpiCard('MOI Retail',        moiR.toFixed(1)+' meses',  isPcs?'En piezas':'En valor $', moiR>3?'#dc2626':'#16a34a') +
+    kpiCard('MOI Almacén',       moiA.toFixed(1)+' meses',  isPcs?'En piezas':'En valor $', moiA>3?'#dc2626':'#16a34a');
 }
 
 /* ── Sort datasets ──────────────────────────────────────────────────────── */
@@ -2557,6 +2605,81 @@ function buildLydeTable(){
 /* ══════ INIT ══════ */
 initMarcaChips();
 buildAVBSection();
+
+
+/* ════════════════════════════════════════════════
+   ACCESS GATE — EmailJS Configuration
+   1. Crea cuenta gratis en https://emailjs.com
+   2. Crea un servicio de email (Gmail / Outlook)
+   3. Crea una plantilla con las variables:
+        {{visitor_name}}, {{access_time}}, {{browser}}, {{page_url}}
+   4. Rellena las 3 constantes de abajo
+   ════════════════════════════════════════════════ */
+const EMAILJS_PUBLIC_KEY  = 'TU_PUBLIC_KEY';   // Account > API Keys
+const EMAILJS_SERVICE_ID  = 'TU_SERVICE_ID';   // Email Services > Service ID
+const EMAILJS_TEMPLATE_ID = 'TU_TEMPLATE_ID';  // Email Templates > Template ID
+const GATE_PASSWORD       = 'alphacomm2026';   // Cambia esta contraseña
+const GATE_NOTIFY_EMAIL   = 'jrteran@me.com';  // Tu correo de notificación
+
+let gateEmailSent = false;
+
+function gateUnlock() {
+  const gate = document.getElementById('access-gate');
+  gate.style.transition = 'opacity .4s';
+  gate.style.opacity = '0';
+  setTimeout(() => gate.remove(), 420);
+}
+
+function gateSubmit() {
+  const pass = document.getElementById('gate-pass').value.trim();
+  const name = document.getElementById('gate-name').value.trim() || 'Visitante anónimo';
+  const msg  = document.getElementById('gate-msg');
+  const btn  = document.getElementById('gate-btn');
+
+  if (!pass) { msg.style.color='#f97316'; msg.textContent='Ingresa la contraseña.'; return; }
+
+  if (pass === GATE_PASSWORD) {
+    // Correct password — send notification + unlock
+    msg.style.color = '#22c55e';
+    msg.textContent = '✓ Acceso concedido. Cargando dashboard…';
+    btn.disabled = true;
+    if (!gateEmailSent) {
+      gateEmailSent = true;
+      const params = {
+        visitor_name: name,
+        access_time:  new Date().toLocaleString('es-MX', {timeZone:'America/Mexico_City'}),
+        browser:      navigator.userAgent.substring(0,120),
+        page_url:     window.location.href,
+        to_email:     GATE_NOTIFY_EMAIL,
+        status:       'ACCESO CONCEDIDO ✅'
+      };
+      if (EMAILJS_PUBLIC_KEY !== 'TU_PUBLIC_KEY') {
+        emailjs.init({ publicKey: EMAILJS_PUBLIC_KEY });
+        emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, params).catch(()=>{});
+      }
+    }
+    setTimeout(gateUnlock, 800);
+  } else {
+    // Wrong password — send notification of failed attempt
+    msg.style.color = '#f97316';
+    msg.textContent = '✗ Contraseña incorrecta. Solicita acceso al administrador.';
+    if (!gateEmailSent) {
+      gateEmailSent = true;
+      const params = {
+        visitor_name: name,
+        access_time:  new Date().toLocaleString('es-MX', {timeZone:'America/Mexico_City'}),
+        browser:      navigator.userAgent.substring(0,120),
+        page_url:     window.location.href,
+        to_email:     GATE_NOTIFY_EMAIL,
+        status:       'INTENTO DE ACCESO ⚠️ (contraseña incorrecta)'
+      };
+      if (EMAILJS_PUBLIC_KEY !== 'TU_PUBLIC_KEY') {
+        emailjs.init({ publicKey: EMAILJS_PUBLIC_KEY });
+        emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, params).catch(()=>{});
+      }
+    }
+  }
+}
 
 </script>
 </body>
