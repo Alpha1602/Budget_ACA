@@ -356,6 +356,21 @@
   <!-- Sinmov KPIs (metric-aware) -->
   <div id="moiSinMovKpis" class="kpi-grid" style="padding:0 0 10px"></div>
 
+  <div class="card">
+    <div class="card-title" id="moiBarTitle">Venta Prom Jun–Jul</div>
+    <div style="height:220px;position:relative"><canvas id="moiBarSales"></canvas></div>
+  </div>
+  <div class="card">
+    <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:6px;margin-bottom:10px">
+      <div class="card-title" id="allSkuTitle" style="margin:0">📋 Inventario por SKU</div>
+    </div>
+    <div class="table-wrap" style="max-height:520px;overflow-y:auto">
+      <table style="width:100%;border-collapse:collapse;font-size:11px">
+        <thead id="allSkuHead" style="position:sticky;top:0;z-index:2"></thead>
+        <tbody id="allSkuBody"></tbody>
+      </table>
+    </div>
+  </div>
 <div class="card" id="moiElevadoCard">
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;flex-wrap:wrap;gap:8px">
       <div>
@@ -379,21 +394,6 @@
       </table>
     </div>
     <div id="moiElevFooter" style="font-size:10px;color:var(--muted);margin-top:6px;padding-top:6px;border-top:1px solid var(--border)"></div>
-  </div>
-  <div class="card">
-    <div class="card-title" id="moiBarTitle">Venta Prom Jun–Jul</div>
-    <div style="height:220px;position:relative"><canvas id="moiBarSales"></canvas></div>
-  </div>
-  <div class="card">
-    <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:6px;margin-bottom:10px">
-      <div class="card-title" id="allSkuTitle" style="margin:0">📋 Inventario por SKU</div>
-    </div>
-    <div class="table-wrap" style="max-height:520px;overflow-y:auto">
-      <table style="width:100%;border-collapse:collapse;font-size:11px">
-        <thead id="allSkuHead" style="position:sticky;top:0;z-index:2"></thead>
-        <tbody id="allSkuBody"></tbody>
-      </table>
-    </div>
   </div>
   </div><!-- /section-moi -->
 
