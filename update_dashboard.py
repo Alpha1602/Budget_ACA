@@ -258,6 +258,47 @@ def extract_sin_movimiento_consenso(ws):
 
 
 
+# ── Extracción: Budget 2026 (hoja "Budget 2026") ──────────────────────────────
+def extract_budget_2026(ws):
+    """
+    Hoja 'Budget 2026':
+      Sección MXN (rows 15-22, 0-indexed 14-21): header en row 15, datos en rows 16-21
+      Sección Pcs  (rows 28-35, 0-indexed 27-34): header en row 28, datos en rows 29-34
+      Columnas: col0=Retail, cols1-12=Jan-Dec
+    Retail map: ATT→AT&T, iShop→iShop, Liverpool→Liverpool, MacStore→MacStore,
+                Coppel→Coppel, Mercado Libre→MercadoLibre
+    """
+    RMAP = {'ATT':'AT&T','iShop':'iShop','Liverpool':'Liverpool',
+            'MacStore':'MacStore','Coppel':'Coppel','Mercado Libre':'MercadoLibre'}
+    ALL_ROWS = list(ws.iter_rows(min_row=1, max_row=ws.max_row, values_only=True))
+
+    budget_val = {}
+    budget_pcs = {}
+
+    # MXN: rows 16-21 (0-indexed 15-20)
+    for row in ALL_ROWS[15:21]:
+        if not row or row[0] is None: continue
+        retail = RMAP.get(str(row[0]).strip())
+        if not retail: continue
+        budget_val[retail] = [round(fl(row[i])) for i in range(1, 13)]
+
+    # Pcs: rows 29-34 (0-indexed 28-33)
+    for row in ALL_ROWS[28:34]:
+        if not row or row[0] is None: continue
+        retail = RMAP.get(str(row[0]).strip())
+        if not retail: continue
+        budget_pcs[retail] = [int(fl(row[i])) for i in range(1, 13)]
+
+    return budget_val, budget_pcs
+
+
+def build_budget_js(budget_val, budget_pcs):
+    import json as _json
+    line1 = 'const budgetVal = ' + _json.dumps(budget_val, ensure_ascii=False, separators=(',', ':')) + ';'
+    line2 = 'const budgetPcs = ' + _json.dumps(budget_pcs, ensure_ascii=False, separators=(',', ':')) + ';'
+    return line1 + '\n' + line2
+
+
 # ── Extracción: Todos los SKUs con OH Retail (para tabla MOI completa) ────────
 def extract_all_skus_with_oh(ws):
     """
@@ -546,10 +587,10 @@ def main():
         'piezasAnual': f'const piezasAnual = {js_retail_obj(fcst_pcs)};',
         'avb2025Val':  f'const avb2025Val = {js_retail_obj(actual_val)};',
         'avb2025Pcs':  f'const avb2025Pcs = {js_retail_obj(actual_pcs)};',
-        'qValorAll':   f'const qValorAll = {js_quarter_obj(qv)};',
-        'qPiezas':     f'const qPiezas   = {js_quarter_obj(qp)};',
-        'q2025Val':    f'const q2025Val  = {js_quarter_obj(q25v)};',
-        'q2025Pcs':    f'const q2025Pcs  = {js_quarter_obj(q25p)};',
+        'qValorAll':   f'const qValorAll = {js_retail_obj(qv)};',
+        'qPiezas':     f'const qPiezas   = {js_retail_obj(qp)};',
+        'q2025Val':    f'const q2025Val  = {js_retail_obj(q25v)};',
+        'q2025Pcs':    f'const q2025Pcs  = {js_retail_obj(q25p)};',
         'ALL_BRANDS':  f'const ALL_BRANDS = {json.dumps(all_brands)};',
     }
 
@@ -595,6 +636,17 @@ def main():
         html, n_mbc = MOI_BC_RE.subn(new_mbc, html, count=1)
         cats_all = len(moi_by_client.get('all', {}).get('cat', []))
         print(f"   {'✅' if n_mbc else '⚠️ NOT FOUND'} moiDataByClient ({cats_all} categorías)")
+
+    # Reemplazar budgetVal / budgetPcs (hoja Budget 2026)
+    if 'Budget 2026' in wb.sheetnames:
+        bval, bpcs = extract_budget_2026(wb['Budget 2026'])
+        BUDGET_RE = re.compile(r'const budgetVal\s*=\s*\{.*?\};\nconst budgetPcs\s*=\s*\{.*?\};', re.DOTALL)
+        new_budget = build_budget_js(bval, bpcs)
+        html, n_b = BUDGET_RE.subn(new_budget, html, count=1)
+        total_b = sum(sum(v) for v in bval.values())
+        print(f"   {'✅' if n_b else '⚠️ NOT FOUND'} budgetVal/budgetPcs (${total_b/1e6:.1f}M)")
+    else:
+        print("   ⚠️  Hoja 'Budget 2026' no encontrada — budget no actualizado")
 
     # Guardar
     output_path.write_text(html, encoding='utf-8')
