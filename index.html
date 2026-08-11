@@ -1262,7 +1262,7 @@ function buildAnualDualChart() {
         {type:'bar', label:'2026 Invoice (Ene–Ago)', data:val2026.map((v,i)=>i<8?v:0), backgroundColor:'#2DD4BF', borderRadius:4, yAxisID:'y', order:2},
         {type:'bar', label:'2026 Proyección (Ago–Dic)', data:val2026.map((v,i)=>i>=8?v:0), backgroundColor:'#93C5FD', borderRadius:4, yAxisID:'y', order:2},
         {type:'line', label:'2026 Piezas', data:pcs2026, borderColor:'#F97316', backgroundColor:'transparent', borderWidth:2.5, pointRadius:4, pointBackgroundColor:'#F97316', tension:.35, yAxisID:'y2', order:1},
-        {type:'line', label:'Budget 2026', data:budgetLine, borderColor:'#7c3aed', backgroundColor:'transparent', borderWidth:2, borderDash:[7,4], pointRadius:3, pointBackgroundColor:'#7c3aed', tension:.3, yAxisID:'y', order:0}
+        {type:'bar', label:'Budget 2026', data:budgetLine, backgroundColor:'rgba(124,58,237,0.22)', borderColor:'#7c3aed', borderWidth:1.5, borderRadius:4, yAxisID:'y', order:3}
       ]
     },
     plugins: [growthLabelPlugin, {
@@ -1346,8 +1346,8 @@ function buildAnualDualTable(val2025, val2026Inv, val2026Proy, pcs2026Inv, pcs20
   const totalBudgetPcs = budgetLinePcs.reduce((a,b)=>a+b,0);
   const fmtVsBudget = (v26, bgt) => {
     if (!bgt) return {txt:'—', color:'#94a3b8'};
-    const g = (v26/bgt-1)*100;
-    return {txt:(g>=0?'+':'')+g.toFixed(1)+'%', color: g>=0?'#16a34a':'#dc2626'};
+    const pct = (v26 / bgt) * 100;
+    return {txt: pct.toFixed(1)+'%', color: pct>=100?'#16a34a':'#dc2626'};
   };
   const totalInv    = val2026Inv.reduce((a,b)=>a+b,0);
   const totalProy   = val2026Proy.reduce((a,b)=>a+b,0);
@@ -1392,7 +1392,7 @@ function buildAnualDualTable(val2025, val2026Inv, val2026Proy, pcs2026Inv, pcs20
     </tr>
     <!-- vs Budget -->
     <tr style="border-bottom:1px solid var(--border);background:rgba(124,58,237,.02)">
-      <td style="padding:7px 8px;font-weight:600;color:#475569;white-space:nowrap;font-size:11px">Attainment vs Budget</td>
+      <td style="padding:7px 8px;font-weight:600;color:#7c3aed;white-space:nowrap;font-size:11px">Alcance vs Budget</td>
       ${val26total.map((v,i)=>{ const g=fmtVsBudget(v,budgetLine[i]); return `<td style="text-align:right;padding:7px 4px;font-weight:600;color:${g.color};${cellBgInv(i)}">${g.txt}</td>`; }).join('')}
       <td style="text-align:right;padding:7px 8px;font-weight:700;color:${fmtVsBudget(totalInv+totalProy,totalBudget).color};background:rgba(100,116,139,.06)">${fmtVsBudget(totalInv+totalProy,totalBudget).txt}</td>
     </tr>
@@ -1847,12 +1847,16 @@ function buildAnualKpis(){
   const clients = anualSelectedClient==='all'
     ? ['AT&T','MacStore','iShop','Liverpool','MercadoLibre','Coppel']
     : [anualSelectedClient];
-  const totalVal = MONTHS_FULL.map((_,i)=>clients.reduce((s,c)=>s+((valorFull[c]||[])[i]||0),0)).reduce((s,v)=>s+v,0);
-  const totalPcs = MONTHS_FULL.map((_,i)=>clients.reduce((s,c)=>s+((piezasAnual[c]||[])[i]||0),0)).reduce((s,v)=>s+v,0);
-  const val25 = MONTHS_FULL.map((_,i)=>clients.reduce((s,c)=>s+((avb2025Val[c]||[])[i]||0),0)).reduce((s,v)=>s+v,0);
+  const totalVal    = MONTHS_FULL.map((_,i)=>clients.reduce((s,c)=>s+((valorFull[c]||[])[i]||0),0)).reduce((s,v)=>s+v,0);
+  const totalPcs    = MONTHS_FULL.map((_,i)=>clients.reduce((s,c)=>s+((piezasAnual[c]||[])[i]||0),0)).reduce((s,v)=>s+v,0);
+  const val25       = MONTHS_FULL.map((_,i)=>clients.reduce((s,c)=>s+((avb2025Val[c]||[])[i]||0),0)).reduce((s,v)=>s+v,0);
+  const totalBudget = MONTHS_FULL.map((_,i)=>clients.reduce((s,c)=>s+((budgetVal[c]||[])[i]||0),0)).reduce((s,v)=>s+v,0);
+  const alcancePct  = totalBudget > 0 ? (totalVal / totalBudget * 100) : null;
+  const alcanceTxt  = alcancePct !== null ? alcancePct.toFixed(1)+'%' : '—';
   el.innerHTML =
     kpiCard('Total 2026',fmtV(totalVal),anualSelectedClient==='all'?'Todos los retails':anualSelectedClient,'var(--accent)') +
     kpiCard('vs 2025',pct(totalVal,val25),'Full Year',totalVal>=val25?'#16a34a':'#dc2626') +
+    kpiCard('Alcance vs Budget',alcanceTxt,'FCST 2026 / Budget 2026',alcancePct===null?'#94a3b8':alcancePct>=100?'#16a34a':'#dc2626') +
     kpiCard('Piezas 2026',fmtP(totalPcs),'FCST','#7c3aed');
 }
 
