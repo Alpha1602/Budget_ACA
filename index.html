@@ -1005,7 +1005,10 @@ function renderAnualTable(){
     } else if (_catFilter) {
       src = (budgetCatRaw[_catFilter] || {})[r];
     }
-    return src ? (src[key] || new Array(12).fill(0)) : (budgetSrc[r] || new Array(12).fill(0));
+    if (src) return src[key] || new Array(12).fill(0);
+    // Filtro activo pero sin entrada para este retail → cero (no usar budget total del retail)
+    if (_marcaFilter || _catFilter) return new Array(12).fill(0);
+    return budgetSrc[r] || new Array(12).fill(0);
   };
   const fmtPct = (fcst, bgt) => {
     if (!bgt) return {txt:'—', color:'#94a3b8'};
