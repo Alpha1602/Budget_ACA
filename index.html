@@ -21,7 +21,7 @@
   .header-logo{width:48px;height:48px;background:rgba(255,255,255,.15);border-radius:12px;display:flex;align-items:center;justify-content:center;font-weight:900;font-size:18px;letter-spacing:-1px}
   .header-right{display:flex;align-items:center;gap:16px}
   .header-date{font-size:11px;opacity:.7;text-align:right}
-  .tabs{display:flex;gap:3px;background:#7f1d1d;padding:0 20px;overflow-x:auto}
+  .tabs{display:flex;gap:3px;background:#7f1d1d;padding:0 20px;overflow-x:auto;position:sticky;top:0;z-index:200;box-shadow:0 2px 8px rgba(0,0,0,.25)}
   .tab{padding:14px 20px 16px;cursor:pointer;color:rgba(255,255,255,.65);font-size:12px;font-weight:600;white-space:nowrap;border-bottom:3px solid transparent;transition:.15s}
   .tab:hover{color:#fff}
   .tab.active{color:#fff;border-bottom-color:#fff}
@@ -1033,6 +1033,32 @@ let chartCatATT=null, chartCatMac=null, chartCatIShop=null, chartCatLiv=null;
 let chartAnualDualInst = null;
 let anualSelectedClient = 'all';
 
+function buildAvbTopKpis() {
+  const isVal  = avbMetric === 'valor';
+  const fmt    = isVal ? fmtV : fmtP;
+  const clients = anualSelectedClient === 'all'
+    ? ['AT&T','MacStore','iShop','Liverpool','MercadoLibre','Coppel']
+    : [anualSelectedClient];
+  const nMonths = avbMode === 'invoice' ? 8 : 12;
+  const src25   = isVal ? avb2025Val  : avb2025Pcs;
+  const src26   = isVal ? valorFull   : piezasAnual;
+  const sum25 = clients.reduce((s,c) => s + (src25[c]||[]).slice(0,nMonths).reduce((a,v)=>a+v,0), 0);
+  const sum26 = clients.reduce((s,c) => s + (src26[c]||[]).slice(0,nMonths).reduce((a,v)=>a+v,0), 0);
+  const periodLabel = avbMode === 'invoice' ? 'Ene–Ago' : 'Ene–Dic';
+  const clientLabel = anualSelectedClient === 'all' ? '2026 FCST' : anualSelectedClient;
+  const kpiEl = document.getElementById('avbKpis');
+  if (!kpiEl) return;
+  const tmp = document.createElement('div');
+  tmp.innerHTML =
+    kpiCard('2025 Real', fmt(sum25), periodLabel, '#64748b') +
+    kpiCard('2026 ' + (avbMode==='invoice'?'Invoice':'Proyección'), fmt(sum26), periodLabel, 'var(--accent)') +
+    kpiCard('YoY vs 2025', pct(sum26,sum25), avbMode==='invoice'?'Ene–Ago':'Full Year', sum26>=sum25?'#16a34a':'#dc2626') +
+    kpiCard('Retails activos', clients.length.toString(), clientLabel, '#7c3aed');
+  const existing = kpiEl.querySelectorAll('.kpi-card');
+  const newCards  = tmp.querySelectorAll('.kpi-card');
+  newCards.forEach((nc, i) => { if (existing[i]) kpiEl.replaceChild(nc, existing[i]); });
+}
+
 function setAnualClient(btn) {
   const key = btn.dataset.c;
   anualSelectedClient = key;
@@ -1041,11 +1067,11 @@ function setAnualClient(btn) {
   });
   const clsMap = {all:'on','AT&T':'on-att','MacStore':'on-macstore','iShop':'on-ishop','Liverpool':'on-liverpool','MercadoLibre':'on-ml','Coppel':'on-coppel'};
   btn.classList.add(clsMap[key] || 'on');
-  // Reset brand/cat selection that may no longer be valid for new retail
   avbChartState = {marca:'all', cat:'all'};
   updateAvbCatChips();
   buildAnualDualChart();
   buildAnualKpis();
+  buildAvbTopKpis();
 }
 
 const avbRetailKeyMap = {'AT&T':'AT&T','MacStore':'MacStore','iShop':'iShop','Liverpool':'Liverpool','MercadoLibre':'MercadoLibre','Coppel':'Coppel'};
