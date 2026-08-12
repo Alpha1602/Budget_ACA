@@ -987,9 +987,7 @@ function renderAnualTable(){
   const isH2 = (m, r) => anualH2.has(m) || (m==='Aug' && augProjRetails.has(r));
 
   // Budget visible en ambos modos (Valor y Piezas)
-  // Cuando hay filtro de marca/cat, budget es de retail total → mostrar "—"
   const showBudget = true;
-  const hasBrandFilter = anualState.marca !== 'all' || anualState.cat !== 'all';
   const budgetSrc = isVal ? budgetVal : budgetPcs;
   const fmtPct = (fcst, bgt) => {
     if (!bgt) return {txt:'—', color:'#94a3b8'};
@@ -1017,7 +1015,7 @@ function renderAnualTable(){
 
   // Body rows
   const bodyRows = anualRetails.map(r=>{
-    const bgtArr = (showBudget && !hasBrandFilter) ? (budgetSrc[r] || new Array(12).fill(0)) : new Array(12).fill(0);
+    const bgtArr = showBudget ? (budgetSrc[r] || new Array(12).fill(0)) : [];
     let rowFcst = 0, rowBgt = 0;
     const cells = ALL_MONTHS.map((m,i)=>{
       const fcstV = data[r][m]||0;
@@ -1044,7 +1042,7 @@ function renderAnualTable(){
   // Footer
   const monthTotals = ALL_MONTHS.map((m,i)=>({
     fcst: anualRetails.reduce((s,r)=>s+(data[r][m]||0),0),
-    bgt:  (showBudget && !hasBrandFilter) ? anualRetails.reduce((s,r)=>s+((budgetSrc[r]||[])[i]||0),0) : 0
+    bgt:  showBudget ? anualRetails.reduce((s,r)=>s+((budgetSrc[r]||[])[i]||0),0) : 0
   }));
   const grand = monthTotals.reduce((s,v)=>s+v.fcst,0);
   const grandBgt = monthTotals.reduce((s,v)=>s+v.bgt,0);
