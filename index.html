@@ -986,9 +986,9 @@ function renderAnualTable(){
   const augProjRetails = new Set(['iShop','Liverpool']);
   const isH2 = (m, r) => anualH2.has(m) || (m==='Aug' && augProjRetails.has(r));
 
-  // Mostrar Budget solo en modo Valor y sin filtros de marca/cat activos
-  const showBudget = isVal; // Budget siempre visible en modo Valor
-  const budgetSrc = budgetVal;
+  // Budget visible en ambos modos (Valor y Piezas)
+  const showBudget = true;
+  const budgetSrc = isVal ? budgetVal : budgetPcs;
   const fmtPct = (fcst, bgt) => {
     if (!bgt) return {txt:'—', color:'#94a3b8'};
     const p = (fcst / bgt) * 100;
@@ -1870,9 +1870,20 @@ function buildAVBSection(){
 
   // KPIs
   const kpiEl = document.getElementById('avbKpis');
+  // Budget totales por mes para todos los retails
+  const bgtSrc = isVal ? budgetVal : budgetPcs;
+  const allBgtRetails = Object.keys(bgtSrc);
+  const totalBudgetArr = Array.from({length:12},(_,i)=>allBgtRetails.reduce((s,r)=>s+((bgtSrc[r]||[])[i]||0),0));
+  const totalBudgetSum = totalBudgetArr.reduce((s,v)=>s+v,0);
+  const alcancePct = totalBudgetSum>0 ? (sum26/totalBudgetSum*100) : null;
+  const alcanceTxt = alcancePct!==null ? alcancePct.toFixed(1)+'%' : '—';
+  const alcanceColor = alcancePct===null?'#94a3b8':alcancePct>=100?'#16a34a':'#dc2626';
+
   if(kpiEl) kpiEl.innerHTML =
     kpiCard('2025 Real', fmt(sum25), avbMode==='invoice'?'Ene–Ago':'Ene–Dic', '#64748b') +
     kpiCard('2026 '+(avbMode==='invoice'?'Invoice':'Proyección'), fmt(sum26), avbMode==='invoice'?'Ene–Ago':'Ene–Dic', 'var(--accent)') +
+    kpiCard('Budget 2026', fmt(totalBudgetSum), 'Meta anual', '#7c3aed') +
+    kpiCard('% Alcance', alcanceTxt, 'FCST vs Budget', alcanceColor) +
     kpiCard('YoY vs 2025', pct(sum26,sum25), avbMode==='invoice'?'Ene–Ago':'Full Year', sum26>=sum25?'#16a34a':'#dc2626') +
     kpiCard('Retails activos', '6', '2026 FCST', '#7c3aed');
 
