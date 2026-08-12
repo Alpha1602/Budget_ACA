@@ -1172,8 +1172,9 @@ function buildAnualDualChart() {
     id: 'growthLabels',
     afterDatasetsDraw(chart) {
       const ctx = chart.ctx;
-      // datasets: 0=2025(bar), 1=2026Invoice(bar), 2=2026Proj(bar), 3=piezas(line)
+      // datasets: 0=2025(bar), 1=2026Invoice(bar), 2=2026Proj(bar), 3=piezas(line), 4=Budget(bar)
       const ds25 = chart.data.datasets[0].data;
+      // Labels YoY en barras Invoice y Proyección
       [1, 2].forEach(dsIdx => {
         const meta = chart.getDatasetMeta(dsIdx);
         if (meta.hidden) return;
@@ -1192,6 +1193,24 @@ function buildAnualDualChart() {
           ctx.restore();
         });
       });
+      // % FCST vs Budget en la barra de Budget (dataset 4)
+      const metaBudget = chart.getDatasetMeta(4);
+      if (!metaBudget.hidden) {
+        metaBudget.data.forEach((bar, i) => {
+          const bgt = chart.data.datasets[4].data[i] || 0;
+          const fcst = (chart.data.datasets[1].data[i] || 0) + (chart.data.datasets[2].data[i] || 0);
+          if (!bgt || !fcst) return;
+          const pctBgt = (fcst / bgt) * 100;
+          const label = pctBgt.toFixed(1) + '%';
+          const color = pctBgt >= 100 ? '#16a34a' : '#dc2626';
+          ctx.save();
+          ctx.font = 'bold 10px system-ui,sans-serif';
+          ctx.fillStyle = color;
+          ctx.textAlign = 'center';
+          ctx.fillText(label, bar.x, bar.y - 5);
+          ctx.restore();
+        });
+      }
     }
   };
 
@@ -1385,21 +1404,15 @@ function buildAnualDualTable(val2025, val2026Inv, val2026Proy, pcs2026Inv, pcs20
     <!-- Budget 2026 -->
     <tr style="border-bottom:1px solid var(--border);background:rgba(124,58,237,.04)">
       <td style="padding:7px 8px;font-weight:600;color:#7c3aed;white-space:nowrap">
-        <span style="display:inline-block;width:10px;height:2px;border-top:2.5px dashed #7c3aed;margin-right:5px;vertical-align:middle"></span>Budget 2026
+        <span style="display:inline-block;width:10px;height:2px;border-top:2.5px dashed #7c3aed;margin-right:5px;vertical-align:middle"></span>Budget 2026 $
       </td>
       ${budgetLine.map((v,i)=>`<td style="text-align:right;padding:7px 4px;${cellBgInv(i)}">${fmt(v)}</td>`).join('')}
       <td style="text-align:right;padding:7px 8px;font-weight:700;background:rgba(100,116,139,.06)">${fmt(totalBudget)}</td>
     </tr>
-    <!-- vs Budget -->
-    <tr style="border-bottom:1px solid var(--border);background:rgba(124,58,237,.02)">
-      <td style="padding:7px 8px;font-weight:600;color:#7c3aed;white-space:nowrap;font-size:11px">Alcance vs Budget</td>
-      ${val26total.map((v,i)=>{ const g=fmtVsBudget(v,budgetLine[i]); return `<td style="text-align:right;padding:7px 4px;font-weight:600;color:${g.color};${cellBgInv(i)}">${g.txt}</td>`; }).join('')}
-      <td style="text-align:right;padding:7px 8px;font-weight:700;color:${fmtVsBudget(totalInv+totalProy,totalBudget).color};background:rgba(100,116,139,.06)">${fmtVsBudget(totalInv+totalProy,totalBudget).txt}</td>
-    </tr>
     <!-- 2026 Invoice (AT&T, MacStore, ML) -->
     <tr style="border-bottom:1px dashed var(--border)">
       <td style="padding:7px 8px;font-weight:600;color:#0d9488;white-space:nowrap;font-size:11px">
-        <span style="display:inline-block;width:10px;height:10px;border-radius:2px;background:#2DD4BF;margin-right:5px;vertical-align:middle"></span>2026 Invoice
+        <span style="display:inline-block;width:10px;height:10px;border-radius:2px;background:#2DD4BF;margin-right:5px;vertical-align:middle"></span>2026 Invoice $
         <div style="font-size:9px;color:#94a3b8;font-weight:400">Ene–Jul: Todos · Ago: AT&T · MacStore · Coppel · ML</div>
       </td>
       ${val2026Inv.map((v,i)=>`<td style="text-align:right;padding:7px 4px;${cellBgInv(i)}">${fmt(v)}</td>`).join('')}
@@ -1408,7 +1421,7 @@ function buildAnualDualTable(val2025, val2026Inv, val2026Proy, pcs2026Inv, pcs20
     <!-- 2026 Proyección (iShop, Liverpool) -->
     <tr style="border-bottom:1px solid var(--border)">
       <td style="padding:7px 8px;font-weight:600;color:#3b82f6;white-space:nowrap;font-size:11px">
-        <span style="display:inline-block;width:10px;height:10px;border-radius:2px;background:#93C5FD;margin-right:5px;vertical-align:middle"></span>2026 Proy.
+        <span style="display:inline-block;width:10px;height:10px;border-radius:2px;background:#93C5FD;margin-right:5px;vertical-align:middle"></span>2026 Proyección $
         <div style="font-size:9px;color:#94a3b8;font-weight:400">Ago: iShop · Liverpool · Sep–Dic: Todos</div>
       </td>
       ${val2026Proy.map((v,i)=>`<td style="text-align:right;padding:7px 4px;${cellBgProy(i)}">${fmt(v)}</td>`).join('')}
@@ -1416,9 +1429,15 @@ function buildAnualDualTable(val2025, val2026Inv, val2026Proy, pcs2026Inv, pcs20
     </tr>
     <!-- YoY (total vs 2025) -->
     <tr style="border-bottom:1px solid var(--border);background:rgba(241,245,249,.5)">
-      <td style="padding:7px 8px;font-weight:600;color:#475569;white-space:nowrap;font-size:11px">YoY vs 2025</td>
+      <td style="padding:7px 8px;font-weight:600;color:#475569;white-space:nowrap;font-size:11px">YoY 2025</td>
       ${val26total.map((v,i)=>{ const g=fmtG(v,val2025[i]); return `<td style="text-align:right;padding:7px 4px;font-weight:700;color:${g.color};${cellBgInv(i)}">${g.txt}</td>`; }).join('')}
       <td style="text-align:right;padding:7px 8px;font-weight:700;color:${totalG.color};background:rgba(100,116,139,.06)">${totalG.txt}</td>
+    </tr>
+    <!-- % FCST vs Budget -->
+    <tr style="border-bottom:1px solid var(--border);background:rgba(124,58,237,.02)">
+      <td style="padding:7px 8px;font-weight:600;color:#7c3aed;white-space:nowrap;font-size:11px">% FCST vs Budget</td>
+      ${val26total.map((v,i)=>{ const g=fmtVsBudget(v,budgetLine[i]); return `<td style="text-align:right;padding:7px 4px;font-weight:600;color:${g.color};${cellBgInv(i)}">${g.txt}</td>`; }).join('')}
+      <td style="text-align:right;padding:7px 8px;font-weight:700;color:${fmtVsBudget(totalInv+totalProy,totalBudget).color};background:rgba(100,116,139,.06)">${fmtVsBudget(totalInv+totalProy,totalBudget).txt}</td>
     </tr>
     <!-- Piezas Invoice -->
     <tr style="border-bottom:1px dashed var(--border)">
@@ -1432,7 +1451,7 @@ function buildAnualDualTable(val2025, val2026Inv, val2026Proy, pcs2026Inv, pcs20
     <!-- Piezas Proyección -->
     <tr>
       <td style="padding:7px 8px;font-weight:600;color:#7c3aed;white-space:nowrap;font-size:11px">
-        <span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:#a78bfa;margin-right:5px;vertical-align:middle"></span>Piezas Proy.
+        <span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:#a78bfa;margin-right:5px;vertical-align:middle"></span>Piezas Proyección
         <div style="font-size:9px;color:#94a3b8;font-weight:400">iShop · Liverpool · Coppel</div>
       </td>
       ${pcs2026Proy.map((v,i)=>`<td style="text-align:right;padding:7px 4px;color:#7c3aed;${cellBgProy(i)}">${fmtP(v)}</td>`).join('')}
