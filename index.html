@@ -912,11 +912,16 @@ function switchAnualTable(mode) {
 function initAnualFilters(){
   const marcaEl = document.getElementById('anualMarcaFilter');
   if(!marcaEl) return;
-  const marcas = Object.keys(marcaRaw).sort();
-  marcaEl.innerHTML = `<button class="chip on" data-val="all" onclick="setAnualFilter('marca',this)">Todas</button>`;
+  // Deduplicar Hypergear/HYPERGEAR: siempre mostrar como 'Hypergear'
+  const rawMarcas = Object.keys(marcaRaw);
+  const seen = new Set();
+  const marcas = rawMarcas.map(m => m==='HYPERGEAR'?'Hypergear':m)
+    .filter(m => { if(seen.has(m)) return false; seen.add(m); return true; })
+    .sort();
+  marcaEl.innerHTML = `<button class="chip ${anualState.marca==='all'?'on':''}" data-val="all" onclick="setAnualFilter('marca',this)">Todas</button>`;
   marcas.forEach(m => {
-    const color = marcaColors[m]||'#64748b';
-    marcaEl.innerHTML += `<button class="chip" data-val="${m}" onclick="setAnualFilter('marca',this)">${m}</button>`;
+    const isActive = anualState.marca===m || (m==='Hypergear' && anualState.marca==='HYPERGEAR');
+    marcaEl.innerHTML += `<button class="chip ${isActive?'on':''}" data-val="${m}" onclick="setAnualFilter('marca',this)">${m}</button>`;
   });
   updateAnualCatChips();
   renderAnualTable();
@@ -927,7 +932,9 @@ function updateAnualCatChips(){
   if(!el) return;
   const activeCats = new Set();
   for(const [marca, clients] of Object.entries(marcaRaw)){
-    if(anualState.marca!=='all' && marca!==anualState.marca) continue;
+    // Tratar HYPERGEAR y Hypergear como la misma marca
+    const marcaNorm = marca==='HYPERGEAR'?'Hypergear':marca;
+    if(anualState.marca!=='all' && marcaNorm!==anualState.marca) continue;
     for(const [, cats] of Object.entries(clients)){
       for(const [cat, md] of Object.entries(cats)){
         if(!cat) continue;
@@ -936,7 +943,7 @@ function updateAnualCatChips(){
     }
   }
   if(anualState.cat!=='all' && !activeCats.has(anualState.cat)) anualState.cat='all';
-  el.innerHTML = `<button class="chip on" data-val="all" onclick="setAnualFilter('cat',this)">Todas</button>`;
+  el.innerHTML = `<button class="chip ${anualState.cat==='all'?'on':''}" data-val="all" onclick="setAnualFilter('cat',this)">Todas</button>`;
   [...activeCats].sort().forEach(cat => {
     el.innerHTML += `<button class="chip ${anualState.cat===cat?'on':''}" data-val="${cat}" onclick="setAnualFilter('cat',this)">${catLabel[cat]||cat}</button>`;
   });
@@ -963,7 +970,9 @@ function renderAnualTable(){
     for(const m of ALL_MONTHS) data[r][m]=0;
   }
   for(const [marca, clients] of Object.entries(marcaRaw)){
-    if(anualState.marca!=='all' && marca!==anualState.marca) continue;
+    // Normalizar HYPERGEAR → Hypergear para filtros
+    const marcaNorm = marca==='HYPERGEAR'?'Hypergear':marca;
+    if(anualState.marca!=='all' && marcaNorm!==anualState.marca) continue;
     for(const [retail, cats] of Object.entries(clients)){
       if(!data[retail]) continue;
       for(const [cat, md] of Object.entries(cats)){
@@ -976,47 +985,85 @@ function renderAnualTable(){
   }
   const augProjRetails = new Set(['iShop','Liverpool']);
   const isH2 = (m, r) => anualH2.has(m) || (m==='Aug' && augProjRetails.has(r));
-  const budgetSrc = isVal ? budgetVal : budgetPcs;
+
+  // Mostrar Budget solo en modo Valor y sin filtros de marca/cat activos
+  const showBudget = isVal && anualState.marca==='all' && anualState.cat==='all';
+  const budgetSrc = budgetVal;
   const fmtPct = (fcst, bgt) => {
     if (!bgt) return {txt:'—', color:'#94a3b8'};
     const p = (fcst / bgt) * 100;
     return {txt: p.toFixed(1)+'%', color: p>=100?'#16a34a':'#dc2626'};
   };
-  // Header: mes group → FCST | Budget | %
-  const monthGroupHeaders = ALL_MONTHS.map((m,i)=>`<th colspan="3" class="num" style="text-align:center;border-left:2px solid var(--border);${anualH2.has(m)?'background:rgba(148,163,184,.1)':''}">${ALL_MONTHS_ES[i]}</th>`).join('');
-  const subHeaders = ALL_MONTHS.map((m,i)=>`<th class="num" style="font-size:10px;color:#0d9488;border-left:2px solid var(--border);${anualH2.has(m)?'background:rgba(148,163,184,.1)':''}">FCST</th><th class="num" style="font-size:10px;color:#7c3aed;${anualH2.has(m)?'background:rgba(148,163,184,.1)':''}">Budget</th><th class="num" style="font-size:10px;color:#475569;${anualH2.has(m)?'background:rgba(148,163,184,.1)':''}">%</th>`).join('');
-  const totalSubHeader = `<th class="num" style="font-size:10px;color:#0d9488;border-left:2px solid var(--border)">FCST</th><th class="num" style="font-size:10px;color:#7c3aed">Budget</th><th class="num" style="font-size:10px;color:#475569">%</th>`;
+
+  // Etiqueta de columna: "Actual" para meses facturados (Ene-Ago), "FCST" para proyectados
+  const colLabel = (i) => i < 8 ? 'Actual' : 'FCST';
+  const colColor = (i) => i < 8 ? '#0d9488' : '#3b82f6';
+
+  // STICKY label style for first column
+  const stickyTh = `position:sticky;left:0;z-index:3;background:var(--surface,#fff);white-space:nowrap`;
+  const stickyTd = `position:sticky;left:0;z-index:2;background:var(--surface,#fff);white-space:nowrap`;
+
+  const colSpan = showBudget ? 3 : 1;
+  // Header: mes group
+  const monthGroupHeaders = ALL_MONTHS.map((m,i)=>`<th colspan="${colSpan}" class="num" style="text-align:center;border-left:2px solid var(--border);${anualH2.has(m)?'background:rgba(148,163,184,.1)':''}">${ALL_MONTHS_ES[i]}</th>`).join('');
+  const subHeaders = showBudget
+    ? ALL_MONTHS.map((m,i)=>`<th class="num" style="font-size:10px;color:${colColor(i)};border-left:2px solid var(--border);${anualH2.has(m)?'background:rgba(148,163,184,.1)':''}">${colLabel(i)}</th><th class="num" style="font-size:10px;color:#7c3aed;${anualH2.has(m)?'background:rgba(148,163,184,.1)':''}">Budget</th><th class="num" style="font-size:10px;color:#475569;${anualH2.has(m)?'background:rgba(148,163,184,.1)':''}">%</th>`).join('')
+    : ALL_MONTHS.map((m,i)=>`<th class="num" style="font-size:10px;color:${colColor(i)};border-left:1px solid var(--border);${anualH2.has(m)?'background:rgba(148,163,184,.1)':''}">${colLabel(i)}</th>`).join('');
+  const totalSubHeader = showBudget
+    ? `<th class="num" style="font-size:10px;color:#0d9488;border-left:2px solid var(--border)">Actual/FCST</th><th class="num" style="font-size:10px;color:#7c3aed">Budget</th><th class="num" style="font-size:10px;color:#475569">%</th>`
+    : `<th class="num" style="font-size:10px;color:#0d9488;border-left:2px solid var(--border)">Total</th>`;
+
   // Body rows
   const bodyRows = anualRetails.map(r=>{
-    const bgtArr = budgetSrc[r] || new Array(12).fill(0);
+    const bgtArr = showBudget ? (budgetSrc[r] || new Array(12).fill(0)) : [];
     let rowFcst = 0, rowBgt = 0;
     const cells = ALL_MONTHS.map((m,i)=>{
       const fcstV = data[r][m]||0;
-      const bgtV  = bgtArr[i]||0;
-      rowFcst += fcstV; rowBgt += bgtV;
-      const p = fmtPct(fcstV, bgtV);
+      rowFcst += fcstV;
       const h2 = isH2(m,r)?'background:rgba(148,163,184,.1);':'';
-      return `<td class="num" style="border-left:2px solid var(--border);${h2}">${fmt(fcstV||0)}</td><td class="num" style="color:#7c3aed;${h2}">${bgtV?fmt(bgtV):'—'}</td><td class="num" style="color:${p.color};font-weight:600;${h2}">${p.txt}</td>`;
+      const bl = 'border-left:2px solid var(--border);';
+      if (showBudget) {
+        const bgtV = bgtArr[i]||0;
+        rowBgt += bgtV;
+        const p = fmtPct(fcstV, bgtV);
+        return `<td class="num" style="${bl}${h2}">${fmt(fcstV)}</td><td class="num" style="color:#7c3aed;${h2}">${bgtV?fmt(bgtV):'—'}</td><td class="num" style="color:${p.color};font-weight:600;${h2}">${p.txt}</td>`;
+      } else {
+        return `<td class="num" style="${bl}${h2}">${fmt(fcstV)}</td>`;
+      }
     }).join('');
-    const totP = fmtPct(rowFcst, rowBgt);
-    return `<tr><td style="white-space:nowrap"><span class="dot" style="background:${anualRetailColorVar[r]}"></span>${anualRetailDisplay[r]}</td>${cells}<td class="num" style="font-weight:700;border-left:2px solid var(--border)">${fmt(rowFcst)}</td><td class="num" style="color:#7c3aed;font-weight:600">${rowBgt?fmt(rowBgt):'—'}</td><td class="num" style="color:${totP.color};font-weight:700">${totP.txt}</td></tr>`;
+    if (showBudget) {
+      const totP = fmtPct(rowFcst, rowBgt);
+      return `<tr><td style="${stickyTd}"><span class="dot" style="background:${anualRetailColorVar[r]}"></span>${anualRetailDisplay[r]}</td>${cells}<td class="num" style="font-weight:700;border-left:2px solid var(--border)">${fmt(rowFcst)}</td><td class="num" style="color:#7c3aed;font-weight:600">${rowBgt?fmt(rowBgt):'—'}</td><td class="num" style="color:${totP.color};font-weight:700">${totP.txt}</td></tr>`;
+    } else {
+      return `<tr><td style="${stickyTd}"><span class="dot" style="background:${anualRetailColorVar[r]}"></span>${anualRetailDisplay[r]}</td>${cells}<td class="num" style="font-weight:700;border-left:2px solid var(--border)">${fmt(rowFcst)}</td></tr>`;
+    }
   }).join('');
+
   // Footer
   const monthTotals = ALL_MONTHS.map((m,i)=>({
     fcst: anualRetails.reduce((s,r)=>s+(data[r][m]||0),0),
-    bgt:  anualRetails.reduce((s,r)=>s+((budgetSrc[r]||[])[i]||0),0)
+    bgt:  showBudget ? anualRetails.reduce((s,r)=>s+((budgetSrc[r]||[])[i]||0),0) : 0
   }));
   const grand = monthTotals.reduce((s,v)=>s+v.fcst,0);
   const grandBgt = monthTotals.reduce((s,v)=>s+v.bgt,0);
   const grandPct = fmtPct(grand, grandBgt);
   const footCells = monthTotals.map((v,i)=>{
-    const p=fmtPct(v.fcst,v.bgt);
     const h2=anualH2.has(ALL_MONTHS[i])?'background:rgba(148,163,184,.1);':'';
-    return `<td class="num" style="font-weight:700;border-left:2px solid var(--border);${h2}">${fmt(v.fcst)}</td><td class="num" style="color:#7c3aed;font-weight:600;${h2}">${v.bgt?fmt(v.bgt):'—'}</td><td class="num" style="color:${p.color};font-weight:700;${h2}">${p.txt}</td>`;
+    const bl='border-left:2px solid var(--border);';
+    if (showBudget) {
+      const p=fmtPct(v.fcst,v.bgt);
+      return `<td class="num" style="font-weight:700;${bl}${h2}">${fmt(v.fcst)}</td><td class="num" style="color:#7c3aed;font-weight:600;${h2}">${v.bgt?fmt(v.bgt):'—'}</td><td class="num" style="color:${p.color};font-weight:700;${h2}">${p.txt}</td>`;
+    } else {
+      return `<td class="num" style="font-weight:700;${bl}${h2}">${fmt(v.fcst)}</td>`;
+    }
   }).join('');
-  const foot = `<tr><td>TOTAL</td>${footCells}<td class="num" style="font-weight:700;border-left:2px solid var(--border)">${fmt(grand)}</td><td class="num" style="color:#7c3aed;font-weight:600">${grandBgt?fmt(grandBgt):'—'}</td><td class="num" style="color:${grandPct.color};font-weight:700">${grandPct.txt}</td></tr>`;
+  const footTotal = showBudget
+    ? `<td class="num" style="font-weight:700;border-left:2px solid var(--border)">${fmt(grand)}</td><td class="num" style="color:#7c3aed;font-weight:600">${grandBgt?fmt(grandBgt):'—'}</td><td class="num" style="color:${grandPct.color};font-weight:700">${grandPct.txt}</td>`
+    : `<td class="num" style="font-weight:700;border-left:2px solid var(--border)">${fmt(grand)}</td>`;
+  const foot = `<tr><td style="${stickyTd}">TOTAL</td>${footCells}${footTotal}</tr>`;
+
   const container = document.getElementById('anualTableContainer');
-  if(container) container.innerHTML = `<div class="table-wrap"><table style="font-size:11px"><thead><tr><th rowspan="2" style="vertical-align:bottom">Retail</th>${monthGroupHeaders}<th colspan="3" class="num" style="text-align:center;border-left:2px solid var(--border)">TOTAL</th></tr><tr>${subHeaders}${totalSubHeader}</tr></thead><tbody>${bodyRows}</tbody><tfoot>${foot}</tfoot></table></div>`;
+  if(container) container.innerHTML = `<div class="table-wrap"><table style="font-size:11px"><thead><tr><th rowspan="2" style="${stickyTh};vertical-align:bottom">Retail</th>${monthGroupHeaders}<th colspan="${colSpan}" class="num" style="text-align:center;border-left:2px solid var(--border)">TOTAL</th></tr><tr>${subHeaders}${totalSubHeader}</tr></thead><tbody>${bodyRows}</tbody><tfoot>${foot}</tfoot></table></div>`;
 }
 
 /* ══════ H2 TABLE TOGGLE ══════ */
@@ -1046,6 +1093,12 @@ function buildAvbTopKpis() {
   const sum26 = clients.reduce((s,c) => s + (src26[c]||[]).slice(0,nMonths).reduce((a,v)=>a+v,0), 0);
   const periodLabel = avbMode === 'invoice' ? 'Ene–Ago' : 'Ene–Dic';
   const clientLabel = anualSelectedClient === 'all' ? '2026 FCST' : anualSelectedClient;
+  // OH Retail filtrado por cliente (AT&T→ATT en moiDataByClient)
+  const moiKeyMap = {'AT&T':'ATT','MacStore':'MacStore','iShop':'iShop','Liverpool':'Liverpool','MercadoLibre':null,'Coppel':null};
+  const moiKey = anualSelectedClient === 'all' ? 'all' : (moiKeyMap[anualSelectedClient] || null);
+  const moiCats = (moiKey ? moiDataByClient[moiKey]?.cat : null) || moiDataByClient['all']?.cat || [];
+  const ohRetailPzas = moiCats.reduce((s,c)=>s+(c.oh_retail||0),0);
+  const ohLabel = moiKey && moiKey!=='all' ? anualSelectedClient : 'Inventario en tiendas';
   const kpiEl = document.getElementById('avbKpis');
   if (!kpiEl) return;
   const tmp = document.createElement('div');
@@ -1053,7 +1106,8 @@ function buildAvbTopKpis() {
     kpiCard('2025 Real', fmt(sum25), periodLabel, '#64748b') +
     kpiCard('2026 ' + (avbMode==='invoice'?'Invoice':'Proyección'), fmt(sum26), periodLabel, 'var(--accent)') +
     kpiCard('YoY vs 2025', pct(sum26,sum25), avbMode==='invoice'?'Ene–Ago':'Full Year', sum26>=sum25?'#16a34a':'#dc2626') +
-    kpiCard('Retails activos', clients.length.toString(), clientLabel, '#7c3aed');
+    kpiCard('Retails activos', clients.length.toString(), clientLabel, '#7c3aed') +
+    kpiCard('OH Retail Consignación', ohRetailPzas.toLocaleString('es-MX')+' pzas', ohLabel, '#0891b2');
   const existing = kpiEl.querySelectorAll('.kpi-card');
   const newCards  = tmp.querySelectorAll('.kpi-card');
   newCards.forEach((nc, i) => { if (existing[i]) kpiEl.replaceChild(nc, existing[i]); });
