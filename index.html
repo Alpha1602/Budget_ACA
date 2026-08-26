@@ -1371,7 +1371,7 @@ function buildAnualDualChart() {
         for(const [cat, md] of Object.entries(cats)){
           if(avbChartState.cat !== 'all' && cat !== avbChartState.cat) continue;
           ALL_MONTHS.forEach((m,i)=>{
-            const isInvMonth = i<7 || (i===7 && !new Set(['iShop','Liverpool']).has(retail));
+            const isInvMonth = i<8;
             if(isInvMonth){ val2026Inv[i]+=(md.val[i]||0); pcs2026Inv[i]+=(md.pcs[i]||0); }
             else           { val2026Proy[i]+=(md.val[i]||0); pcs2026Proy[i]+=(md.pcs[i]||0); }
           });
@@ -1379,25 +1379,20 @@ function buildAnualDualChart() {
       }
     }
   } else {
-    const AUG_PROY = new Set(['iShop','Liverpool']);
     val2026Inv  = MONTHS_FULL.map((_,mi) => {
-      if(mi<7) return clients.reduce((s,c)=>s+((valorFull[c]||[])[mi]||0),0);
-      if(mi===7) return clients.filter(c=>!AUG_PROY.has(c)).reduce((s,c)=>s+((valorFull[c]||[])[mi]||0),0);
+      if(mi<8) return clients.reduce((s,c)=>s+((valorFull[c]||[])[mi]||0),0);
       return 0;
     });
     val2026Proy = MONTHS_FULL.map((_,mi) => {
-      if(mi<7) return 0;
-      if(mi===7) return clients.filter(c=>AUG_PROY.has(c)).reduce((s,c)=>s+((valorFull[c]||[])[mi]||0),0);
+      if(mi<8) return 0;
       return clients.reduce((s,c)=>s+((valorFull[c]||[])[mi]||0),0);
     });
     pcs2026Inv  = MONTHS_FULL.map((_,mi) => {
-      if(mi<7) return clients.reduce((s,c)=>s+((piezasAnual[c]||[])[mi]||0),0);
-      if(mi===7) return clients.filter(c=>!AUG_PROY.has(c)).reduce((s,c)=>s+((piezasAnual[c]||[])[mi]||0),0);
+      if(mi<8) return clients.reduce((s,c)=>s+((piezasAnual[c]||[])[mi]||0),0);
       return 0;
     });
     pcs2026Proy = MONTHS_FULL.map((_,mi) => {
-      if(mi<7) return 0;
-      if(mi===7) return clients.filter(c=>AUG_PROY.has(c)).reduce((s,c)=>s+((piezasAnual[c]||[])[mi]||0),0);
+      if(mi<8) return 0;
       return clients.reduce((s,c)=>s+((piezasAnual[c]||[])[mi]||0),0);
     });
   }
@@ -1492,7 +1487,7 @@ function buildAnualDualTable(val2025, val2026Inv, val2026Proy, pcs2026Inv, pcs20
   // Invoice rows  → Ene–Ago white, Sep–Dic shaded
   const cellBgInv  = i => i < 8  ? '' : SHADE;
   // Proy rows     → Ene–Jul shaded (no data), Ago–Dic white
-  const cellBgProy = i => i < 7  ? SHADE : '';
+  const cellBgProy = i => i < 8  ? SHADE : '';
   // Keep legacy alias for 2025 Real / YoY (same as invoice)
   const cellBg = cellBgInv;
 
@@ -1559,7 +1554,7 @@ function buildAnualDualTable(val2025, val2026Inv, val2026Proy, pcs2026Inv, pcs20
     <tr style="border-bottom:1px solid var(--border)">
       <td style="padding:7px 8px;font-weight:600;color:#3b82f6;white-space:nowrap;font-size:11px">
         <span style="display:inline-block;width:10px;height:10px;border-radius:2px;background:#93C5FD;margin-right:5px;vertical-align:middle"></span>2026 Proyección $
-        <div style="font-size:9px;color:#94a3b8;font-weight:400">Ago: iShop · Liverpool · Sep–Dic: Todos</div>
+        <div style="font-size:9px;color:#94a3b8;font-weight:400">Sep–Dic: Todos</div>
       </td>
       ${val2026Proy.map((v,i)=>`<td style="text-align:right;padding:7px 4px;${cellBgProy(i)}">${fmt(v)}</td>`).join('')}
       <td style="text-align:right;padding:7px 8px;font-weight:700;background:rgba(100,116,139,.06)">${fmt(totalProy)}</td>
