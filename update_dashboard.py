@@ -176,7 +176,7 @@ def extract_sin_movimiento_consenso(ws):
     records = []
 
     for row in ws.iter_rows(min_row=3, values_only=True):
-        if not row or len(row) < 61:
+        if not row or len(row) < 30:
             continue
 
         retail = str(row[8]).strip() if row[8] else ''
@@ -187,13 +187,14 @@ def extract_sin_movimiento_consenso(ws):
         if oh_retail <= 0:
             continue
 
-        # Sin movimiento = sin FCST para meses FUTUROS (Ago-Dic, cols 27-31)
-        # Los meses pasados (Ene-Jul) pueden tener FCST real — no los consideramos
-        fcst_future = sum(fl(row[27 + i]) for i in range(5))  # Aug Sep Oct Nov Dec
+        # Sin movimiento = sin FCST para meses FUTUROS (Ago-Dic)
+        # V27 Consenso: col25=FCST Aug, col26=Sep, col27=Oct, col28=Nov, col29=Dec
+        fcst_future = sum(fl(row[25 + i]) for i in range(5))  # Aug Sep Oct Nov Dec
         if fcst_future > 0:
             continue  # tiene plan de venta futuro → no es sin movimiento
 
-        fcst_months = [fl(row[20 + i]) for i in range(12)]
+        # V27: col19=Jan..col24=Jun, col25=Aug..col29=Dec (sin Jul)
+        fcst_months = [fl(row[19 + i]) for i in range(6)] + [0] + [fl(row[25 + i]) for i in range(5)]
 
         marca   = str(row[0]).strip()  if row[0]  else ''
         sku     = str(row[1]).strip()  if row[1]  else ''
@@ -204,27 +205,27 @@ def extract_sin_movimiento_consenso(ws):
         status  = str(row[12]).strip() if row[12] else ''
         oh_aca  = fl(row[15])
 
-        # FCST/mes en PIEZAS: cols 25 (FCST Jun) y 26 (FCST Jul).
-        # Para meses pasados, el modelo reemplaza FCST con ventas reales en pcs.
-        # (Verificado: pcs × costo = MXN real en cols 50/51)
-        venta_jun = fl(row[25])  # FCST Jun pcs = ventas reales Jun (unidades)
-        venta_jul = fl(row[26])  # FCST Jul pcs = ventas reales Jul (unidades)
-        avg_fcst  = round((venta_jun + venta_jul) / 2, 2)
+        # FCST/mes en PIEZAS: col24=FCST Jun, col25=FCST Aug (Jul no existe en V27)
+        venta_jun = fl(row[24])  # FCST Jun pcs (ventas reales Jun)
+        venta_ago = fl(row[25])  # FCST Aug pcs (más reciente disponible)
+        avg_fcst  = round((venta_jun + venta_ago) / 2, 2) if (venta_jun + venta_ago) > 0 else venta_jun
 
         # MOI: OH Retail / avg ventas mensual (si hay venta previa)
         moi = round(oh_retail / avg_fcst, 1) if avg_fcst > 0 else None
 
-        # Costos totales desde Consenso (ya multiplicados × unidades)
-        costo_retail = round(fl(row[58]), 2)
-        costo_landed = round(fl(row[59]), 2)
-        costo_usd    = round(fl(row[60]), 2)
+        # Costos totales: costo unitario (col11) × OH Retail (col14)
+        cost_unit    = fl(row[11])
+        costo_retail = round(cost_unit * oh_retail, 2)
+        costo_landed = costo_retail  # misma base MXN (no hay separación landed en V27)
+        costo_usd    = 0.0
 
-        # val_riesgo = costo_landed total
-        val_riesgo = costo_landed
+        # val_riesgo = valor total OH al costo
+        val_riesgo = costo_retail
 
-        # FCST Jul-Dec para columnas de la tabla (cols 26-31)
-        fcst_jul = fl(row[26]); fcst_aug = fl(row[27]); fcst_sep = fl(row[28])
-        fcst_oct = fl(row[29]); fcst_nov = fl(row[30]); fcst_dec = fl(row[31])
+        # FCST Jul-Dec para columnas de la tabla
+        # V27: no hay Jul → 0; Aug=col25, Sep=col26, Oct=col27, Nov=col28, Dec=col29
+        fcst_jul = 0.0; fcst_aug = fl(row[25]); fcst_sep = fl(row[26])
+        fcst_oct = fl(row[27]); fcst_nov = fl(row[28]); fcst_dec = fl(row[29])
 
         records.append({
             'marca':        marca,
@@ -258,45 +259,77 @@ def extract_sin_movimiento_consenso(ws):
 
 
 
-# ── Extracción: Budget 2026 (hoja "Budget 2026") ──────────────────────────────
+# ── Extracción: Budget 2026 (hoja "Budget 120M") ─────────────────────────────
 def extract_budget_2026(ws):
     """
-    Hoja 'Budget 2026':
-      Sección MXN (rows 15-22, 0-indexed 14-21): header en row 15, datos en rows 16-21
-      Sección Pcs  (rows 28-35, 0-indexed 27-34): header en row 28, datos en rows 29-34
-      Columnas: col0=Retail, cols1-12=Jan-Dec
-    Retail map: ATT→AT&T, iShop→iShop, Liverpool→Liverpool, MacStore→MacStore,
-                Coppel→Coppel, Mercado Libre→MercadoLibre
+    Hoja 'Budget 120M' (SKU-level, min_row=4):
+      col0  = Marca
+      col9  = Retail  ('ATT','MacStore','iShop','Liverpool','Coppel')
+      col23-34 = Budget piezas Jan-Dec
+      col36-47 = Budget $ MXN Jan-Dec
+
+    Devuelve:
+      budget_val  {retail: [12 meses MXN]}
+      budget_pcs  {retail: [12 meses pzas]}
+      budget_marca {marca: {retail: {val:[12], pcs:[12]}}}
     """
     RMAP = {'ATT':'AT&T','iShop':'iShop','Liverpool':'Liverpool',
-            'MacStore':'MacStore','Coppel':'Coppel','Mercado Libre':'MercadoLibre'}
-    ALL_ROWS = list(ws.iter_rows(min_row=1, max_row=ws.max_row, values_only=True))
+            'MacStore':'MacStore','Coppel':'Coppel','MercadoLibre':'MercadoLibre'}
+    BRAND_NORM = {'TECH21':'Tech21','HYPERGEAR':'Hypergear'}
 
-    budget_val = {}
-    budget_pcs = {}
+    def _new():
+        return {'val':[0.0]*12,'pcs':[0.0]*12}
 
-    # MXN: rows 16-21 (0-indexed 15-20)
-    for row in ALL_ROWS[15:21]:
-        if not row or row[0] is None: continue
-        retail = RMAP.get(str(row[0]).strip())
-        if not retail: continue
-        budget_val[retail] = [round(fl(row[i])) for i in range(1, 13)]
+    bv = defaultdict(lambda: [0.0]*12)
+    bp = defaultdict(lambda: [0.0]*12)
+    # marca → retail → {val, pcs}
+    bm   = defaultdict(lambda: defaultdict(_new))
+    # cat → retail → {val, pcs}
+    bc   = defaultdict(lambda: defaultdict(_new))
+    # marca → cat → retail → {val, pcs}
+    bmc  = defaultdict(lambda: defaultdict(lambda: defaultdict(_new)))
 
-    # Pcs: rows 29-34 (0-indexed 28-33)
-    for row in ALL_ROWS[28:34]:
-        if not row or row[0] is None: continue
-        retail = RMAP.get(str(row[0]).strip())
-        if not retail: continue
-        budget_pcs[retail] = [int(fl(row[i])) for i in range(1, 13)]
+    for row in ws.iter_rows(min_row=4, values_only=True):
+        if not row or len(row) < 48 or row[9] is None:
+            continue
+        retail_key = str(row[9]).strip()
+        retail = RMAP.get(retail_key)
+        if not retail:
+            continue
+        marca_raw = str(row[0]).strip() if row[0] else ''
+        marca = BRAND_NORM.get(marca_raw.upper(), marca_raw)
+        cat   = str(row[5]).strip() if row[5] else 'Others'
+        for i in range(12):
+            p = fl(row[23 + i]); v = fl(row[36 + i])
+            bp[retail][i] += p;           bv[retail][i] += v
+            bm[marca][retail]['pcs'][i]         += p
+            bm[marca][retail]['val'][i]         += v
+            bc[cat][retail]['pcs'][i]            += p
+            bc[cat][retail]['val'][i]            += v
+            bmc[marca][cat][retail]['pcs'][i]    += p
+            bmc[marca][cat][retail]['val'][i]    += v
 
-    return budget_val, budget_pcs
+    def _round(d):
+        return {r: {'val':[round(x) for x in e['val']],'pcs':[int(x) for x in e['pcs']]}
+                for r, e in d.items()}
+
+    budget_val      = {r: [round(v) for v in vals] for r, vals in bv.items()}
+    budget_pcs      = {r: [int(v)   for v in vals] for r, vals in bp.items()}
+    budget_marca    = {m: _round(rd)  for m, rd  in bm.items()}
+    budget_cat      = {c: _round(rd)  for c, rd  in bc.items()}
+    budget_marca_cat = {m: {c: _round(rd) for c, rd in cats.items()}
+                        for m, cats in bmc.items()}
+    return budget_val, budget_pcs, budget_marca, budget_cat, budget_marca_cat
 
 
-def build_budget_js(budget_val, budget_pcs):
+def build_budget_js(budget_val, budget_pcs, budget_marca, budget_cat, budget_marca_cat):
     import json as _json
-    line1 = 'const budgetVal = ' + _json.dumps(budget_val, ensure_ascii=False, separators=(',', ':')) + ';'
-    line2 = 'const budgetPcs = ' + _json.dumps(budget_pcs, ensure_ascii=False, separators=(',', ':')) + ';'
-    return line1 + '\n' + line2
+    line1 = 'const budgetVal = '         + _json.dumps(budget_val,       ensure_ascii=False, separators=(',',':')) + ';'
+    line2 = 'const budgetPcs = '         + _json.dumps(budget_pcs,       ensure_ascii=False, separators=(',',':')) + ';'
+    line3 = 'const budgetMarcaRaw = '    + _json.dumps(budget_marca,     ensure_ascii=False, separators=(',',':')) + ';'
+    line4 = 'const budgetCatRaw = '      + _json.dumps(budget_cat,       ensure_ascii=False, separators=(',',':')) + ';'
+    line5 = 'const budgetMarcaCatRaw = ' + _json.dumps(budget_marca_cat, ensure_ascii=False, separators=(',',':')) + ';'
+    return '\n'.join([line1, line2, line3, line4, line5])
 
 
 # ── Extracción: Todos los SKUs con OH Retail (para tabla MOI completa) ────────
@@ -308,7 +341,7 @@ def extract_all_skus_with_oh(ws):
     RETAIL_CONSENSO = {'ATT', 'MacStore', 'iShop', 'Liverpool', 'Coppel'}
     records = []
     for row in ws.iter_rows(min_row=3, values_only=True):
-        if not row or len(row) < 61:
+        if not row or len(row) < 30:
             continue
         retail = str(row[8]).strip() if row[8] else ''
         if retail not in RETAIL_CONSENSO:
@@ -323,12 +356,14 @@ def extract_all_skus_with_oh(ws):
         cat    = str(row[5]).strip() if row[5] else ''
         oh_aca = fl(row[15])
 
-        venta_jun = fl(row[25])
-        venta_jul = fl(row[26])
-        avg_pcs   = round((venta_jun + venta_jul) / 2, 1)
+        # V27: col24=FCST Jun, col25=FCST Aug (sin Jul)
+        venta_jun = fl(row[24])
+        venta_ago = fl(row[25])
+        avg_pcs   = round((venta_jun + venta_ago) / 2, 1) if (venta_jun + venta_ago) > 0 else round(venta_jun, 1)
         moi       = round(oh_retail / avg_pcs, 1) if avg_pcs > 0 else None
 
-        costo_retail = round(fl(row[58]), 2)
+        # Costo = costo unitario (col11) × OH Retail
+        costo_retail = round(fl(row[11]) * oh_retail, 2)
 
         records.append({
             'cliente':      retail,
@@ -382,7 +417,7 @@ def extract_moi_data_by_client(ws_consenso, ws_datos_html):
     oh_brand = defaultdict(lambda: {'oh_retail': 0.0, 'oh_aca': 0.0,
                                     'oh_retail_val': 0.0, 'oh_aca_val': 0.0})
     for row in ws_consenso.iter_rows(min_row=3, values_only=True):
-        if not row or len(row) < 60:
+        if not row or len(row) < 30:
             continue
         retail = str(row[8]).strip() if row[8] else ''
         if retail not in RETAILS_CONSENSO:
@@ -390,7 +425,10 @@ def extract_moi_data_by_client(ws_consenso, ws_datos_html):
         cat   = str(row[5]).strip() if row[5] else 'Other'
         brand = str(row[0]).strip() if row[0] else 'Other'
         oh_r = fl(row[14]); oh_a = fl(row[15])
-        rv58 = fl(row[58]); rv59 = fl(row[59])
+        # V27: costo unitario (col11) × unidades = valor total MXN
+        cost_unit = fl(row[11])
+        rv58 = cost_unit * oh_r   # OH Retail valor MXN
+        rv59 = cost_unit * oh_a   # OH ACA valor MXN
         for r in [retail, 'all']:
             oh_cat[(r, cat)]['oh_retail']     += oh_r
             oh_cat[(r, cat)]['oh_aca']        += oh_a
@@ -637,16 +675,22 @@ def main():
         cats_all = len(moi_by_client.get('all', {}).get('cat', []))
         print(f"   {'✅' if n_mbc else '⚠️ NOT FOUND'} moiDataByClient ({cats_all} categorías)")
 
-    # Reemplazar budgetVal / budgetPcs (hoja Budget 2026)
-    if 'Budget 2026' in wb.sheetnames:
-        bval, bpcs = extract_budget_2026(wb['Budget 2026'])
-        BUDGET_RE = re.compile(r'const budgetVal\s*=\s*\{.*?\};\nconst budgetPcs\s*=\s*\{.*?\};', re.DOTALL)
-        new_budget = build_budget_js(bval, bpcs)
+    # Reemplazar budgetVal / budgetPcs / budgetMarcaRaw (hoja Budget 120M)
+    budget_sheet = 'Budget 120M' if 'Budget 120M' in wb.sheetnames else 'Budget 2026'
+    if budget_sheet in wb.sheetnames:
+        bval, bpcs, bmarca, bcat, bmc = extract_budget_2026(wb[budget_sheet])
+        BUDGET_RE = re.compile(
+            r'const budgetVal\s*=\s*\{.*?\};\nconst budgetPcs\s*=\s*\{.*?\};\n'
+            r'const budgetMarcaRaw\s*=\s*\{.*?\};\nconst budgetCatRaw\s*=\s*\{.*?\};\n'
+            r'const budgetMarcaCatRaw\s*=\s*\{.*?\};',
+            re.DOTALL
+        )
+        new_budget = build_budget_js(bval, bpcs, bmarca, bcat, bmc)
         html, n_b = BUDGET_RE.subn(new_budget, html, count=1)
         total_b = sum(sum(v) for v in bval.values())
-        print(f"   {'✅' if n_b else '⚠️ NOT FOUND'} budgetVal/budgetPcs (${total_b/1e6:.1f}M)")
+        print(f"   {'✅' if n_b else '⚠️ NOT FOUND'} budget vars (${total_b/1e6:.1f}M, {len(bmarca)} marcas, {len(bcat)} cats)")
     else:
-        print("   ⚠️  Hoja 'Budget 2026' no encontrada — budget no actualizado")
+        print("   ⚠️  Hoja 'Budget 120M' no encontrada — budget no actualizado")
 
     # Guardar
     output_path.write_text(html, encoding='utf-8')
