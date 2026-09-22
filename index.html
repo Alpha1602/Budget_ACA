@@ -495,9 +495,9 @@
           style="font-size:11px;padding:5px 10px;border-radius:8px;border:1px solid var(--border);background:var(--surface);color:var(--text);width:190px">
       </div>
     </div>
-    <div class="table-wrap">
+    <div class="table-wrap" style="max-height:520px;overflow-y:auto">
       <table style="width:100%;border-collapse:collapse;font-size:11px">
-        <thead>
+        <thead style="position:sticky;top:0;z-index:2">
           <tr id="devThead"></tr>
         </thead>
         <tbody id="devTbody"></tbody>
@@ -852,8 +852,8 @@ function renderAllSkuTable() {
     <th style="${thR}">Costo Retail</th>
   </tr>`;
 
-  // ── Totals row ──
-  const totRow = `<tr>
+  // ── Totals row (sticky) ──
+  const totRow = `<tr style="position:sticky;top:34px;z-index:1">
     <td colspan="5" style="${totS}">📊 TOTAL — ${data.length} SKUs</td>
     <td style="${totR}">${fmt(totOHR)}</td>
     <td style="${totR}">${fmt(totOHA)}</td>
@@ -3225,8 +3225,8 @@ function renderDevTable(){
   // Totals row
   const totOH  = data.reduce((s,x)=>s+(x.oh_retail||0),0);
   const totVal = data.reduce((s,x)=>s+(x.val_riesgo||0),0);
-  const totRow = `<tr style="background:#f1f5f9;font-weight:700">
-    <td style="${tdS()};border-top:2px solid var(--border)" colspan="2">TOTALES</td>
+  const totRow = `<tr style="position:sticky;top:34px;z-index:1;background:#f1f5f9;font-weight:700">
+    <td style="${tdS()};border-top:2px solid var(--border)" colspan="2">📊 ${data.length} SKUs</td>
     <td style="${tdS()};border-top:2px solid var(--border)" colspan="3"></td>
     <td style="${tdS()};border-top:2px solid var(--border)"></td>
     <td style="${tdS('right')};border-top:2px solid var(--border);color:#dc2626">${totOH.toLocaleString('es-MX')}</td>
