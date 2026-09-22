@@ -387,9 +387,9 @@
       <span class="filter-label" style="margin-bottom:0;white-space:nowrap">Categoría</span>
       <div class="chip-row" id="moiElevCatChips" style="flex-wrap:wrap"></div>
     </div>
-    <div class="table-wrap">
+    <div class="table-wrap" style="max-height:520px;overflow-y:auto">
       <table style="width:100%;border-collapse:collapse;font-size:11px">
-        <thead><tr id="moiElevHead"></tr></thead>
+        <thead style="position:sticky;top:0;z-index:2"><tr id="moiElevHead"></tr></thead>
         <tbody id="moiElevBody"></tbody>
       </table>
     </div>
@@ -1225,8 +1225,16 @@ function setAvbFilter(type, btn){
   document.querySelectorAll(`#${key} .chip`).forEach(b=>b.classList.remove('on'));
   btn.classList.add('on');
   avbChartState[type] = btn.dataset.val;
+  // Sync with Dashboard by Quarter table
+  anualState[type] = btn.dataset.val;
+  const anualKey = type==='marca' ? 'anualMarcaFilter' : 'anualCatFilter';
+  document.querySelectorAll(`#${anualKey} .chip`).forEach(b=>b.classList.toggle('on', b.dataset.val===btn.dataset.val));
+  const resetBtn = document.getElementById('anualResetBtn');
+  if(resetBtn) resetBtn.style.display = (anualState.marca!=='all'||anualState.cat!=='all') ? '' : 'none';
+  if(type==='marca') updateAnualCatChips();
   updateAvbCatChips();
   buildAnualDualChart();
+  renderAnualTable();
 }
 
 function resetAnualFilters(){
@@ -3416,7 +3424,23 @@ function renderMoiElevTable(){
     return;
   }
 
-  tbody.innerHTML = sorted.slice(0,300).map(x=>{
+  // ── Totals row (sticky) ──
+  const totOHE  = sorted.reduce((s,x)=>s+(x.oh_retail||0),0);
+  const totValE = sorted.reduce((s,x)=>s+(x.val_riesgo||0),0);
+  const totMetE = sorted.reduce((s,x)=>s+metricValElev(x),0);
+  const tdTot = (align='left')=>`padding:7px 10px;font-size:10px;font-weight:700;border-top:2px solid var(--border);border-bottom:2px solid var(--border);background:#f1f5f9;text-align:${align}`;
+  const totRowEl = `<tr style="position:sticky;top:34px;z-index:1">
+    <td colspan="4" style="${tdTot()}">📊 ${sorted.length} SKUs · ${moiClient==='all'?'Todos':moiClient==='ATT'?'AT&amp;T':moiClient}</td>
+    <td style="${tdTot('right')}">${totOHE.toLocaleString('es-MX')}</td>
+    <td style="${tdTot('right')}">${fmtMetricElev(totMetE)}</td>
+    <td style="${tdTot('center')}">—</td>
+    <td style="${tdTot('center')}">—</td>
+    <td style="${tdTot('right')}">—</td>
+    <td style="${tdTot('right')};color:#dc2626">${fmtV(totValE)}</td>
+    <td style="${tdTot('center')}">—</td>
+  </tr>`;
+
+  tbody.innerHTML = totRowEl + sorted.slice(0,300).map(x=>{
     // FCST/Mes: use run-rate implied by MOI (≈ Jun-Jul avg velocity)
     const fcstAvg = (x.moi && x.moi>0) ? Math.round((x.oh_retail||0)/x.moi) : (x.fcst_jul||0);
     x.fcst_avg = fcstAvg; // cache for sort
