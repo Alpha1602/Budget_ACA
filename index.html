@@ -39,6 +39,11 @@
   .kpi-label{font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px}
   .kpi-value{font-size:24px;font-weight:700;line-height:1.15;margin:4px 0}
   .kpi-sub{font-size:10px;color:var(--muted);margin-top:2px}
+  .fy-chip-bar{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px}
+  .fy-chip{display:flex;align-items:center;gap:12px;background:#fff;border:1.5px solid #e2e8f0;border-radius:12px;padding:12px 20px;flex:1;min-width:180px}
+  .fy-chip-label{font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.4px;margin-bottom:3px}
+  .fy-chip-val{font-size:22px;font-weight:700;line-height:1.1}
+  .fy-chip-sub{font-size:9px;color:var(--muted);margin-top:2px}
   .filter-bar{background:#fff;border-radius:10px;padding:12px 16px;margin-bottom:14px;box-shadow:0 1px 3px rgba(0,0,0,.06)}
   .filter-label{font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.4px;margin-bottom:6px;display:block}
   .chip-row{display:flex;gap:6px;flex-wrap:wrap}
@@ -91,7 +96,8 @@
 
 <!-- ─── TAB 0: ATTAINMENT VS BUDGET ─── -->
 <div class="section active" id="section-attainment">
-  <div id="avbKpis" class="kpi-grid" style="padding:16px 0 8px"></div>
+  <div id="avbFyChips" class="fy-chip-bar" style="padding:16px 0 6px"></div>
+  <div id="avbKpis" class="kpi-grid" style="padding:0 0 8px"></div>
 
   <div class="filter-bar">
     <div style="display:flex;align-items:center;gap:16px;flex-wrap:wrap">
@@ -1906,6 +1912,42 @@ function buildAVBSection(){
   const alcanceTxt = alcancePct!==null ? alcancePct.toFixed(1)+'%' : '—';
   const alcanceColor = alcancePct===null?'#94a3b8':alcancePct>=100?'#16a34a':'#dc2626';
   const periodLabel = avbMode==='invoice' ? 'Ene–Sep' : 'Ene–Dic';
+
+  // ── Full-year summary chips (siempre 12 meses, todos los retails) ──
+  const fyChipEl = document.getElementById('avbFyChips');
+  if(fyChipEl){
+    const allR = ['AT&T','MacStore','iShop','Liverpool','MercadoLibre','Coppel'];
+    const fyBudget = MONTHS_FULL.reduce((s,_,i)=>s+allR.reduce((ss,r)=>ss+((budgetVal[r]||[])[i]||0),0),0);
+    const fyFcst   = MONTHS_FULL.reduce((s,_,i)=>s+allR.reduce((ss,r)=>ss+((valorFull[r]||[])[i]||0),0),0);
+    const fyPct    = fyBudget>0 ? (fyFcst/fyBudget*100) : null;
+    const fyPctColor = fyPct===null?'#94a3b8':fyPct>=100?'#16a34a':'#dc2626';
+    const fyPctTxt   = fyPct!==null ? fyPct.toFixed(1)+'%' : '—';
+    const gap = fyFcst - fyBudget;
+    const gapTxt = (gap>=0?'+':'')+fmtV(Math.abs(gap));
+    const gapColor = gap>=0?'#16a34a':'#dc2626';
+    fyChipEl.innerHTML =
+      `<div class="fy-chip" style="border-color:#7c3aed40">
+        <div>
+          <div class="fy-chip-label">💜 Budget Full Year 2026</div>
+          <div class="fy-chip-val" style="color:#7c3aed">${fmtV(fyBudget)}</div>
+          <div class="fy-chip-sub">Objetivo anual · 12 meses</div>
+        </div>
+      </div>` +
+      `<div class="fy-chip" style="border-color:#16a34a40">
+        <div>
+          <div class="fy-chip-label">📈 Proyectado Full Year 2026</div>
+          <div class="fy-chip-val" style="color:#16a34a">${fmtV(fyFcst)}</div>
+          <div class="fy-chip-sub">FCST Ene–Dic · todos los retails</div>
+        </div>
+      </div>` +
+      `<div class="fy-chip" style="border-color:${fyPctColor}40">
+        <div>
+          <div class="fy-chip-label">🎯 Alcance vs Budget</div>
+          <div class="fy-chip-val" style="color:${fyPctColor}">${fyPctTxt}</div>
+          <div class="fy-chip-sub" style="color:${gapColor};font-weight:600">${gapTxt} MXN Full Year</div>
+        </div>
+      </div>`;
+  }
 
   if(kpiEl) kpiEl.innerHTML =
     kpiCard('2025 Real', fmt(sum25), periodLabel, '#64748b') +
