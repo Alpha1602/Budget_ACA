@@ -104,10 +104,10 @@
       <div>
         <div class="filter-label">Vista</div>
         <div style="display:flex;gap:4px">
-          <button id="avbInvoiceBtn" class="toggle-btn active" onclick="setAVBMode('invoice',this)">Invoice Ene–Sep</button>
+          <button id="avbInvoiceBtn" class="toggle-btn active" onclick="setAVBMode('invoice',this)">Invoice Ene–Oct</button>
           <button id="avbProjBtn"    class="toggle-btn"        onclick="setAVBMode('projection',this)">Full Year Proyección</button>
         </div>
-        <div id="avbModeNote" style="font-size:10px;color:var(--muted);margin-top:4px">Mostrando facturas emitidas Ene–Sep 2026</div>
+        <div id="avbModeNote" style="font-size:10px;color:var(--muted);margin-top:4px">Mostrando facturas emitidas Ene–Oct 2026</div>
       </div>
       <div>
         <div class="filter-label">Métrica</div>
@@ -1113,12 +1113,12 @@ function buildAvbTopKpis() {
   const clients = anualSelectedClient === 'all'
     ? ['AT&T','MacStore','iShop','Liverpool','MercadoLibre','Coppel']
     : [anualSelectedClient];
-  const nMonths = avbMode === 'invoice' ? 9 : 12;
+  const nMonths = avbMode === 'invoice' ? 10 : 12;
   const src25   = isVal ? avb2025Val  : avb2025Pcs;
   const src26   = isVal ? valorFull   : piezasAnual;
   const sum25 = clients.reduce((s,c) => s + (src25[c]||[]).slice(0,nMonths).reduce((a,v)=>a+v,0), 0);
   const sum26 = clients.reduce((s,c) => s + (src26[c]||[]).slice(0,nMonths).reduce((a,v)=>a+v,0), 0);
-  const periodLabel = avbMode === 'invoice' ? 'Ene–Sep' : 'Ene–Dic';
+  const periodLabel = avbMode === 'invoice' ? 'Ene–Oct' : 'Ene–Dic';
   const clientLabel = anualSelectedClient === 'all' ? '2026 FCST' : anualSelectedClient;
   // OH Retail filtrado por cliente (AT&T→ATT en moiDataByClient)
   const moiKeyMap = {'AT&T':'ATT','MacStore':'MacStore','iShop':'iShop','Liverpool':'Liverpool','MercadoLibre':null,'Coppel':null};
@@ -1140,7 +1140,7 @@ function buildAvbTopKpis() {
     kpiCard('2026 ' + (avbMode==='invoice'?'Invoice':'Proyección'), fmt(sum26), periodLabel, 'var(--accent)') +
     kpiCard('Budget 2026', fmt(totalBudgetKpi), periodLabel, '#7c3aed') +
     kpiCard('% Alcance', alcanceTxt, 'FCST vs Budget', alcanceColor) +
-    kpiCard('YoY vs 2025', pct(sum26,sum25), avbMode==='invoice'?'Ene–Sep':'Full Year', sum26>=sum25?'#16a34a':'#dc2626') +
+    kpiCard('YoY vs 2025', pct(sum26,sum25), avbMode==='invoice'?'Ene–Oct':'Full Year', sum26>=sum25?'#16a34a':'#dc2626') +
     kpiCard('Retails activos', clients.length.toString(), clientLabel, '#0891b2') +
     kpiCard('OH Retail Consignación', ohRetailPzas.toLocaleString('es-MX')+' pzas', ohLabel, '#0891b2');
   const existing = kpiEl.querySelectorAll('.kpi-card');
@@ -1672,7 +1672,7 @@ function setAVBMode(mode, el){
   if(mode==='invoice'){
     inv.style.background='#fff'; inv.style.color='#374151'; inv.style.borderColor='#cbd5e1';
     proj.style.background='#9ca3af'; proj.style.color='#fff'; proj.style.borderColor='#9ca3af';
-    if(note) note.textContent='Mostrando facturas emitidas Ene–Sep 2026';
+    if(note) note.textContent='Mostrando facturas emitidas Ene–Oct 2026';
   } else {
     proj.style.background='#334155'; proj.style.color='#fff'; proj.style.borderColor='#334155';
     inv.style.background='#fff'; inv.style.color='#374151'; inv.style.borderColor='#cbd5e1';
@@ -1684,7 +1684,7 @@ function setAVBMode(mode, el){
 function avbGetData(src2025, src2026){
   // Returns {byRetail:{retail:[12]}, total2025:[12], total2026:[12]}
   const retails = ['AT&T','MacStore','iShop','Liverpool','MercadoLibre','Coppel'];
-  const nMonths = avbMode==='invoice' ? 9 : 12;
+  const nMonths = avbMode==='invoice' ? 10 : 12;
   const byRetail = {};
   const total25 = new Array(nMonths).fill(0);
   const total26 = new Array(nMonths).fill(0);
@@ -1911,7 +1911,7 @@ function buildAVBSection(){
   const alcancePct = totalBudgetSum>0 ? (sum26/totalBudgetSum*100) : null;
   const alcanceTxt = alcancePct!==null ? alcancePct.toFixed(1)+'%' : '—';
   const alcanceColor = alcancePct===null?'#94a3b8':alcancePct>=100?'#16a34a':'#dc2626';
-  const periodLabel = avbMode==='invoice' ? 'Ene–Sep' : 'Ene–Dic';
+  const periodLabel = avbMode==='invoice' ? 'Ene–Oct' : 'Ene–Dic';
 
   // ── Full-year summary chips (siempre 12 meses, todos los retails) ──
   const fyChipEl = document.getElementById('avbFyChips');
@@ -1954,7 +1954,7 @@ function buildAVBSection(){
     kpiCard('2026 '+(avbMode==='invoice'?'Invoice':'Proyección'), fmt(sum26), periodLabel, 'var(--accent)') +
     kpiCard('Budget 2026', fmt(totalBudgetSum), periodLabel, '#7c3aed') +
     kpiCard('% Alcance', alcanceTxt, 'FCST vs Budget '+periodLabel, alcanceColor) +
-    kpiCard('YoY vs 2025', pct(sum26,sum25), avbMode==='invoice'?'Ene–Sep':'Full Year', sum26>=sum25?'#16a34a':'#dc2626') +
+    kpiCard('YoY vs 2025', pct(sum26,sum25), avbMode==='invoice'?'Ene–Oct':'Full Year', sum26>=sum25?'#16a34a':'#dc2626') +
     kpiCard('Retails activos', '6', '2026 FCST', '#7c3aed');
 
   // Extra KPIs from inventory & risk data
